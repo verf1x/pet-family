@@ -2,7 +2,7 @@ using CSharpFunctionalExtensions;
 
 namespace PetFamily.Domain;
 
-public class HelpDetails : ValueObject
+public record HelpDetails
 {
     public string Name { get; }
     public string Description { get; } 
@@ -24,11 +24,5 @@ public class HelpDetails : ValueObject
         HelpDetails helpDetails = new(name, description);
         
         return Result.Success(helpDetails);
-    }
-    
-    protected override IEnumerable<object> GetEqualityComponents()
-    {
-        yield return Name;
-        yield return Description;
     }
 }

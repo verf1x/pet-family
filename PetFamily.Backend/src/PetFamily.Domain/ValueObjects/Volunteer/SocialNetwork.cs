@@ -2,7 +2,7 @@ using CSharpFunctionalExtensions;
 
 namespace PetFamily.Domain.ValueObjects.Volunteer;
 
-public class SocialNetwork : ValueObject
+public record SocialNetwork
 {
     public string Name { get; }
     public string Url { get; }
@@ -24,11 +24,5 @@ public class SocialNetwork : ValueObject
         SocialNetwork socialNetwork = new(name, url);
         
         return Result.Success(socialNetwork);
-    }
-
-    protected override IEnumerable<object> GetEqualityComponents()
-    {
-        yield return Name;
-        yield return Url;
     }
 }
