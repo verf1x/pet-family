@@ -2,7 +2,7 @@ using CSharpFunctionalExtensions;
 
 namespace PetFamily.Domain.ValueObjects.Volunteer;
 
-public class FullName : ValueObject
+public record FullName
 {
     public string FirstName { get; } 
     public string LastName { get; } 
@@ -26,14 +26,5 @@ public class FullName : ValueObject
         FullName name = new(firstName, lastName, middleName);
         
         return Result.Success(name);
-    }
-    
-    protected override IEnumerable<object> GetEqualityComponents()
-    {
-        yield return FirstName;
-        yield return LastName;
-        
-        if (MiddleName is not null) 
-            yield return MiddleName;
     }
 }

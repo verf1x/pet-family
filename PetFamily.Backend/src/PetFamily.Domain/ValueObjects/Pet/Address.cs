@@ -3,8 +3,10 @@ using CSharpFunctionalExtensions;
 
 namespace PetFamily.Domain.ValueObjects.Pet;
 
-public class Address : ValueObject
+public record Address
 {
+    private const int MinAddressLines = 1;
+    private const int MaxAddressLines = 4;
     private readonly List<string> _addressLines;
     
     public IReadOnlyList<string> AddressLines => _addressLines;
@@ -29,22 +31,13 @@ public class Address : ValueObject
         string postalCode,
         string countryCode)
     {
-        const int minAddressLines = 1;
-        const int maxAddressLines = 4;
-        
-        if(addressLines.Count is < minAddressLines or > maxAddressLines)
+        if(addressLines.Count is < MinAddressLines or > MaxAddressLines)
             return Result.Failure<Address>(
-                $"The number of address lines must be between {minAddressLines} and {maxAddressLines} to comply" +
+                $"The number of address lines must be between {MinAddressLines} and {MaxAddressLines} to comply" +
                 $" with the 1-4 address line standard (street, house, building, etc.)");
         
         if (string.IsNullOrWhiteSpace(locality))
             return Result.Failure<Address>("Locality cannot be empty.");
-        
-        if(string.IsNullOrWhiteSpace(region))
-            return Result.Failure<Address>("Region cannot be empty.");
-        
-        if(string.IsNullOrWhiteSpace(postalCode))
-            return Result.Failure<Address>("Postal code cannot be empty.");
 
         if (string.IsNullOrWhiteSpace(countryCode) || !Regex.IsMatch(countryCode, @"^[A-Z]{2}$"))
             return Result.Failure<Address>("Country code must be a 2-letter ISO 3166-1 alpha-2 code.");
@@ -68,10 +61,5 @@ public class Address : ValueObject
         
         parts.Add(CountryCode);
         return string.Join(", ", parts);
-    }
-
-    protected override IEnumerable<object> GetEqualityComponents()
-    {
-        yield return ToString();
     }
 }

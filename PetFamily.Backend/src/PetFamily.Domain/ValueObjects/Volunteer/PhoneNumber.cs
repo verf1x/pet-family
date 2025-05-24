@@ -3,7 +3,7 @@ using CSharpFunctionalExtensions;
 
 namespace PetFamily.Domain.ValueObjects.Volunteer;
 
-public class PhoneNumber : ValueObject
+public record PhoneNumber
 {
     public string Number { get; }
     
@@ -23,10 +23,5 @@ public class PhoneNumber : ValueObject
         PhoneNumber number = new(phoneNumber);
         
         return Result.Success(number);
-    }
-    
-    protected override IEnumerable<object> GetEqualityComponents()
-    {
-        yield return Number;
     }
 }
