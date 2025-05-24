@@ -1,6 +1,6 @@
 using CSharpFunctionalExtensions;
 
-namespace PetFamily.Domain;
+namespace PetFamily.Domain.ValueObjects;
 
 public record HelpDetails
 {

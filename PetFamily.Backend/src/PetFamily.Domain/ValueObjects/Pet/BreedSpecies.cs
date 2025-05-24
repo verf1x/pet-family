@@ -4,21 +4,21 @@ namespace PetFamily.Domain.ValueObjects.Pet;
 
 public record BreedSpecies
 {
-    public Guid SpeciesId { get; private set; }
-    public Guid BreedId { get; private set; }
+    public SpeciesId SpeciesId { get; private set; }
+    public BreedId BreedId { get; private set; }
 
-    private BreedSpecies(Guid speciesId, Guid breedId)
+    private BreedSpecies(SpeciesId speciesId, BreedId breedId)
     {
         SpeciesId = speciesId;
         BreedId = breedId;
     }
     
-    public static Result<BreedSpecies> Create(Guid speciesId, Guid breedId)
+    public static Result<BreedSpecies> Create(SpeciesId speciesId, BreedId breedId)
     {
-        if (speciesId == Guid.Empty)
+        if (speciesId.Value == Guid.Empty)
             return Result.Failure<BreedSpecies>("Species ID cannot be empty.");
 
-        if (breedId == Guid.Empty)
+        if (breedId.Value == Guid.Empty)
             return Result.Failure<BreedSpecies>("Breed ID cannot be empty.");
 
         BreedSpecies breedSpecies = new(speciesId, breedId);
