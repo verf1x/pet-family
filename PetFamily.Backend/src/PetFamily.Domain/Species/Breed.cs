@@ -4,12 +4,12 @@ namespace PetFamily.Domain.Species;
 
 public class Breed
 {
-    public Guid Id { get; private set; }
+    public BreedId Id { get; private set; }
     public string Name { get; private set; }
 
     private Breed(string name)
     {
-        Id = Guid.NewGuid();
+        Id = BreedId.CreateNew();
         Name = name;
     }
     

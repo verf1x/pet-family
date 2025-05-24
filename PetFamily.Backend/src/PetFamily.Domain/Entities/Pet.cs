@@ -1,14 +1,14 @@
 ﻿using CSharpFunctionalExtensions;
+using PetFamily.Domain.ValueObjects;
 using PetFamily.Domain.ValueObjects.Pet;
 using PetFamily.Domain.ValueObjects.Volunteer;
 
 namespace PetFamily.Domain.Entities;
 
-public class Pet : Entity
+public class Pet : Shared.Entity<PetId>
 {
     private readonly List<HelpDetails> _helpDetails = []; 
     
-    public new Guid Id { get; private set; }
     public string Name { get; private set; } = null!;
     public string Description { get; private set; } = null!;
     public BreedSpecies BreedSpecies { get; private set; } = null!;
@@ -26,9 +26,10 @@ public class Pet : Entity
     public DateTime CreatedAt { get; private set; }
     
     // ef core ctor
-    private Pet() { }
+    private Pet(PetId id) : base(id) { }
 
     private Pet(
+        PetId id,
         string name,
         string description,
         BreedSpecies breedSpecies,
@@ -41,9 +42,8 @@ public class Pet : Entity
         bool isNeutered,
         DateOnly dateOfBirth,
         bool isVaccinated,
-        HelpStatus helpStatus)
+        HelpStatus helpStatus) : base(id)
     {
-        Id = Guid.NewGuid();
         Name = name;
         Description = description;
         BreedSpecies = breedSpecies;
@@ -61,6 +61,7 @@ public class Pet : Entity
     }
 
     public static Result<Pet> Create(
+        PetId id,
         string name,
         string description,
         BreedSpecies breedSpecies,
@@ -93,7 +94,7 @@ public class Pet : Entity
         if(height <= 0)
             return Result.Failure<Pet>("Height must be greater than 0");
         
-        Pet pet = new(name, description, breedSpecies, color, healthStatus, address, weight, height, ownerPhoneNumber,
+        Pet pet = new(id, name, description, breedSpecies, color, healthStatus, address, weight, height, ownerPhoneNumber,
             isNeutered, dateOfBirth, isVaccinated, helpStatus);
         
         return Result.Success(pet);

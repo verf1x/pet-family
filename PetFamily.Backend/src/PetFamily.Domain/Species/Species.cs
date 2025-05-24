@@ -6,12 +6,12 @@ public class Species
 {
     private readonly List<Breed> _breeds = [];
     
-    public Guid Id { get; private set; }
+    public SpeciesId Id { get; private set; }
     public IReadOnlyList<Breed> Breeds => _breeds;
 
     private Species()
     {
-        Id = Guid.NewGuid();
+        Id = SpeciesId.CreateNew();
     }
 
     public static Species Create()

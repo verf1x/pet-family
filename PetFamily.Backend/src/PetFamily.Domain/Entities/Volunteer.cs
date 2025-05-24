@@ -1,14 +1,14 @@
 using CSharpFunctionalExtensions;
+using PetFamily.Domain.ValueObjects;
 using PetFamily.Domain.ValueObjects.Volunteer;
 
 namespace PetFamily.Domain.Entities;
 
-public class Volunteer : Entity
+public class Volunteer : Shared.Entity<VolunteerId>
 {
     private readonly List<SocialNetwork> _socialNetworks = [];
     private readonly List<Pet> _allPets = [];
     
-    public new Guid Id { get; private set; }
     public FullName FullName { get; private set; } = null!;
     public string Email { get; private set; } = null!;
     public string Description { get; private set; } = null!;
@@ -22,17 +22,17 @@ public class Volunteer : Entity
     public IReadOnlyList<Pet> AllPets => _allPets;
     
     // ef core ctor
-    private Volunteer() { }
+    private Volunteer(VolunteerId id) : base(id) { }
     
     private Volunteer(
+        VolunteerId id,
         FullName fullName,
         string email,
         string description,
         int experienceYears,
         PhoneNumber phoneNumber,
-        HelpDetails helpDetails)
+        HelpDetails helpDetails) : base(id)
     {
-        Id = Guid.NewGuid();
         FullName = fullName;
         Email = email;
         Description = description;
@@ -42,6 +42,7 @@ public class Volunteer : Entity
     }
     
     public static Result<Volunteer> Create(
+        VolunteerId id,
         FullName fullName,
         string email,
         string description,
@@ -58,7 +59,7 @@ public class Volunteer : Entity
         if (experienceYears < 0)
             return Result.Failure<Volunteer>("Experience years cannot be negative.");
         
-        Volunteer volunteer = new(fullName, email, description, experienceYears, phoneNumber, helpDetails);
+        Volunteer volunteer = new(id, fullName, email, description, experienceYears, phoneNumber, helpDetails);
         
         return Result.Success(volunteer);
     }
