@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using PetFamily.Domain.Entities;
+using PetFamily.Domain.Species;
 
 namespace PetFamily.Infrastructure;
 
@@ -11,11 +12,14 @@ public class ApplicationDbContext(IConfiguration configuration) : DbContext
     
     public DbSet<Volunteer> Volunteers => Set<Volunteer>();
     
+    public DbSet<PetSpecies> Species => Set<PetSpecies>();
+    
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.UseNpgsql(configuration.GetConnectionString(Database));
         optionsBuilder.UseSnakeCaseNamingConvention();
         optionsBuilder.UseLoggerFactory(CreateLoggerFactory());
+        optionsBuilder.EnableSensitiveDataLogging();
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
