@@ -1,14 +1,13 @@
 using CSharpFunctionalExtensions;
+using PetFamily.Domain.ValueObjects;
 using PetFamily.Domain.ValueObjects.Volunteer;
 
 namespace PetFamily.Domain.Entities;
 
-public class Volunteer : Entity
+public class Volunteer : Shared.Entity<VolunteerId>
 {
-    private readonly List<SocialNetwork> _socialNetworks = [];
     private readonly List<Pet> _allPets = [];
     
-    public new Guid Id { get; private set; }
     public FullName FullName { get; private set; } = null!;
     public string Email { get; private set; } = null!;
     public string Description { get; private set; } = null!;
@@ -17,60 +16,53 @@ public class Volunteer : Entity
     public IReadOnlyList<Pet> PetsLookingForHome => GetPetsLookingForHome();
     public IReadOnlyList<Pet> PetsFoundHome => GetPetsFoundHome();
     public PhoneNumber PhoneNumber { get; private set; } = null!;
-    public IReadOnlyList<SocialNetwork> SocialNetworks => _socialNetworks;
-    public HelpDetails HelpDetails { get; private set; } = null!;
+    public SocialNetworks SocialNetworks { get; private set; } = null!;
+    public HelpDetail HelpDetail { get; private set; } = null!;
     public IReadOnlyList<Pet> AllPets => _allPets;
     
     // ef core ctor
-    private Volunteer() { }
+    private Volunteer(VolunteerId id) : base(id) { }
     
     private Volunteer(
+        VolunteerId id,
         FullName fullName,
         string email,
         string description,
         int experienceYears,
         PhoneNumber phoneNumber,
-        HelpDetails helpDetails)
+        SocialNetworks socialNetworks,
+        HelpDetail helpDetail) : base(id)
     {
-        Id = Guid.NewGuid();
         FullName = fullName;
         Email = email;
         Description = description;
         ExperienceYears = experienceYears;
         PhoneNumber = phoneNumber;
-        HelpDetails = helpDetails;
+        SocialNetworks = socialNetworks;
+        HelpDetail = helpDetail;
     }
     
-    public static Result<Volunteer> Create(
+    public static Result<Volunteer, string> Create(
+        VolunteerId id,
         FullName fullName,
         string email,
         string description,
         int experienceYears,
         PhoneNumber phoneNumber,
-        HelpDetails helpDetails)
+        SocialNetworks socialNetworks,
+        HelpDetail helpDetail)
     {
         if (string.IsNullOrWhiteSpace(email))
-            return Result.Failure<Volunteer>("Email cannot be empty.");
+            return "Email cannot be empty.";
         
         if (string.IsNullOrWhiteSpace(description))
-            return Result.Failure<Volunteer>("Description cannot be empty.");
+            return "Description cannot be empty.";
         
         if (experienceYears < 0)
-            return Result.Failure<Volunteer>("Experience years cannot be negative.");
+            return "Experience years cannot be negative.";
         
-        Volunteer volunteer = new(fullName, email, description, experienceYears, phoneNumber, helpDetails);
-        
-        return Result.Success(volunteer);
-    }
-    
-    public Result AddSocialNetwork(SocialNetwork socialNetwork)
-    {
-        if (_socialNetworks.Contains(socialNetwork))
-            return Result.Failure("Social network already exists in the volunteer's list.");
-        
-        _socialNetworks.Add(socialNetwork);
-        
-        return Result.Success();
+        return new Volunteer(id, fullName, email, description, experienceYears,
+            phoneNumber, socialNetworks, helpDetail);
     }
     
     public Result AddPet(Pet pet)

@@ -3,7 +3,7 @@ using CSharpFunctionalExtensions;
 
 namespace PetFamily.Domain.ValueObjects.Volunteer;
 
-public class PhoneNumber : ValueObject
+public record PhoneNumber
 {
     public string Number { get; }
     
@@ -12,21 +12,14 @@ public class PhoneNumber : ValueObject
         Number = number;
     }
 
-    public static Result<PhoneNumber> Create(string phoneNumber)
+    public static Result<PhoneNumber, string> Create(string phoneNumber)
     {
         if (string.IsNullOrWhiteSpace(phoneNumber) ||
             !Regex.IsMatch(phoneNumber, @"^\+?\d{1,4}?[\s-]?(\(?\d{1,5}\)?[\s-]?)?[\d\s-]{5,15}$"))
         {
-            return Result.Failure<PhoneNumber>("Invalid phone number");
+            return "Invalid phone number";
         }
-        
-        PhoneNumber number = new(phoneNumber);
-        
-        return Result.Success(number);
-    }
-    
-    protected override IEnumerable<object> GetEqualityComponents()
-    {
-        yield return Number;
+
+        return new PhoneNumber(phoneNumber);
     }
 }
