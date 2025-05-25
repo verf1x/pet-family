@@ -13,13 +13,11 @@ public class Breed
         Name = name;
     }
     
-    public static Result<Breed> Create(string name)
+    public static Result<Breed, string> Create(string name)
     {
         if(string.IsNullOrWhiteSpace(name))
-            return Result.Failure<Breed>("Breed name cannot be empty");
+            return "Breed name cannot be empty";
         
-        Breed breed = new(name);
-        
-        return Result.Success(breed);
+        return new Breed(name);
     }
 }
