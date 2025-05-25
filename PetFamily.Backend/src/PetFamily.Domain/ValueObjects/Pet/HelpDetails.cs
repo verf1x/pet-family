@@ -1,4 +1,4 @@
-using CSharpFunctionalExtensions;
+using PetFamily.Domain.Shared;
 
 namespace PetFamily.Domain.ValueObjects.Pet;
 
@@ -11,7 +11,7 @@ public class HelpDetails
     public Result AddHelpDetails(HelpDetail detail)
     {
         if(_details.Contains(detail))
-            return Result.Failure("Details already exists in the list.");
+            return "Details already exists in the list.";
         
         _details.Add(detail);
         

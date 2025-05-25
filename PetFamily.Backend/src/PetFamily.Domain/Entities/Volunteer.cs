@@ -1,4 +1,4 @@
-using CSharpFunctionalExtensions;
+using PetFamily.Domain.Shared;
 using PetFamily.Domain.ValueObjects;
 using PetFamily.Domain.ValueObjects.Volunteer;
 
@@ -42,7 +42,7 @@ public class Volunteer : Shared.Entity<VolunteerId>
         HelpDetail = helpDetail;
     }
     
-    public static Result<Volunteer, string> Create(
+    public static Result<Volunteer> Create(
         VolunteerId id,
         FullName fullName,
         string email,
@@ -68,7 +68,7 @@ public class Volunteer : Shared.Entity<VolunteerId>
     public Result AddPet(Pet pet)
     {
         if (_allPets.Contains(pet))
-            return Result.Failure("Pet already exists in the volunteer's list.");
+            return "Pet already exists in the volunteer's list.";
         
         _allPets.Add(pet);
         
