@@ -1,5 +1,5 @@
 using System.Text.RegularExpressions;
-using CSharpFunctionalExtensions;
+using PetFamily.Domain.Shared;
 
 namespace PetFamily.Domain.ValueObjects.Pet;
 
@@ -23,7 +23,7 @@ public record Address
         CountryCode = countryCode;
     }
     
-    public static Result<Address, string> Create(
+    public static Result<Address> Create(
         List<string> addressLines,
         string locality,
         string region,

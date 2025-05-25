@@ -1,4 +1,4 @@
-using CSharpFunctionalExtensions;
+using PetFamily.Domain.Shared;
 using PetFamily.Domain.ValueObjects.Pet;
 
 namespace PetFamily.Domain.Species;
@@ -16,7 +16,7 @@ public class PetSpecies : Shared.Entity<SpeciesId>
         Name = name;
     }
 
-    public static Result<PetSpecies, string> Create(SpeciesId id, string name, Breeds breeds)
+    public static Result<PetSpecies> Create(SpeciesId id, string name, Breeds breeds)
     {
         if(string.IsNullOrWhiteSpace(name))
             return "Name cannot be null or whitespace.";

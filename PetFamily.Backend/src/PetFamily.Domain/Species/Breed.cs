@@ -1,4 +1,4 @@
-using CSharpFunctionalExtensions;
+using PetFamily.Domain.Shared;
 
 namespace PetFamily.Domain.Species;
 
@@ -13,7 +13,7 @@ public class Breed
         Name = name;
     }
     
-    public static Result<Breed, string> Create(string name)
+    public static Result<Breed> Create(string name)
     {
         if(string.IsNullOrWhiteSpace(name))
             return "Breed name cannot be empty";

@@ -1,5 +1,4 @@
-﻿using CSharpFunctionalExtensions;
-using PetFamily.Domain.Species;
+﻿using PetFamily.Domain.Shared;
 using PetFamily.Domain.ValueObjects.Pet;
 using PetFamily.Domain.ValueObjects.Volunteer;
 
@@ -58,7 +57,7 @@ public class Pet : Shared.Entity<PetId>
         CreatedAt = DateTime.UtcNow;
     }
 
-    public static Result<Pet, string> Create(
+    public static Result<Pet> Create(
         PetId id,
         string name,
         string description,

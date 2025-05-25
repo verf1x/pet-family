@@ -1,4 +1,4 @@
-using CSharpFunctionalExtensions;
+using PetFamily.Domain.Shared;
 using PetFamily.Domain.Species;
 
 namespace PetFamily.Domain.ValueObjects.Pet;
@@ -12,7 +12,7 @@ public class Breeds
     public Result AddBreed(Breed breed)
     {
         if(_allBreeds.Contains(breed))
-            return Result.Failure("Breed already exists in this species.");
+            return "Breed already exists in this species.";
         
         _allBreeds.Add(breed);
         
