@@ -1,6 +1,6 @@
 namespace PetFamily.Domain.Species;
 
-public class SpeciesId
+public record SpeciesId
 {
     public Guid Value { get; }
     
