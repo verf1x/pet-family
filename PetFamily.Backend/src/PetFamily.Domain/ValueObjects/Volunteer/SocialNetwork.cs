@@ -17,7 +17,7 @@ public record SocialNetwork
     public static Result<SocialNetwork, Error> Create(string name, string url)
     {
         if(string.IsNullOrWhiteSpace(name))
-            return Errors.General.ValueIsInvalid(nameof(name));
+            return Errors.General.ValueIsRequired(nameof(name));
         
         if(string.IsNullOrWhiteSpace(url) || !Uri.IsWellFormedUriString(url, UriKind.Absolute))
             return Errors.General.ValueIsInvalid(nameof(url));

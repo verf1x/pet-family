@@ -76,22 +76,22 @@ public class Pet : Shared.Entity<PetId>
         HelpStatus helpStatus)
     {
         if(string.IsNullOrWhiteSpace(name))
-            return Errors.General.ValueIsInvalid(nameof(name));
+            return Errors.General.ValueIsRequired(nameof(name));
         
         if(string.IsNullOrWhiteSpace(description))
-            return Errors.General.ValueIsInvalid(nameof(description));
+            return Errors.General.ValueIsRequired(nameof(description));
         
         if(string.IsNullOrWhiteSpace(color))
-            return Errors.General.ValueIsInvalid(nameof(color));
+            return Errors.General.ValueIsRequired(nameof(color));
         
         if(string.IsNullOrWhiteSpace(healthStatus))
-            return Errors.General.ValueIsInvalid(nameof(healthStatus));
+            return Errors.General.ValueIsRequired(nameof(healthStatus));
         
         if(weight <= 0)
-            return Error.Validation("value.is.invalid", "weight must be greater than zero");
+            return Errors.General.ValueIsInvalid(nameof(weight));
         
         if(height <= 0)
-            return Error.Validation("value.is.invalid", "height must be greater than zero");
+            return Errors.General.ValueIsInvalid(nameof(height));
         
         return new Pet(id, name, description, speciesBreed, color, healthStatus, address, weight,
             height, ownerPhoneNumber, isNeutered, dateOfBirth, isVaccinated, helpStatus);
