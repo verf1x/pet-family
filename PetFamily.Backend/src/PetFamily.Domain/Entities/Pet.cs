@@ -1,4 +1,6 @@
-﻿using PetFamily.Domain.Shared;
+﻿using CSharpFunctionalExtensions;
+using PetFamily.Domain.Shared;
+using PetFamily.Domain.Species;
 using PetFamily.Domain.ValueObjects.Pet;
 using PetFamily.Domain.ValueObjects.Volunteer;
 
@@ -57,7 +59,7 @@ public class Pet : Shared.Entity<PetId>
         CreatedAt = DateTime.UtcNow;
     }
 
-    public static Result<Pet> Create(
+    public static Result<Pet, Error> Create(
         PetId id,
         string name,
         string description,
@@ -74,22 +76,22 @@ public class Pet : Shared.Entity<PetId>
         HelpStatus helpStatus)
     {
         if(string.IsNullOrWhiteSpace(name))
-            return "Name cannot be empty";
+            return Errors.General.ValueIsInvalid(nameof(name));
         
         if(string.IsNullOrWhiteSpace(description))
-            return "Description cannot be empty";
+            return Errors.General.ValueIsInvalid(nameof(description));
         
         if(string.IsNullOrWhiteSpace(color))
-            return "Color cannot be empty";
+            return Errors.General.ValueIsInvalid(nameof(color));
         
         if(string.IsNullOrWhiteSpace(healthStatus))
-            return "Health status cannot be empty";
+            return Errors.General.ValueIsInvalid(nameof(healthStatus));
         
         if(weight <= 0)
-            return "Weight must be greater than 0";
+            return Error.Validation("value.is.invalid", "weight must be greater than zero");
         
         if(height <= 0)
-            return "Height must be greater than 0";
+            return Error.Validation("value.is.invalid", "height must be greater than zero");
         
         return new Pet(id, name, description, speciesBreed, color, healthStatus, address, weight,
             height, ownerPhoneNumber, isNeutered, dateOfBirth, isVaccinated, helpStatus);

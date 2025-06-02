@@ -1,20 +1,21 @@
+using CSharpFunctionalExtensions;
 using PetFamily.Domain.Shared;
 
 namespace PetFamily.Domain.ValueObjects.Volunteer;
 
 public record SocialNetworks
 {
-    private readonly List<SocialNetwork> _all = [];
+    private readonly List<SocialNetwork> _values = [];
     
-    public IReadOnlyList<SocialNetwork> All => _all;
+    public IReadOnlyList<SocialNetwork> Values => _values;
     
-    public Result AddSocialNetwork(SocialNetwork socialNetwork)
+    public Result<Error> AddSocialNetwork(SocialNetwork socialNetwork)
     {
-        if (_all.Contains(socialNetwork))
-            return "Social network already exists in the volunteer's list.";
+        if (_values.Contains(socialNetwork))
+            return Errors.General.Conflict();
         
-        _all.Add(socialNetwork);
+        _values.Add(socialNetwork);
         
-        return Result.Success();
+        return Result.Success<Error>(null!);
     }
 }
