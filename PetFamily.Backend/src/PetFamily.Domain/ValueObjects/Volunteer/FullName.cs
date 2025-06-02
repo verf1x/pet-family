@@ -19,10 +19,10 @@ public record FullName
     public static Result<FullName, Error> Create(string firstName, string lastName, string middleName = null!)
     {
         if(string.IsNullOrWhiteSpace(firstName))
-            return Errors.General.ValueIsInvalid(nameof(firstName));
+            return Errors.General.ValueIsRequired(nameof(firstName));
         
         if(string.IsNullOrWhiteSpace(lastName))
-            return Errors.General.ValueIsInvalid(nameof(lastName));
+            return Errors.General.ValueIsRequired(nameof(lastName));
         
         return new FullName(firstName, lastName, middleName);
     }

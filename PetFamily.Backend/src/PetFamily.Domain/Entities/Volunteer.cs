@@ -54,13 +54,13 @@ public class Volunteer : Shared.Entity<VolunteerId>
         HelpDetail helpDetail)
     {
         if (string.IsNullOrWhiteSpace(email))
-            return Errors.General.ValueIsInvalid(nameof(email));
+            return Errors.General.ValueIsRequired(nameof(email));
         
         if (string.IsNullOrWhiteSpace(description))
-            return Errors.General.ValueIsInvalid(nameof(description));
+            return Errors.General.ValueIsRequired(nameof(description));
         
         if (experienceYears < 0)
-            return Errors.General.ValueIsInvalid(nameof(experienceYears));
+            return Errors.General.ValueIsRequired(nameof(experienceYears));
         
         return new Volunteer(id, fullName, email, description, experienceYears,
             phoneNumber, socialNetworks, helpDetail);
@@ -69,7 +69,7 @@ public class Volunteer : Shared.Entity<VolunteerId>
     public Result<Error> AddPet(Pet pet)
     {
         if (_allPets.Contains(pet))
-            return Errors.General.ValueIsInvalid(nameof(pet));
+            return Errors.General.Conflict(pet.Id.Value);
         
         _allPets.Add(pet);
         

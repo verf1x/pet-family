@@ -17,10 +17,10 @@ public record HelpDetail
     public static Result<HelpDetail, Error> Create(string name, string description)
     {
         if (string.IsNullOrWhiteSpace(name))
-            return Errors.General.ValueIsInvalid(nameof(name));
+            return Errors.General.ValueIsRequired(nameof(name));
         
         if (string.IsNullOrWhiteSpace(description))
-            return Errors.General.ValueIsInvalid(nameof(description));
+            return Errors.General.ValueIsRequired(nameof(description));
         
         return new HelpDetail(name, description);
     }

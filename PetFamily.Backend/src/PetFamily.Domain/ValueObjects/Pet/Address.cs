@@ -6,9 +6,6 @@ namespace PetFamily.Domain.ValueObjects.Pet;
 
 public record Address
 {
-    private const int MinAddressLines = 1;
-    private const int MaxAddressLines = 4;
-    
     public IReadOnlyList<string> AddressLines { get; }
     public string Locality { get; }
     public string? Region { get; }
@@ -31,14 +28,14 @@ public record Address
         string postalCode,
         string countryCode)
     {
-        if(addressLines.Count is < MinAddressLines or > MaxAddressLines)
+        if(addressLines.Count is < Constants.MinAddressLines or > Constants.MaxAddressLines)
             return Errors.General.ValueIsInvalid(nameof(addressLines));
         
         if (string.IsNullOrWhiteSpace(locality))
-            return Errors.General.ValueIsInvalid(nameof(locality));
+            return Errors.General.ValueIsRequired(nameof(locality));
 
         if (string.IsNullOrWhiteSpace(countryCode) || !Regex.IsMatch(countryCode, @"^[A-Z]{2}$"))
-            return Errors.General.ValueIsInvalid(nameof(countryCode));
+            return Errors.General.ValueIsRequired(nameof(countryCode));
         
         return new Address(addressLines, locality, region, postalCode, countryCode);
     }
