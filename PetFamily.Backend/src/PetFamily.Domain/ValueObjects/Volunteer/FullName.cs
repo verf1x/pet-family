@@ -1,4 +1,5 @@
 using CSharpFunctionalExtensions;
+using PetFamily.Domain.Shared;
 
 namespace PetFamily.Domain.ValueObjects.Volunteer;
 
@@ -15,13 +16,13 @@ public record FullName
         MiddleName = middleName;
     }
 
-    public static Result<FullName, string> Create(string firstName, string lastName, string middleName = null!)
+    public static Result<FullName, Error> Create(string firstName, string lastName, string middleName = null!)
     {
         if(string.IsNullOrWhiteSpace(firstName))
-            return "First name cannot be empty";
+            return Errors.General.ValueIsInvalid(nameof(firstName));
         
         if(string.IsNullOrWhiteSpace(lastName))
-            return "Last name cannot be empty";
+            return Errors.General.ValueIsInvalid(nameof(lastName));
         
         return new FullName(firstName, lastName, middleName);
     }

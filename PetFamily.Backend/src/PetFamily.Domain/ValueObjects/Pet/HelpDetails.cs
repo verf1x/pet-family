@@ -1,20 +1,21 @@
 using CSharpFunctionalExtensions;
+using PetFamily.Domain.Shared;
 
 namespace PetFamily.Domain.ValueObjects.Pet;
 
-public class HelpDetails
+public record HelpDetails
 {
-    private readonly List<HelpDetail> _details = [];
+    private readonly List<HelpDetail> _values = [];
     
-    public IReadOnlyList<HelpDetail> Details => _details;
+    public IReadOnlyList<HelpDetail> Values => _values;
     
-    public Result AddHelpDetails(HelpDetail detail)
+    public Result<Error> AddHelpDetails(HelpDetail detail)
     {
-        if(_details.Contains(detail))
-            return Result.Failure("Details already exists in the list.");
+        if (_values.Contains(detail))
+            return Errors.General.Conflict();
         
-        _details.Add(detail);
+        _values.Add(detail);
         
-        return Result.Success();
+        return Result.Success<Error>(null!);
     }
 }

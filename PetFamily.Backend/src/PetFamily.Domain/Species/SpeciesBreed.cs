@@ -1,6 +1,7 @@
 using CSharpFunctionalExtensions;
+using PetFamily.Domain.Shared;
 
-namespace PetFamily.Domain.ValueObjects.Pet;
+namespace PetFamily.Domain.Species;
 
 public record SpeciesBreed
 {
@@ -13,13 +14,13 @@ public record SpeciesBreed
         BreedId = breedId;
     }
     
-    public static Result<SpeciesBreed, string> Create(SpeciesId speciesId, BreedId breedId)
+    public static Result<SpeciesBreed, Error> Create(SpeciesId speciesId, BreedId breedId)
     {
         if (speciesId.Value == Guid.Empty)
-            return "Species ID cannot be empty.";
+            return Errors.General.ValueIsInvalid(nameof(speciesId));
 
         if (breedId.Value == Guid.Empty)
-            return "Breed ID cannot be empty.";
+            return Errors.General.ValueIsInvalid(nameof(breedId));
         
         return new SpeciesBreed(speciesId, breedId);
     }

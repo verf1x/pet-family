@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using PetFamily.Domain.Entities;
 using PetFamily.Domain.Shared;
 using PetFamily.Domain.Species;
 
@@ -28,7 +29,7 @@ public class SpeciesConfiguration : IEntityTypeConfiguration<PetSpecies>
             {
                 bb.ToJson("species_breeds");
                 bb.OwnsMany(
-                    sbb => sbb.AllBreeds,
+                    sbb => sbb.Values,
                     b =>
                     {
                         b.Property(bp => bp.Name)

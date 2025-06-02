@@ -1,5 +1,6 @@
 using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
+using PetFamily.Domain.Shared;
 
 namespace PetFamily.Domain.ValueObjects.Pet;
 
@@ -23,7 +24,7 @@ public record Address
         CountryCode = countryCode;
     }
     
-    public static Result<Address, string> Create(
+    public static Result<Address, Error> Create(
         List<string> addressLines,
         string locality,
         string region,
@@ -31,14 +32,13 @@ public record Address
         string countryCode)
     {
         if(addressLines.Count is < MinAddressLines or > MaxAddressLines)
-            return $"The number of address lines must be between {MinAddressLines} and {MaxAddressLines} to comply" +
-                   $" with the 1-4 address line standard (street, house, building, etc.)";
+            return Errors.General.ValueIsInvalid(nameof(addressLines));
         
         if (string.IsNullOrWhiteSpace(locality))
-            return "Locality cannot be empty.";
+            return Errors.General.ValueIsInvalid(nameof(locality));
 
         if (string.IsNullOrWhiteSpace(countryCode) || !Regex.IsMatch(countryCode, @"^[A-Z]{2}$"))
-            return "Country code must be a 2-letter ISO 3166-1 alpha-2 code.";
+            return Errors.General.ValueIsInvalid(nameof(countryCode));
         
         return new Address(addressLines, locality, region, postalCode, countryCode);
     }
