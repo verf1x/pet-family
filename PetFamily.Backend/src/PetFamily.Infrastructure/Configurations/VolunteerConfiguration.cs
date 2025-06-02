@@ -62,7 +62,7 @@ public class VolunteerConfiguration : IEntityTypeConfiguration<Volunteer>
             b =>
         {
             b.ToJson("social_networks");
-            b.OwnsMany(snb => snb.All, sn =>
+            b.OwnsMany(snb => snb.Values, sn =>
             {
                 sn.Property(snn => snn.Name)
                     .IsRequired()

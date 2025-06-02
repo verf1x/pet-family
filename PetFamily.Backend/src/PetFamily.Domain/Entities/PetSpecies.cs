@@ -1,7 +1,9 @@
 using CSharpFunctionalExtensions;
+using PetFamily.Domain.Shared;
+using PetFamily.Domain.Species;
 using PetFamily.Domain.ValueObjects.Pet;
 
-namespace PetFamily.Domain.Species;
+namespace PetFamily.Domain.Entities;
 
 public class PetSpecies : Shared.Entity<SpeciesId>
 {
@@ -16,10 +18,10 @@ public class PetSpecies : Shared.Entity<SpeciesId>
         Name = name;
     }
 
-    public static Result<PetSpecies, string> Create(SpeciesId id, string name, Breeds breeds)
+    public static Result<PetSpecies, Error> Create(SpeciesId id, string name, Breeds breeds)
     {
         if(string.IsNullOrWhiteSpace(name))
-            return "Name cannot be null or whitespace.";
+            return Errors.General.ValueIsInvalid(nameof(name));
         
         return new PetSpecies(id, name, breeds);
     }

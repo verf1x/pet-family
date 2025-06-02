@@ -1,4 +1,5 @@
 using CSharpFunctionalExtensions;
+using PetFamily.Domain.Shared;
 using PetFamily.Domain.ValueObjects;
 using PetFamily.Domain.ValueObjects.Volunteer;
 
@@ -42,7 +43,7 @@ public class Volunteer : Shared.Entity<VolunteerId>
         HelpDetail = helpDetail;
     }
     
-    public static Result<Volunteer, string> Create(
+    public static Result<Volunteer, Error> Create(
         VolunteerId id,
         FullName fullName,
         string email,
@@ -53,26 +54,26 @@ public class Volunteer : Shared.Entity<VolunteerId>
         HelpDetail helpDetail)
     {
         if (string.IsNullOrWhiteSpace(email))
-            return "Email cannot be empty.";
+            return Errors.General.ValueIsInvalid(nameof(email));
         
         if (string.IsNullOrWhiteSpace(description))
-            return "Description cannot be empty.";
+            return Errors.General.ValueIsInvalid(nameof(description));
         
         if (experienceYears < 0)
-            return "Experience years cannot be negative.";
+            return Errors.General.ValueIsInvalid(nameof(experienceYears));
         
         return new Volunteer(id, fullName, email, description, experienceYears,
             phoneNumber, socialNetworks, helpDetail);
     }
     
-    public Result AddPet(Pet pet)
+    public Result<Error> AddPet(Pet pet)
     {
         if (_allPets.Contains(pet))
-            return Result.Failure("Pet already exists in the volunteer's list.");
+            return Errors.General.ValueIsInvalid(nameof(pet));
         
         _allPets.Add(pet);
         
-        return Result.Success();
+        return Result.Success<Error>(null!);
     }
     
     private IReadOnlyList<Pet> GetPetsNeedsHelp()

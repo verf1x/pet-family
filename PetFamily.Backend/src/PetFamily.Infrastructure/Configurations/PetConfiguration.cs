@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PetFamily.Domain.Entities;
 using PetFamily.Domain.Shared;
+using PetFamily.Domain.Species;
 using PetFamily.Domain.ValueObjects.Pet;
 
 namespace PetFamily.Infrastructure.Configurations;
@@ -112,7 +113,7 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
         builder.OwnsOne(p => p.HelpDetails, hdb =>
         {
             hdb.ToJson("pet_help_details");
-            hdb.OwnsMany(hd => hd.Details, db =>
+            hdb.OwnsMany(hd => hd.Values, db =>
             {
                 db.Property(d => d.Name)
                     .IsRequired()
