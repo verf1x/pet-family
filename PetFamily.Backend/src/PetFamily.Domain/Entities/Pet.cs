@@ -21,7 +21,7 @@ public class Pet : Shared.Entity<PetId>
     public DateOnly DateOfBirth { get; private set; }
     public bool IsVaccinated { get; private set; }
     public HelpStatus HelpStatus { get; private set; }
-    public HelpDetails HelpDetails { get; private set; } = null!;
+    public HelpRequisites HelpRequisites { get; private set; } = null!;
     public DateTime CreatedAt { get; private set; }
     
     // ef core ctor

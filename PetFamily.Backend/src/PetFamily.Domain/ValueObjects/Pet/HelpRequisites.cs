@@ -3,7 +3,7 @@ using PetFamily.Domain.Shared;
 
 namespace PetFamily.Domain.ValueObjects.Pet;
 
-public record HelpDetails
+public record HelpRequisites
 {
     private readonly List<HelpDetail> _values = [];
     
