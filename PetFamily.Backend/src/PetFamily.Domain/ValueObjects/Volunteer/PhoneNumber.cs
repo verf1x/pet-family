@@ -6,11 +6,11 @@ namespace PetFamily.Domain.ValueObjects.Volunteer;
 
 public record PhoneNumber
 {
-    public string Number { get; }
+    public string Value { get; }
     
-    private PhoneNumber(string number)
+    private PhoneNumber(string value)
     {
-        Number = number;
+        Value = value;
     }
 
     public static Result<PhoneNumber, Error> Create(string phoneNumber)
