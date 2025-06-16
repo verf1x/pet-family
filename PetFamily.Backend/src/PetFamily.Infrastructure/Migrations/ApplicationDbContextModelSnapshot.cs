@@ -209,17 +209,17 @@ namespace PetFamily.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(2000)
-                        .HasColumnType("character varying(2000)")
-                        .HasColumnName("description");
+                    b.ComplexProperty<Dictionary<string, object>>("Description", "PetFamily.Domain.Entities.Volunteer.Description#Description", b1 =>
+                        {
+                            b1.IsRequired();
 
-                    b.Property<int>("ExperienceYears")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(0)
-                        .HasColumnName("experience_years");
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .ValueGeneratedOnUpdateSometimes()
+                                .HasMaxLength(2000)
+                                .HasColumnType("character varying(2000)")
+                                .HasColumnName("description");
+                        });
 
                     b.ComplexProperty<Dictionary<string, object>>("Email", "PetFamily.Domain.Entities.Volunteer.Email#Email", b1 =>
                         {
@@ -232,6 +232,17 @@ namespace PetFamily.Infrastructure.Migrations
                                 .HasColumnName("email");
                         });
 
+                    b.ComplexProperty<Dictionary<string, object>>("Experience", "PetFamily.Domain.Entities.Volunteer.Experience#Experience", b1 =>
+                        {
+                            b1.IsRequired();
+
+                            b1.Property<int>("TotalYears")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("integer")
+                                .HasDefaultValue(0)
+                                .HasColumnName("total_years");
+                        });
+
                     b.ComplexProperty<Dictionary<string, object>>("FullName", "PetFamily.Domain.Entities.Volunteer.FullName#FullName", b1 =>
                         {
                             b1.IsRequired();
@@ -240,7 +251,7 @@ namespace PetFamily.Infrastructure.Migrations
                                 .IsRequired()
                                 .HasMaxLength(100)
                                 .HasColumnType("character varying(100)")
-                                .HasColumnName("full_name");
+                                .HasColumnName("first_name");
 
                             b1.Property<string>("LastName")
                                 .IsRequired()
@@ -268,11 +279,7 @@ namespace PetFamily.Infrastructure.Migrations
                     b.HasKey("Id")
                         .HasName("pk_volunteers");
 
-                    b.ToTable("volunteers", null, t =>
-                        {
-                            t.Property("Description")
-                                .HasColumnName("volunteer_description");
-                        });
+                    b.ToTable("volunteers", (string)null);
                 });
 
             modelBuilder.Entity("PetFamily.Domain.Entities.Pet", b =>
@@ -309,13 +316,13 @@ namespace PetFamily.Infrastructure.Migrations
 
                             b1.ToTable("pets");
 
-                            b1.ToJson("pet_help_details");
+                            b1.ToJson("pet_help_requisites");
 
                             b1.WithOwner()
                                 .HasForeignKey("PetId")
                                 .HasConstraintName("fk_pets_pets_pet_id");
 
-                            b1.OwnsMany("PetFamily.Domain.ValueObjects.HelpDetail", "Values", b2 =>
+                            b1.OwnsMany("PetFamily.Domain.ValueObjects.HelpRequisite", "Values", b2 =>
                                 {
                                     b2.Property<Guid>("HelpRequisitesPetId")
                                         .HasColumnType("uuid");
@@ -328,19 +335,19 @@ namespace PetFamily.Infrastructure.Migrations
                                         .IsRequired()
                                         .HasMaxLength(1000)
                                         .HasColumnType("character varying(1000)")
-                                        .HasColumnName("help_detail_description");
+                                        .HasColumnName("help_requisite_description");
 
                                     b2.Property<string>("Name")
                                         .IsRequired()
                                         .HasMaxLength(100)
                                         .HasColumnType("character varying(100)")
-                                        .HasColumnName("help_detail_name");
+                                        .HasColumnName("help_requisite_name");
 
                                     b2.HasKey("HelpRequisitesPetId", "__synthesizedOrdinal");
 
                                     b2.ToTable("pets");
 
-                                    b2.ToJson("pet_help_details");
+                                    b2.ToJson("pet_help_requisites");
 
                                     b2.WithOwner()
                                         .HasForeignKey("HelpRequisitesPetId")
@@ -424,7 +431,7 @@ namespace PetFamily.Infrastructure.Migrations
                                 .HasForeignKey("VolunteerId")
                                 .HasConstraintName("fk_volunteers_volunteers_id");
 
-                            b1.OwnsMany("PetFamily.Domain.ValueObjects.HelpDetail", "Values", b2 =>
+                            b1.OwnsMany("PetFamily.Domain.ValueObjects.HelpRequisite", "Values", b2 =>
                                 {
                                     b2.Property<Guid>("HelpRequisitesVolunteerId")
                                         .HasColumnType("uuid");
@@ -435,6 +442,7 @@ namespace PetFamily.Infrastructure.Migrations
 
                                     b2.Property<string>("Description")
                                         .IsRequired()
+                                        .ValueGeneratedOnUpdateSometimes()
                                         .HasMaxLength(100)
                                         .HasColumnType("character varying(100)")
                                         .HasColumnName("description");

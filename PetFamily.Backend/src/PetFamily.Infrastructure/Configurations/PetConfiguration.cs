@@ -112,18 +112,18 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
 
         builder.OwnsOne(p => p.HelpRequisites, hdb =>
         {
-            hdb.ToJson("pet_help_details");
+            hdb.ToJson("pet_help_requisites");
             hdb.OwnsMany(hd => hd.Values, db =>
             {
                 db.Property(d => d.Name)
                     .IsRequired()
                     .HasMaxLength(Constants.MaxLowTextLength)
-                    .HasColumnName("help_detail_name");
+                    .HasColumnName("help_requisite_name");
 
                 db.Property(d => d.Description)
                     .IsRequired()
                     .HasMaxLength(Constants.MaxMediumTextLength)
-                    .HasColumnName("help_detail_description");
+                    .HasColumnName("help_requisite_description");
             });
         });
 

@@ -29,10 +29,10 @@ namespace PetFamily.Infrastructure.Migrations
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
-                    volunteer_description = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: false),
-                    experience_years = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
+                    description = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: false),
                     email = table.Column<string>(type: "character varying(254)", maxLength: 254, nullable: false),
-                    full_name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    total_years = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
+                    first_name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     last_name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     middle_name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
                     phone_number = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
@@ -72,7 +72,7 @@ namespace PetFamily.Infrastructure.Migrations
                     owner_phone_number = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     breed_id = table.Column<Guid>(type: "uuid", nullable: false),
                     species_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    pet_help_details = table.Column<string>(type: "jsonb", nullable: false)
+                    pet_help_requisites = table.Column<string>(type: "jsonb", nullable: false)
                 },
                 constraints: table =>
                 {
