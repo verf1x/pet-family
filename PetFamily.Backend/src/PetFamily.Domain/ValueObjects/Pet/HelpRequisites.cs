@@ -5,17 +5,20 @@ namespace PetFamily.Domain.ValueObjects.Pet;
 
 public record HelpRequisites
 {
-    private readonly List<HelpDetail> _values = [];
+    private readonly List<HelpRequisite> _values;
     
-    public IReadOnlyList<HelpDetail> Values => _values;
+    public IReadOnlyList<HelpRequisite> Values => _values;
+
+    // ef core ctor
+    private HelpRequisites() {}
     
-    public Result<Error> AddHelpDetails(HelpDetail detail)
+    private HelpRequisites(List<HelpRequisite> values)
     {
-        if (_values.Contains(detail))
-            return Errors.General.Conflict();
-        
-        _values.Add(detail);
-        
-        return Result.Success<Error>(null!);
+        _values = values;
+    }
+    
+    public static Result<HelpRequisites, Error> Create(IEnumerable<HelpRequisite> helpRequisites)
+    {
+        return Result.Success<HelpRequisites, Error>(new HelpRequisites(helpRequisites.ToList()));
     }
 }

@@ -24,7 +24,7 @@ public class VolunteerConfiguration : IEntityTypeConfiguration<Volunteer>
             b.Property(fn => fn.FirstName)
                 .IsRequired()
                 .HasMaxLength(Constants.MaxLowTextLength)
-                .HasColumnName("full_name");
+                .HasColumnName("first_name");
             b.Property(fn => fn.LastName)
                 .IsRequired()
                 .HasMaxLength(Constants.MaxLowTextLength)
@@ -45,13 +45,25 @@ public class VolunteerConfiguration : IEntityTypeConfiguration<Volunteer>
                     .HasColumnName("email");
             });
 
-        builder.Property(v => v.Description)
-            .IsRequired()
-            .HasMaxLength(Constants.MaxLongTextLength);
+        builder.ComplexProperty(
+            v => v.Description,
+            vdb =>
+            {
+                vdb.Property(d => d.Value)
+                    .IsRequired()
+                    .HasMaxLength(Constants.MaxLongTextLength)
+                    .HasColumnName("description");
+            });
 
-        builder.Property(v => v.ExperienceYears)
-            .IsRequired()
-            .HasDefaultValue(0);
+        builder.ComplexProperty(
+            v => v.Experience,
+            veb =>
+            {
+                veb.Property(e => e.TotalYears)
+                    .IsRequired()
+                    .HasColumnName("total_years")
+                    .HasDefaultValue(0);
+            });
 
         builder.ComplexProperty(
             v => v.PhoneNumber,
