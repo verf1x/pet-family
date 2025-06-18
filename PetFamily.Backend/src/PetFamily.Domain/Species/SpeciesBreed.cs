@@ -5,8 +5,8 @@ namespace PetFamily.Domain.Species;
 
 public record SpeciesBreed
 {
-    public SpeciesId SpeciesId { get; private set; }
-    public BreedId BreedId { get; private set; }
+    public SpeciesId SpeciesId { get; }
+    public BreedId BreedId { get; }
 
     private SpeciesBreed(SpeciesId speciesId, BreedId breedId)
     {

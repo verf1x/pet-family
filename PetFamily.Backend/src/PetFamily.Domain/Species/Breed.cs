@@ -17,7 +17,7 @@ public record Breed
     public static Result<Breed, Error> Create(string name)
     {
         if(string.IsNullOrWhiteSpace(name))
-            return Errors.General.ValueIsInvalid(nameof(name));
+            return Errors.General.ValueIsRequired(nameof(name));
         
         return new Breed(name);
     }

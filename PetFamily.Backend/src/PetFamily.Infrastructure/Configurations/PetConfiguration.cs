@@ -89,7 +89,7 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
 
         builder.ComplexProperty(p => p.OwnerPhoneNumber, opn =>
         {
-            opn.Property(p => p.Number)
+            opn.Property(p => p.Value)
                 .IsRequired()
                 .HasMaxLength(Constants.MaxPhoneNumberLength)
                 .HasColumnName("owner_phone_number");
@@ -110,20 +110,20 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
             .IsRequired()
             .HasDefaultValue(HelpStatus.NeedsHelp);
 
-        builder.OwnsOne(p => p.HelpDetails, hdb =>
+        builder.OwnsOne(p => p.HelpRequisites, hdb =>
         {
-            hdb.ToJson("pet_help_details");
+            hdb.ToJson("pet_help_requisites");
             hdb.OwnsMany(hd => hd.Values, db =>
             {
                 db.Property(d => d.Name)
                     .IsRequired()
                     .HasMaxLength(Constants.MaxLowTextLength)
-                    .HasColumnName("help_detail_name");
+                    .HasColumnName("help_requisite_name");
 
                 db.Property(d => d.Description)
                     .IsRequired()
                     .HasMaxLength(Constants.MaxMediumTextLength)
-                    .HasColumnName("help_detail_description");
+                    .HasColumnName("help_requisite_description");
             });
         });
 

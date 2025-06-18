@@ -1,6 +1,6 @@
 using CSharpFunctionalExtensions;
 using PetFamily.Domain.Shared;
-using PetFamily.Domain.ValueObjects;
+using PetFamily.Domain.ValueObjects.Pet;
 using PetFamily.Domain.ValueObjects.Volunteer;
 
 namespace PetFamily.Domain.Entities;
@@ -9,67 +9,44 @@ public class Volunteer : Shared.Entity<VolunteerId>
 {
     private readonly List<Pet> _allPets = [];
     
-    public FullName FullName { get; private set; } = null!;
-    public string Email { get; private set; } = null!;
-    public string Description { get; private set; } = null!;
-    public int ExperienceYears { get; private set; }
+    public FullName FullName { get; private set; }
+    public Email Email { get; private set; }
+    public Description Description { get; private set; }
+    public Experience Experience { get; private set; }
     public IReadOnlyList<Pet> PetsNeedsHelp => GetPetsNeedsHelp();
     public IReadOnlyList<Pet> PetsLookingForHome => GetPetsLookingForHome();
     public IReadOnlyList<Pet> PetsFoundHome => GetPetsFoundHome();
-    public PhoneNumber PhoneNumber { get; private set; } = null!;
-    public SocialNetworks SocialNetworks { get; private set; } = null!;
-    public HelpDetail HelpDetail { get; private set; } = null!;
+    public PhoneNumber PhoneNumber { get; private set; }
+    public SocialNetworks SocialNetworks { get; private set; }
+    public HelpRequisites HelpRequisites { get; private set; }
     public IReadOnlyList<Pet> AllPets => _allPets;
     
     // ef core ctor
     private Volunteer(VolunteerId id) : base(id) { }
     
-    private Volunteer(
+    public Volunteer(
         VolunteerId id,
         FullName fullName,
-        string email,
-        string description,
-        int experienceYears,
+        Email email,
+        Description description,
+        Experience experience,
         PhoneNumber phoneNumber,
         SocialNetworks socialNetworks,
-        HelpDetail helpDetail) : base(id)
+        HelpRequisites helpRequisites) : base(id)
     {
         FullName = fullName;
         Email = email;
         Description = description;
-        ExperienceYears = experienceYears;
+        Experience = experience;
         PhoneNumber = phoneNumber;
         SocialNetworks = socialNetworks;
-        HelpDetail = helpDetail;
-    }
-    
-    public static Result<Volunteer, Error> Create(
-        VolunteerId id,
-        FullName fullName,
-        string email,
-        string description,
-        int experienceYears,
-        PhoneNumber phoneNumber,
-        SocialNetworks socialNetworks,
-        HelpDetail helpDetail)
-    {
-        if (string.IsNullOrWhiteSpace(email))
-            return Errors.General.ValueIsInvalid(nameof(email));
-        
-        if (string.IsNullOrWhiteSpace(description))
-            return Errors.General.ValueIsInvalid(nameof(description));
-        
-        if (experienceYears < 0)
-            return Errors.General.ValueIsInvalid(nameof(experienceYears));
-        
-        return new Volunteer(id, fullName, email, description, experienceYears,
-            phoneNumber, socialNetworks, helpDetail);
+        HelpRequisites = helpRequisites;
     }
     
     public Result<Error> AddPet(Pet pet)
     {
         if (_allPets.Contains(pet))
-            return Errors.General.ValueIsInvalid(nameof(pet));
+            return Errors.General.Conflict(pet.Id.Value);
         
         _allPets.Add(pet);
         

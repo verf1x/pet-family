@@ -21,7 +21,7 @@ public class PetSpecies : Shared.Entity<SpeciesId>
     public static Result<PetSpecies, Error> Create(SpeciesId id, string name, Breeds breeds)
     {
         if(string.IsNullOrWhiteSpace(name))
-            return Errors.General.ValueIsInvalid(nameof(name));
+            return Errors.General.ValueIsRequired(nameof(name));
         
         return new PetSpecies(id, name, breeds);
     }
