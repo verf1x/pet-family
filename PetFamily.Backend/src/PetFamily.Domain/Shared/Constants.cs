@@ -9,4 +9,6 @@ public abstract class Constants
     public const int MaxPhoneNumberLength = 20;
     public const int MaxUrlLength = 2048;
     public const int MaxCountryCodeLength = 2;
+    public const int MinAddressLines = 1;
+    public const int MaxAddressLines = 4;
 }

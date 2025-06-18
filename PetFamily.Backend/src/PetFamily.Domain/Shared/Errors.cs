@@ -1,3 +1,5 @@
+using CSharpFunctionalExtensions;
+
 namespace PetFamily.Domain.Shared;
 
 public static class Errors
@@ -26,6 +28,14 @@ public static class Errors
         {
             var forId = id is null ? "" : $" for id '{id}'";
             return Error.NotFound("value.already.exists", $"value already exists{forId}");
+        }
+    }
+
+    public static class Module
+    {
+        public static Error AlreadyExists()
+        {
+            return Error.Validation("record.already.exists", $"Module already exists");
         }
     }
 }
