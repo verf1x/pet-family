@@ -8,6 +8,8 @@ namespace PetFamily.Application.Volunteers;
 public interface IVolunteerRepository
 {
     Task<Guid> AddAsync(Volunteer volunteer, CancellationToken cancellationToken = default);
-    Task<Result<Volunteer, Error>> GetByIdAsync(VolunteerId volunteerId);
-    Task<Result<Volunteer>> GetByEmailAsync(Email emailResultValue);
+    
+    Task<Result<Volunteer, Error>> GetByIdAsync(VolunteerId volunteerId, CancellationToken cancellationToken = default);
+    
+    Task<Result<Volunteer>> GetByEmailAsync(Email emailResultValue, CancellationToken cancellationToken = default);
 }

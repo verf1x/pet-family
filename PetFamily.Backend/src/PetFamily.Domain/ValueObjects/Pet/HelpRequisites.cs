@@ -1,6 +1,3 @@
-using CSharpFunctionalExtensions;
-using PetFamily.Domain.Shared;
-
 namespace PetFamily.Domain.ValueObjects.Pet;
 
 public record HelpRequisites
@@ -10,15 +7,10 @@ public record HelpRequisites
     public IReadOnlyList<HelpRequisite> Values => _values;
 
     // ef core ctor
-    private HelpRequisites() {}
+    private HelpRequisites() { }
     
-    private HelpRequisites(List<HelpRequisite> values)
+    public HelpRequisites(List<HelpRequisite> values)
     {
         _values = values;
-    }
-    
-    public static Result<HelpRequisites, Error> Create(IEnumerable<HelpRequisite> helpRequisites)
-    {
-        return Result.Success<HelpRequisites, Error>(new HelpRequisites(helpRequisites.ToList()));
     }
 }

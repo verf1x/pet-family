@@ -16,7 +16,7 @@ public class CreateVolunteerHandler
         _volunteersRepository = volunteersRepository;
     }
     
-    public async Task<Result<Guid, Error>> HandleAsync(CreateVolunteerRequest request, CancellationToken token = default)
+    public async Task<Result<Guid, Error>> HandleAsync(CreateVolunteerRequest request, CancellationToken cancellationToken = default)
     {
         var emailResult = Email.Create(request.Email);
         
@@ -24,7 +24,7 @@ public class CreateVolunteerHandler
             return emailResult.Error;
 
         var volunteerToCreate = 
-            await _volunteersRepository.GetByEmailAsync(emailResult.Value);
+            await _volunteersRepository.GetByEmailAsync(emailResult.Value, cancellationToken);
         
         if (volunteerToCreate.IsSuccess)
             return Errors.Module.AlreadyExists();
@@ -53,24 +53,16 @@ public class CreateVolunteerHandler
         
         if(phoneNumberResult.IsFailure)
             return phoneNumberResult.Error;
+
+        var socialNetworks = new SocialNetworks(
+            request.SocialNetworks
+                .Select(s => SocialNetwork.Create(s.Name, s.Url).Value)
+                .ToList());
         
-        var socialNetworksResult = request.SocialNetworks.Select(
-            sn => SocialNetwork.Create(sn.Name, sn.Url)).ToList();
-        
-        if(socialNetworksResult.Any(r => r.IsFailure))
-            return Errors.General.ValueIsRequired("name or description in social network");
-        
-        var socialNetworks = SocialNetworks.Create(
-            socialNetworksResult.Select(r => r.Value).ToList()).Value;
-        
-        var helpRequisitesResult = request.HelpRequisites.Select(
-            r => HelpRequisite.Create(r.Name, r.Description)).ToList();
-        
-        if(helpRequisitesResult.Any(r => r.IsFailure))
-            return Errors.General.ValueIsRequired("name or description in requisite");
-        
-        var helpRequisites = HelpRequisites.Create(
-            helpRequisitesResult.Select(r => r.Value).ToList()).Value;
+        var helpRequisites = new HelpRequisites(
+            request.HelpRequisites
+                .Select(r => HelpRequisite.Create(r.Name, r.Description).Value)
+                .ToList());
         
         Volunteer volunteer = new(
             id,
@@ -83,7 +75,7 @@ public class CreateVolunteerHandler
             helpRequisites);
         
         
-        await _volunteersRepository.AddAsync(volunteer, token);
+        await _volunteersRepository.AddAsync(volunteer, cancellationToken);
 
         return (Guid)volunteer.Id;
     }
