@@ -10,13 +10,13 @@ public record Breeds
     
     public IReadOnlyList<Breed> Values => _values;
     
-    public Result<Error> AddBreed(Breed breed)
+    public UnitResult<Error> Add(Breed breed)
     {
         if(_values.Contains(breed))
             return Errors.General.Conflict(breed.Id.Value);
         
         _values.Add(breed);
         
-        return Result.Success<Error>(null!);
+        return UnitResult.Success<Error>();
     }
 }
