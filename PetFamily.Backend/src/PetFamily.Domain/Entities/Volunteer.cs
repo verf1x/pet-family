@@ -43,14 +43,14 @@ public class Volunteer : Shared.Entity<VolunteerId>
         HelpRequisites = helpRequisites;
     }
     
-    public Result<Error> AddPet(Pet pet)
+    public UnitResult<Error> AddPet(Pet pet)
     {
         if (_allPets.Contains(pet))
             return Errors.General.Conflict(pet.Id.Value);
         
         _allPets.Add(pet);
-        
-        return Result.Success<Error>(null!);
+
+        return UnitResult.Success<Error>();
     }
     
     private IReadOnlyList<Pet> GetPetsNeedsHelp()
