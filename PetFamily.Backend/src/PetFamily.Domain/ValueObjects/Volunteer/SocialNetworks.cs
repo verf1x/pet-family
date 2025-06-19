@@ -1,16 +1,14 @@
 namespace PetFamily.Domain.ValueObjects.Volunteer;
 
 public record SocialNetworks
-{
-    private readonly List<SocialNetwork> _values;
-    
-    public IReadOnlyList<SocialNetwork> Values => _values;
+{ 
+    public readonly IReadOnlyList<SocialNetwork> Values;
     
     // ef core ctor
     private SocialNetworks() { }
     
-    public SocialNetworks(List<SocialNetwork> values)
+    public SocialNetworks(IEnumerable<SocialNetwork> values)
     {
-        _values = values;
+        Values = values.ToList();
     }
 }
