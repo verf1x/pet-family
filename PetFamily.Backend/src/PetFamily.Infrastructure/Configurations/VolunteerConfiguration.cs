@@ -113,10 +113,13 @@ public class VolunteerConfiguration : IEntityTypeConfiguration<Volunteer>
                 });
             });
 
-        builder.HasMany(v => v.AllPets)
+        builder.HasMany(v => v.Pets)
             .WithOne()
             .HasForeignKey("volunteer_id")
-            .OnDelete(DeleteBehavior.NoAction)
+            .OnDelete(DeleteBehavior.Cascade)
             .IsRequired();
+
+        builder.Navigation(v => v.Pets)
+            .AutoInclude();
     }
 }

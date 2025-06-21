@@ -7,7 +7,7 @@ namespace PetFamily.Domain.Entities;
 
 public class Volunteer : Shared.Entity<VolunteerId>
 {
-    private readonly List<Pet> _allPets = [];
+    private readonly List<Pet> _pets = [];
     
     public FullName FullName { get; private set; }
     public Email Email { get; private set; }
@@ -19,7 +19,7 @@ public class Volunteer : Shared.Entity<VolunteerId>
     public PhoneNumber PhoneNumber { get; private set; }
     public SocialNetworks SocialNetworks { get; private set; }
     public HelpRequisites HelpRequisites { get; private set; }
-    public IReadOnlyList<Pet> AllPets => _allPets;
+    public IReadOnlyList<Pet> Pets => _pets;
     
     // ef core ctor
     private Volunteer(VolunteerId id) : base(id) { }
@@ -43,33 +43,33 @@ public class Volunteer : Shared.Entity<VolunteerId>
         HelpRequisites = helpRequisites;
     }
     
-    public Result<Error> AddPet(Pet pet)
+    public UnitResult<Error> AddPet(Pet pet)
     {
-        if (_allPets.Contains(pet))
+        if (_pets.Contains(pet))
             return Errors.General.Conflict(pet.Id.Value);
         
-        _allPets.Add(pet);
-        
-        return Result.Success<Error>(null!);
+        _pets.Add(pet);
+
+        return UnitResult.Success<Error>();
     }
     
     private IReadOnlyList<Pet> GetPetsNeedsHelp()
     {
-        return _allPets
+        return _pets
             .Where(p => p.HelpStatus is HelpStatus.NeedsHelp)
             .ToList();
     }
     
     private IReadOnlyList<Pet> GetPetsLookingForHome()
     {
-        return _allPets
+        return _pets
             .Where(p => p.HelpStatus is HelpStatus.LookingForHome)
             .ToList();
     }
     
     private IReadOnlyList<Pet> GetPetsFoundHome()
     {
-        return _allPets
+        return _pets
             .Where(p => p.HelpStatus is HelpStatus.FoundHome)
             .ToList();
     }

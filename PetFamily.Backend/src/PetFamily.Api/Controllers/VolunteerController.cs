@@ -4,9 +4,7 @@ using PetFamily.Application.Volunteers.CreateVolunteer;
 
 namespace PetFamily.Api.Controllers;
 
-[ApiController]
-[Route("[controller]")]
-public class VolunteerController : ControllerBase
+public class VolunteerController : ApplicationController
 {
     [HttpPost]
     public async Task<ActionResult<Guid>> Create(
@@ -18,7 +16,7 @@ public class VolunteerController : ControllerBase
 
         if (result.IsFailure)
             return result.Error.ToResponse();
-        
+
         return Ok(result.Value);
     }
 }

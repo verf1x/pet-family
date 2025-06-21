@@ -2,15 +2,13 @@ namespace PetFamily.Domain.ValueObjects.Pet;
 
 public record HelpRequisites
 {
-    private readonly List<HelpRequisite> _values;
-    
-    public IReadOnlyList<HelpRequisite> Values => _values;
+    public readonly IReadOnlyList<HelpRequisite> Values;
 
     // ef core ctor
     private HelpRequisites() { }
     
-    public HelpRequisites(List<HelpRequisite> values)
+    public HelpRequisites(IEnumerable<HelpRequisite> values)
     {
-        _values = values;
+        Values = values.ToList();
     }
 }
