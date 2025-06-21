@@ -13,7 +13,7 @@ using PetFamily.Infrastructure;
 namespace PetFamily.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250618191632_Initial")]
+    [Migration("20250621134114_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -303,9 +303,9 @@ namespace PetFamily.Infrastructure.Migrations
                         .HasConstraintName("fk_pets_volunteers_volunteer_id2");
 
                     b.HasOne("PetFamily.Domain.Entities.Volunteer", null)
-                        .WithMany("AllPets")
+                        .WithMany("Pets")
                         .HasForeignKey("volunteer_id")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_pets_volunteers_volunteer_id3");
 
@@ -531,7 +531,7 @@ namespace PetFamily.Infrastructure.Migrations
 
             modelBuilder.Entity("PetFamily.Domain.Entities.Volunteer", b =>
                 {
-                    b.Navigation("AllPets");
+                    b.Navigation("Pets");
 
                     b.Navigation("PetsFoundHome");
 

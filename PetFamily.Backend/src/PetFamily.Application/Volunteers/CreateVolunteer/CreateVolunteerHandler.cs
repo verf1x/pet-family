@@ -11,48 +11,39 @@ public class CreateVolunteerHandler
 {
     private readonly IVolunteerRepository _volunteersRepository;
 
-    public CreateVolunteerHandler(IVolunteerRepository volunteersRepository)
+    public CreateVolunteerHandler(
+        IVolunteerRepository volunteersRepository)
     {
         _volunteersRepository = volunteersRepository;
     }
     
-    public async Task<Result<Guid, Error>> HandleAsync(CreateVolunteerRequest request, CancellationToken cancellationToken = default)
+    public async Task<Result<Guid, Error>> HandleAsync(
+        CreateVolunteerRequest request,
+        CancellationToken cancellationToken = default)
     {
-        var emailResult = Email.Create(request.Email);
+        var email = Email.Create(request.Email).Value;
         
-        if (emailResult.IsFailure)
-            return emailResult.Error;
+        var phoneNumber = PhoneNumber.Create(request.PhoneNumber).Value;
 
-        var volunteerToCreate = 
-            await _volunteersRepository.GetByEmailAsync(emailResult.Value, cancellationToken);
+        var volunteerByEmail = 
+            await _volunteersRepository.GetByEmailAsync(email, cancellationToken);
         
-        if (volunteerToCreate.IsSuccess)
+        var volunteerByPhoneNumber = 
+            await _volunteersRepository.GetByPhoneNumberAsync(phoneNumber, cancellationToken);
+        
+        if (volunteerByEmail.IsSuccess || volunteerByPhoneNumber.IsSuccess)
             return Errors.Module.AlreadyExists();
         
         var id = VolunteerId.CreateNew();
         
-        var fullNameResult = FullName.Create(
+        var fullName = FullName.Create(
             request.FullName.FirstName,
             request.FullName.LastName,
-            request.FullName.MiddleName!);
+            request.FullName.MiddleName!).Value;
+        
+        var description = Description.Create(request.Description).Value;
 
-        if (fullNameResult.IsFailure)
-            return fullNameResult.Error;
-        
-        var descriptionResult = Description.Create(request.Description);
-        
-        if (descriptionResult.IsFailure)
-            return descriptionResult.Error;
-
-        var experienceResult = Experience.Create(request.ExperienceYears);
-        
-        if (experienceResult.IsFailure)
-            return experienceResult.Error;
-        
-        var phoneNumberResult = PhoneNumber.Create(request.PhoneNumber);
-        
-        if(phoneNumberResult.IsFailure)
-            return phoneNumberResult.Error;
+        var experience = Experience.Create(request.ExperienceYears).Value;
 
         var socialNetworks = new SocialNetworks(
             request.SocialNetworks
@@ -66,11 +57,11 @@ public class CreateVolunteerHandler
         
         Volunteer volunteer = new(
             id,
-            fullNameResult.Value, 
-            emailResult.Value,
-            descriptionResult.Value,
-            experienceResult.Value,
-            phoneNumberResult.Value,
+            fullName, 
+            email,
+            description,
+            experience,
+            phoneNumber,
             socialNetworks, 
             helpRequisites);
         
