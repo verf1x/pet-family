@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using PetFamily.Api.Response;
 
 namespace PetFamily.Api.Controllers;
 

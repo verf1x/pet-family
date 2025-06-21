@@ -300,9 +300,9 @@ namespace PetFamily.Infrastructure.Migrations
                         .HasConstraintName("fk_pets_volunteers_volunteer_id2");
 
                     b.HasOne("PetFamily.Domain.Entities.Volunteer", null)
-                        .WithMany("AllPets")
+                        .WithMany("Pets")
                         .HasForeignKey("volunteer_id")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_pets_volunteers_volunteer_id3");
 
@@ -528,7 +528,7 @@ namespace PetFamily.Infrastructure.Migrations
 
             modelBuilder.Entity("PetFamily.Domain.Entities.Volunteer", b =>
                 {
-                    b.Navigation("AllPets");
+                    b.Navigation("Pets");
 
                     b.Navigation("PetsFoundHome");
 

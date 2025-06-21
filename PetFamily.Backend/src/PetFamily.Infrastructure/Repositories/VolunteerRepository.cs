@@ -25,10 +25,12 @@ public class VolunteerRepository : IVolunteerRepository
         return volunteer.Id;
     }
 
-    public async Task<Result<Volunteer, Error>> GetByIdAsync(VolunteerId volunteerId, CancellationToken cancellationToken = default)
+    public async Task<Result<Volunteer, Error>> GetByIdAsync(
+        VolunteerId volunteerId,
+        CancellationToken cancellationToken = default)
     {
         var volunteer = await _dbContext.Volunteers
-            .Include(v => v.AllPets)
+            .Include(v => v.Pets)
             .FirstOrDefaultAsync(v => v.Id == volunteerId, cancellationToken: cancellationToken);
 
         if (volunteer is null)
@@ -40,9 +42,18 @@ public class VolunteerRepository : IVolunteerRepository
     public async Task<Result<Volunteer>> GetByEmailAsync(Email email, CancellationToken cancellationToken = default)
     {
         var volunteer = await _dbContext.Volunteers
-            .Include(v => v.AllPets)
             .FirstOrDefaultAsync(v => v.Email == email, cancellationToken: cancellationToken);
         
         return volunteer ?? Result.Failure<Volunteer>("Email number not found");
+    }
+
+    public async Task<Result<Volunteer>> GetByPhoneNumberAsync(
+        PhoneNumber phoneNumber,
+        CancellationToken cancellationToken = default)
+    {
+        var volunteer = await _dbContext.Volunteers
+            .FirstOrDefaultAsync(v => v.PhoneNumber == phoneNumber, cancellationToken: cancellationToken);
+        
+        return volunteer ?? Result.Failure<Volunteer>("Phone number not found");
     }
 }
