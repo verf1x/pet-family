@@ -96,7 +96,8 @@ namespace PetFamily.Infrastructure.Migrations
                         name: "fk_pets_volunteers_volunteer_id3",
                         column: x => x.volunteer_id3,
                         principalTable: "volunteers",
-                        principalColumn: "id");
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(

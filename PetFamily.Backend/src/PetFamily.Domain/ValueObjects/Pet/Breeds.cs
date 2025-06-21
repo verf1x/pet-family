@@ -1,22 +1,16 @@
-using CSharpFunctionalExtensions;
-using PetFamily.Domain.Shared;
 using PetFamily.Domain.Species;
 
 namespace PetFamily.Domain.ValueObjects.Pet;
 
 public record Breeds
 {
-    private readonly List<Breed> _values = [];
+    public readonly IReadOnlyList<Breed> Values;
+
+    // ef core ctor
+    private Breeds() { }
     
-    public IReadOnlyList<Breed> Values => _values;
-    
-    public Result<Error> AddBreed(Breed breed)
+    public Breeds(IEnumerable<Breed> values)
     {
-        if(_values.Contains(breed))
-            return Errors.General.Conflict(breed.Id.Value);
-        
-        _values.Add(breed);
-        
-        return Result.Success<Error>(null!);
+        Values = values.ToList();
     }
 }

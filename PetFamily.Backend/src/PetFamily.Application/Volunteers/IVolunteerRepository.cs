@@ -11,5 +11,7 @@ public interface IVolunteerRepository
     
     Task<Result<Volunteer, Error>> GetByIdAsync(VolunteerId volunteerId, CancellationToken cancellationToken = default);
     
-    Task<Result<Volunteer>> GetByEmailAsync(Email emailResultValue, CancellationToken cancellationToken = default);
+    Task<Result<Volunteer>> GetByEmailAsync(Email email, CancellationToken cancellationToken = default);
+    
+    Task<Result<Volunteer>> GetByPhoneNumberAsync(PhoneNumber phoneNumber, CancellationToken cancellationToken = default);
 }
