@@ -1,3 +1,5 @@
+using PetFamily.Api.Extensions;
+using PetFamily.Api.Middlewares;
 using PetFamily.Api.Validation;
 using PetFamily.Application;
 using PetFamily.Infrastructure;
@@ -19,10 +21,14 @@ builder.Services.AddFluentValidationAutoValidation(configuration =>
 
 var app = builder.Build();
 
+app.UseExceptionMiddleware();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+
+    await app.ApplyMigrations();
 }
 
 app.UseHttpsRedirection();
