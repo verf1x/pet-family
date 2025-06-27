@@ -2,7 +2,7 @@ namespace PetFamily.Domain.Shared;
 
 public record Error
 {
-    public const string Separator = "||";
+    private const string Separator = "||";
     
     public string Code { get; }
     public string Message { get; }
@@ -36,7 +36,7 @@ public record Error
             throw new ArgumentException("Invalid serialized format");
         
         if(Enum.TryParse<ErrorType>(parts[2], out var type) is false)
-            throw new ArgumentException($"Invalid serialized format");
+            throw new ArgumentException("Invalid serialized format");
         
         return new Error(parts[0], parts[1], type);
     }
