@@ -45,7 +45,6 @@ public static class ResponseExtensions
 
         var envelope = Envelope.Error(responseErrors);
 
-
         return new ObjectResult(envelope)
         {
             StatusCode = StatusCodes.Status400BadRequest

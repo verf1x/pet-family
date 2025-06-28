@@ -4,7 +4,7 @@ using PetFamily.Application.Volunteers.CreateVolunteer;
 
 namespace PetFamily.Api.Controllers;
 
-public class VolunteerController : ApplicationController
+public class VolunteersController : ApplicationController
 {
     [HttpPost]
     public async Task<ActionResult<Guid>> Create(
