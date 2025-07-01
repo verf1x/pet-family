@@ -129,5 +129,11 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
 
         builder.Property(p => p.CreatedAt)
             .IsRequired();
+        
+        builder.Property<bool>("IsDeleted")
+            .HasColumnName("is_deleted");
+        
+        builder.Property<DateTime?>("DeletionDate")
+            .HasColumnName("deletion_date");
     }
 }

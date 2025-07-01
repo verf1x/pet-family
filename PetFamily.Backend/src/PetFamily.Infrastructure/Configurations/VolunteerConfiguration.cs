@@ -121,5 +121,11 @@ public class VolunteerConfiguration : IEntityTypeConfiguration<Volunteer>
 
         builder.Navigation(v => v.Pets)
             .AutoInclude();
+
+        builder.Property<bool>("IsDeleted")
+            .HasColumnName("is_deleted");
+        
+        builder.Property<DateTime?>("DeletionDate")
+            .HasColumnName("deletion_date");
     }
 }

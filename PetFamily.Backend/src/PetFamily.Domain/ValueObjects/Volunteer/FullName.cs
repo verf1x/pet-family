@@ -16,7 +16,7 @@ public record FullName
         MiddleName = middleName;
     }
 
-    public static Result<FullName, Error> Create(string firstName, string lastName, string middleName = null!)
+    public static Result<FullName, Error> Create(string firstName, string lastName, string? middleName = null!)
     {
         if(string.IsNullOrWhiteSpace(firstName))
             return Errors.General.ValueIsRequired(nameof(firstName));
@@ -24,6 +24,6 @@ public record FullName
         if(string.IsNullOrWhiteSpace(lastName))
             return Errors.General.ValueIsRequired(nameof(lastName));
         
-        return new FullName(firstName, lastName, middleName);
+        return new FullName(firstName, lastName, middleName!);
     }
 }
