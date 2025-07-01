@@ -6,7 +6,7 @@ using PetFamily.Domain.ValueObjects;
 using PetFamily.Domain.ValueObjects.Pet;
 using PetFamily.Domain.ValueObjects.Volunteer;
 
-namespace PetFamily.Application.Volunteers.CreateVolunteer;
+namespace PetFamily.Application.Volunteers.Create;
 
 public class CreateVolunteerHandler
 {
@@ -26,7 +26,6 @@ public class CreateVolunteerHandler
         CancellationToken cancellationToken = default)
     {
         var email = Email.Create(request.Email).Value;
-        
         var phoneNumber = PhoneNumber.Create(request.PhoneNumber).Value;
 
         var volunteerByEmail = 
@@ -46,9 +45,8 @@ public class CreateVolunteerHandler
             request.FullName.MiddleName!).Value;
         
         var description = Description.Create(request.Description).Value;
-
         var experience = Experience.Create(request.ExperienceYears).Value;
-
+        
         var socialNetworks = new SocialNetworks(
             request.SocialNetworks
                 .Select(s => SocialNetwork.Create(s.Name, s.Url).Value)
