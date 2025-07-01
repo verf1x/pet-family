@@ -5,14 +5,14 @@ using PetFamily.Domain.ValueObjects.Volunteer;
 
 namespace PetFamily.Application.Volunteers.Delete;
 
-public class DeleteVolunteerHandler
+public class HardDeleteVolunteerHandler
 {
     private readonly IVolunteerRepository _volunteersRepository;
-    private readonly ILogger<DeleteVolunteerHandler> _logger;
+    private readonly ILogger<SoftDeleteVolunteerHandler> _logger;
 
-    public DeleteVolunteerHandler(
+    public HardDeleteVolunteerHandler(
         IVolunteerRepository volunteersRepository,
-        ILogger<DeleteVolunteerHandler> logger)
+        ILogger<SoftDeleteVolunteerHandler> logger)
     {
         _volunteersRepository = volunteersRepository;
         _logger = logger;
@@ -29,7 +29,7 @@ public class DeleteVolunteerHandler
         
         var result = await _volunteersRepository.DeleteAsync(volunteerResult.Value, cancellationToken);
         
-        _logger.LogInformation("Deleted volunteer with ID: {VolunteerId}", request.VolunteerId); 
+        _logger.LogInformation("Hard deleted volunteer with ID: {VolunteerId}", request.VolunteerId); 
         
         return result;
     }

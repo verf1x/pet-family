@@ -44,10 +44,31 @@ public class VolunteersController : ApplicationController
         return Ok(result.Value);
     }
     
-    [HttpDelete("{id:guid}")]
+    [HttpDelete("{id:guid}/soft")]
     public async Task<IActionResult> DeleteAsync(
         [FromRoute] Guid id,
-        [FromServices] DeleteVolunteerHandler handler,
+        [FromServices] SoftDeleteVolunteerHandler handler,
+        [FromServices] IValidator<DeleteVolunteerRequest> validator,
+        CancellationToken cancellationToken = default)
+    {
+        var request = new DeleteVolunteerRequest(id);
+        
+        var validationResult = await validator.ValidateAsync(request, cancellationToken);
+        if (validationResult.IsValid is false)
+            return validationResult.ToValidationErrorResponse();
+        
+        var result = await handler.HandleAsync(request, cancellationToken);
+
+        if (result.IsFailure)
+            return result.Error.ToResponse();
+
+        return Ok(result.Value);
+    }
+    
+    [HttpDelete("{id:guid}/hard")]
+    public async Task<IActionResult> DeleteAsync(
+        [FromRoute] Guid id,
+        [FromServices] HardDeleteVolunteerHandler handler,
         [FromServices] IValidator<DeleteVolunteerRequest> validator,
         CancellationToken cancellationToken = default)
     {
