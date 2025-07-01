@@ -5,7 +5,7 @@ using PetFamily.Domain.ValueObjects.Volunteer;
 
 namespace PetFamily.Domain.Entities;
 
-public class Volunteer : Shared.Entity<VolunteerId>
+public class Volunteer : SoftDeletableEntity<VolunteerId>
 {
     private readonly List<Pet> _pets = [];
     
