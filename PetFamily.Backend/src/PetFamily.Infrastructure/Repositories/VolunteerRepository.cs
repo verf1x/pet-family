@@ -24,6 +24,15 @@ public class VolunteerRepository : IVolunteerRepository
         
         return volunteer.Id;
     }
+    
+    public async Task<Guid> SaveAsync(Volunteer volunteer, CancellationToken cancellationToken = default)
+    {
+        _dbContext.Volunteers.Attach(volunteer);
+        
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        
+        return volunteer.Id;
+    }
 
     public async Task<Result<Volunteer, Error>> GetByIdAsync(
         VolunteerId volunteerId,
@@ -31,7 +40,7 @@ public class VolunteerRepository : IVolunteerRepository
     {
         var volunteer = await _dbContext.Volunteers
             .Include(v => v.Pets)
-            .FirstOrDefaultAsync(v => v.Id == volunteerId, cancellationToken: cancellationToken);
+            .FirstOrDefaultAsync(v => v.Id == volunteerId, cancellationToken);
 
         if (volunteer is null)
             return Errors.General.NotFound(volunteerId.Value);
@@ -42,7 +51,7 @@ public class VolunteerRepository : IVolunteerRepository
     public async Task<Result<Volunteer>> GetByEmailAsync(Email email, CancellationToken cancellationToken = default)
     {
         var volunteer = await _dbContext.Volunteers
-            .FirstOrDefaultAsync(v => v.Email == email, cancellationToken: cancellationToken);
+            .FirstOrDefaultAsync(v => v.Email == email, cancellationToken);
         
         return volunteer ?? Result.Failure<Volunteer>("Email number not found");
     }
@@ -52,7 +61,7 @@ public class VolunteerRepository : IVolunteerRepository
         CancellationToken cancellationToken = default)
     {
         var volunteer = await _dbContext.Volunteers
-            .FirstOrDefaultAsync(v => v.PhoneNumber == phoneNumber, cancellationToken: cancellationToken);
+            .FirstOrDefaultAsync(v => v.PhoneNumber == phoneNumber, cancellationToken);
         
         return volunteer ?? Result.Failure<Volunteer>("Phone number not found");
     }
