@@ -7,14 +7,14 @@ namespace PetFamily.Application.Volunteers.UpdateMainInfo;
 
 public class UpdateMainInfoHandler
 {
-    private readonly IVolunteerRepository _volunteerRepository;
+    private readonly IVolunteerRepository _volunteersRepository;
     private readonly ILogger<UpdateMainInfoHandler> _logger;
 
     public UpdateMainInfoHandler(
-        IVolunteerRepository volunteerRepository,
+        IVolunteerRepository volunteersRepository,
         ILogger<UpdateMainInfoHandler> logger)
     {
-        _volunteerRepository = volunteerRepository;
+        _volunteersRepository = volunteersRepository;
         _logger = logger;
     }
     
@@ -23,7 +23,7 @@ public class UpdateMainInfoHandler
         CancellationToken cancellationToken = default)
     {
         var volunteerId = VolunteerId.Create(request.VolunteerId);
-        var volunteerResult = await _volunteerRepository.GetByIdAsync(volunteerId, cancellationToken);
+        var volunteerResult = await _volunteersRepository.GetByIdAsync(volunteerId, cancellationToken);
         if (volunteerResult.IsFailure)
             return volunteerResult.Error;
         
@@ -44,7 +44,9 @@ public class UpdateMainInfoHandler
             experienceYears,
             phoneNumber);
         
-        var result = await _volunteerRepository.SaveAsync(volunteerResult.Value, cancellationToken);
+        var result = await _volunteersRepository.SaveAsync(volunteerResult.Value, cancellationToken);
+        
+        _logger.LogInformation("Updated volunteer with ID: {VolunteerId}", request.VolunteerId); 
         
         return result;
     }
