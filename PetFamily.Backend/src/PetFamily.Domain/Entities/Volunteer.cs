@@ -5,7 +5,7 @@ using PetFamily.Domain.ValueObjects.Volunteer;
 
 namespace PetFamily.Domain.Entities;
 
-public class Volunteer : Shared.Entity<VolunteerId>
+public class Volunteer : SoftDeletableEntity<VolunteerId>
 {
     private readonly List<Pet> _pets = [];
     
@@ -29,7 +29,7 @@ public class Volunteer : Shared.Entity<VolunteerId>
         FullName fullName,
         Email email,
         Description description,
-        Experience experience,
+        Experience experience, 
         PhoneNumber phoneNumber,
         SocialNetworks socialNetworks,
         HelpRequisites helpRequisites) : base(id)
@@ -51,6 +51,20 @@ public class Volunteer : Shared.Entity<VolunteerId>
         _pets.Add(pet);
 
         return UnitResult.Success<Error>();
+    }
+
+    public void UpdateMainInfo(
+        FullName fullName,
+        Email email,
+        Description description,
+        Experience experience,
+        PhoneNumber phoneNumber)
+    {
+        FullName = fullName;
+        Email = email;
+        Description = description;
+        Experience = experience;
+        PhoneNumber = phoneNumber;
     }
     
     private IReadOnlyList<Pet> GetPetsNeedsHelp()

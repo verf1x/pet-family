@@ -6,7 +6,7 @@ using PetFamily.Domain.ValueObjects.Volunteer;
 
 namespace PetFamily.Domain.Entities;
 
-public class Pet : Shared.Entity<PetId>
+public class Pet : SoftDeletableEntity<PetId>
 {
     public string Name { get; private set; } = null!;
     public string Description { get; private set; } = null!;
