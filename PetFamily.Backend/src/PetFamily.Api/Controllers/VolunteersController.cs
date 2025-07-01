@@ -2,6 +2,7 @@ using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using PetFamily.Api.Extensions;
 using PetFamily.Application.Volunteers.Create;
+using PetFamily.Application.Volunteers.Delete;
 using PetFamily.Application.Volunteers.UpdateMainInfo;
 
 namespace PetFamily.Api.Controllers;
@@ -24,8 +25,8 @@ public class VolunteersController : ApplicationController
     [HttpPut("{id:guid}/main-info")]
     public async Task<IActionResult> UpdateMainInfoAsync(
         [FromRoute] Guid id,
-        [FromServices] UpdateMainInfoHandler handler,
         [FromBody] UpdateMainInfoDto dto,
+        [FromServices] UpdateMainInfoHandler handler,
         [FromServices] IValidator<UpdateMainInfoRequest> validator,
         CancellationToken cancellationToken = default)
     {
@@ -42,4 +43,25 @@ public class VolunteersController : ApplicationController
 
         return Ok(result.Value);
     }
-}
+    
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> DeleteAsync(
+        [FromRoute] Guid id,
+        [FromServices] DeleteVolunteerHandler handler,
+        [FromServices] IValidator<DeleteVolunteerRequest> validator,
+        CancellationToken cancellationToken = default)
+    {
+        var request = new DeleteVolunteerRequest(id);
+        
+        var validationResult = await validator.ValidateAsync(request, cancellationToken);
+        if (validationResult.IsValid is false)
+            return validationResult.ToValidationErrorResponse();
+        
+        var result = await handler.HandleAsync(request, cancellationToken);
+
+        if (result.IsFailure)
+            return result.Error.ToResponse();
+
+        return Ok(result.Value);
+    }
+} 

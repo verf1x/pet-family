@@ -5,19 +5,9 @@ using PetFamily.Domain.ValueObjects.Volunteer;
 
 namespace PetFamily.Application.Volunteers.UpdateMainInfo;
 
-public class UpdateMainInfoRequestValidator : AbstractValidator<UpdateMainInfoRequest>
+public class UpdateMainInfoRequestValidator : AbstractValidator<UpdateMainInfoDto>
 {
     public UpdateMainInfoRequestValidator()
-    {
-        RuleFor(r => r.VolunteerId)
-            .NotEmpty()
-            .WithError(Errors.General.ValueIsRequired());
-    }
-}
-
-public class UpdateMainInfoDtoValidator : AbstractValidator<UpdateMainInfoDto>
-{
-    public UpdateMainInfoDtoValidator()
     {
         RuleFor(d => d.FullName)
             .MustBeValueObject(fn => FullName.Create(fn.FirstName, fn.LastName, fn.MiddleName));
@@ -33,5 +23,15 @@ public class UpdateMainInfoDtoValidator : AbstractValidator<UpdateMainInfoDto>
 
         RuleFor(d => d.PhoneNumber)
             .MustBeValueObject(PhoneNumber.Create);
+    }
+}
+
+public class UpdateMainInfoDtoValidator : AbstractValidator<UpdateMainInfoRequest>
+{
+    public UpdateMainInfoDtoValidator()
+    {
+        RuleFor(r => r.VolunteerId)
+            .NotEmpty()
+            .WithError(Errors.General.ValueIsRequired());
     }
 }
