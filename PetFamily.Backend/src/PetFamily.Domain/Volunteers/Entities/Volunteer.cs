@@ -1,9 +1,11 @@
 using CSharpFunctionalExtensions;
 using PetFamily.Domain.Shared;
-using PetFamily.Domain.ValueObjects.Pet;
-using PetFamily.Domain.ValueObjects.Volunteer;
+using PetFamily.Domain.Shared.EntityIds;
+using PetFamily.Domain.Shared.ValueObjects;
+using PetFamily.Domain.Volunteers.Enums;
+using PetFamily.Domain.Volunteers.ValueObjects;
 
-namespace PetFamily.Domain.Entities;
+namespace PetFamily.Domain.Volunteers.Entities;
 
 public class Volunteer : SoftDeletableEntity<VolunteerId>
 {
