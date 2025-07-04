@@ -71,6 +71,11 @@ public class Volunteer : SoftDeletableEntity<VolunteerId>
         return UnitResult.Success<Error>();
     }
 
+    // public UnitResult<Error> MovePet(Pet petToMove, SerialNumber targetSerialNumber)
+    // {
+    //     
+    // }
+
     public void UpdateMainInfo(
         FullName fullName,
         Email email,

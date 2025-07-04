@@ -1,11 +1,12 @@
-﻿using PetFamily.Domain.Shared.EntityIds;
+﻿using FluentAssertions;
+using PetFamily.Domain.Shared.EntityIds;
 using PetFamily.Domain.Shared.ValueObjects;
 using PetFamily.Domain.Species.ValueObjects;
 using PetFamily.Domain.Volunteers.Entities;
 using PetFamily.Domain.Volunteers.Enums;
 using PetFamily.Domain.Volunteers.ValueObjects;
 
-namespace PetFamily.UnitTests;
+namespace PetFamily.Domain.UnitTests;
 
 public class VolunteersTests
 {
@@ -20,9 +21,9 @@ public class VolunteersTests
         var result = volunteer.AddPet(pet);
         
         // Assert
-        Assert.True(result.IsSuccess);
-        Assert.Equal(volunteer.Pets[^1].Id, pet.Id);
-        Assert.Equal(volunteer.Pets[^1].SerialNumber, SerialNumber.First);
+        result.IsSuccess.Should().BeTrue();
+        volunteer.Pets[^1].Id.Should().BeEquivalentTo(pet.Id);
+        volunteer.Pets[^1].SerialNumber.Should().BeEquivalentTo(SerialNumber.First);
     }
     
     [Fact]
@@ -43,9 +44,33 @@ public class VolunteersTests
         var serialNumber = SerialNumber.Create(petsCount + 1);
         
         // Assert
-        Assert.True(result.IsSuccess);
-        Assert.Equal(volunteer.Pets[^1].Id, petToAdd.Id);
-        Assert.Equal(volunteer.Pets[^1].SerialNumber, serialNumber);
+        result.IsSuccess.Should().BeTrue();
+        volunteer.Pets[^1].Id.Should().BeEquivalentTo(petToAdd.Id);
+        volunteer.Pets[^1].SerialNumber.Should().BeEquivalentTo(serialNumber);
+    }
+    
+    [Fact]
+    public void MovePet_To_Lower_SerialNumber_ReturnsSuccessResult()
+    {
+        // Arrange 
+        const int petsCount = 5;
+        var volunteer = GetUniqueVolunteer();
+        var petsBeforeMove = Enumerable.Range(1, petsCount)
+            .Select(_ => GetUniquePet())
+            .ToList();
+        
+        foreach (var pet in petsBeforeMove)
+            volunteer.AddPet(pet);
+        
+        const int lowerTargetPosition = 2;
+        const int higherSerialNumber = 4;
+        
+        var petToMove = volunteer.Pets[higherSerialNumber];
+        var lowerTargetSerialNumber = SerialNumber.Create(lowerTargetPosition).Value;
+        
+        // Act
+        
+        //Assert
     }
     
     private Email GetRandomEmail()
