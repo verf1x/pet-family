@@ -197,6 +197,15 @@ namespace PetFamily.Infrastructure.Migrations
                                 .HasColumnName("owner_phone_number");
                         });
 
+                    b.ComplexProperty<Dictionary<string, object>>("SerialNumber", "PetFamily.Domain.Volunteers.Entities.Pet.SerialNumber#SerialNumber", b1 =>
+                        {
+                            b1.IsRequired();
+
+                            b1.Property<int>("Value")
+                                .HasColumnType("integer")
+                                .HasColumnName("serial_number");
+                        });
+
                     b.ComplexProperty<Dictionary<string, object>>("SpeciesBreed", "PetFamily.Domain.Volunteers.Entities.Pet.SpeciesBreed#SpeciesBreed", b1 =>
                         {
                             b1.IsRequired();

@@ -72,6 +72,7 @@ namespace PetFamily.Infrastructure.Migrations
                     weight = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
                     nickname = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     owner_phone_number = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
+                    serial_number = table.Column<int>(type: "integer", nullable: false),
                     breed_id = table.Column<Guid>(type: "uuid", nullable: false),
                     species_id = table.Column<Guid>(type: "uuid", nullable: false),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false),
