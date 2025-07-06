@@ -39,7 +39,7 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
                     .HasColumnName("description");
             });
 
-        builder.ComplexProperty(p => p.SerialNumber,
+        builder.ComplexProperty(p => p.Position,
             snb =>
             {
                 snb.Property(sn => sn.Value)

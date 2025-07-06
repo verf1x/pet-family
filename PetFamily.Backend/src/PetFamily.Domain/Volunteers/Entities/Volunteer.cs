@@ -60,7 +60,7 @@ public class Volunteer : SoftDeletableEntity<VolunteerId>
         if (_pets.Contains(pet))
             return Errors.General.Conflict(pet.Id.Value);
 
-        var serialNumberResult = SerialNumber.Create(_pets.Count + 1);
+        var serialNumberResult = Position.Create(_pets.Count + 1);
         if (serialNumberResult.IsFailure)
             return serialNumberResult.Error;
 
@@ -71,10 +71,73 @@ public class Volunteer : SoftDeletableEntity<VolunteerId>
         return UnitResult.Success<Error>();
     }
 
-    // public UnitResult<Error> MovePet(Pet petToMove, SerialNumber targetSerialNumber)
-    // {
-    //     
-    // }
+    public UnitResult<Error> MovePet(Pet pet, Position newPosition)
+    {
+        var currentPosition = pet.Position;
+
+        if (currentPosition == newPosition || _pets.Count == 1)
+            return Result.Success<Error>();
+
+        var adjustedPositionResult = AdjustNewPositionIfOutOfRange(newPosition);
+        if (adjustedPositionResult.IsFailure)
+            return adjustedPositionResult.Error;
+
+        newPosition = adjustedPositionResult.Value;
+
+        var moveResult = MovePetsBetweenPositions(newPosition, currentPosition);
+        if(moveResult.IsFailure)
+            return moveResult.Error;
+
+        pet.Move(newPosition);
+
+        return Result.Success<Error>();
+    }
+
+    private UnitResult<Error> MovePetsBetweenPositions(Position newPosition, Position currentPosition)
+    {
+        if (newPosition < currentPosition)
+        {
+            var petsToMove = _pets.Where(i => i.Position >= newPosition
+                                              && i.Position <= currentPosition);
+
+            foreach (var petToMove in petsToMove)
+            {
+                var result = petToMove.MoveForward();
+                if (result.IsFailure)
+                {
+                    return result.Error;
+                }
+            }
+        }
+        else if (newPosition > currentPosition)
+        {
+            var petsToMove = _pets.Where(i => i.Position > currentPosition
+                                              && i.Position <= newPosition);
+
+            foreach (var petToMove in petsToMove)
+            {
+                var result = petToMove.MoveBackward();
+                if (result.IsFailure)
+                {
+                    return result.Error; 
+                }
+            }
+        }
+
+        return Result.Success<Error>();
+    }
+
+    private Result<Position, Error> AdjustNewPositionIfOutOfRange(Position newPosition)
+    {
+        if (newPosition <= _pets.Count)
+            return newPosition;
+
+        var lastPositionResult = Position.Create(_pets.Count - 1);
+        if (lastPositionResult.IsFailure)
+            return lastPositionResult.Error;
+
+        return lastPositionResult.Value;
+    }
 
     public void UpdateMainInfo(
         FullName fullName,
