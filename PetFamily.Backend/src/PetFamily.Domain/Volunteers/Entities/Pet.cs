@@ -14,7 +14,7 @@ public class Pet : SoftDeletableEntity<PetId>
     
     public Description Description { get; private set; }
     
-    public SerialNumber SerialNumber { get; private set; }
+    public Position Position { get; private set; }
     
     public SpeciesBreed SpeciesBreed { get; private set; }
     
@@ -67,8 +67,35 @@ public class Pet : SoftDeletableEntity<PetId>
         CreatedAt = DateTime.UtcNow;
     }
     
-    public void SetSerialNumber(SerialNumber serialNumber)
+    public void SetSerialNumber(Position position)
     {
-        SerialNumber = serialNumber;
+        Position = position;
+    }
+
+    public UnitResult<Error> MoveForward()
+    {
+        var newPosition = Position.Forward();
+        if (newPosition.IsFailure)
+            return newPosition.Error;
+        
+        Position = newPosition.Value;
+        
+        return Result.Success<Error>();
+    }
+    
+    public UnitResult<Error> MoveBackward()
+    {
+        var newPosition = Position.Backward();
+        if (newPosition.IsFailure)
+            return newPosition.Error;
+        
+        Position = newPosition.Value;
+        
+        return Result.Success<Error>();
+    }
+    
+    public void Move(Position newPosition)
+    {
+        Position = newPosition;
     }
 }
