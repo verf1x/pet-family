@@ -21,7 +21,7 @@ public class UploadFileHandler
         UploadFileRequest request,
         CancellationToken cancellationToken)
     {
-        FileData fileData = new(
+        var fileData = new FileData(
             request.Stream,
             request.BucketName,
             request.ObjectName);

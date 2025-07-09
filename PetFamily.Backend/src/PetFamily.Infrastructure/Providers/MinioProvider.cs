@@ -25,18 +25,8 @@ public class MinioProvider : IFileProvider
     {
         try
         {
-            var bucketExistsArgs = new BucketExistsArgs()
-                .WithBucket(fileData.BucketName);
-        
-            bool bucketExists = await _minioClient.BucketExistsAsync(bucketExistsArgs, cancellationToken);
-            if (!bucketExists)
-            {
-                var makeBucketArgs = new MakeBucketArgs()
-                    .WithBucket(fileData.BucketName);
-            
-                await _minioClient.MakeBucketAsync(makeBucketArgs, cancellationToken);
-            }
-        
+            await CreateBucketIfNotExists(fileData.BucketName, cancellationToken);
+
             var putObjectArgs = new PutObjectArgs()
                 .WithBucket(fileData.BucketName)
                 .WithStreamData(fileData.Stream)
@@ -58,18 +48,7 @@ public class MinioProvider : IFileProvider
     {
         try
         {
-            var bucketExistsArgs = new BucketExistsArgs()
-                .WithBucket(bucketName);
-            
-            bool bucketExists = await _minioClient.BucketExistsAsync(bucketExistsArgs, cancellationToken);
-            
-            if (!bucketExists)
-            {
-                var makeBucketArgs = new MakeBucketArgs()
-                    .WithBucket(bucketName);
-                
-                await _minioClient.MakeBucketAsync(makeBucketArgs, cancellationToken);
-            }
+            await CreateBucketIfNotExists(bucketName, cancellationToken);
             
             var removeObjectArgs = new RemoveObjectArgs()
                 .WithBucket(bucketName)
@@ -92,18 +71,7 @@ public class MinioProvider : IFileProvider
     {
         try
         {
-            var bucketExistsArgs = new BucketExistsArgs()
-                .WithBucket(data.BucketName);
-            
-            bool bucketExists = await _minioClient.BucketExistsAsync(bucketExistsArgs, cancellationToken);
-            
-            if (!bucketExists)
-            {
-                var makeBucketArgs = new MakeBucketArgs()
-                    .WithBucket(data.BucketName);
-                
-                await _minioClient.MakeBucketAsync(makeBucketArgs, cancellationToken);
-            }
+            await CreateBucketIfNotExists(data.BucketName, cancellationToken);
             
             var presignedUrlArgs = new PresignedGetObjectArgs()
                 .WithBucket(data.BucketName)
@@ -118,6 +86,21 @@ public class MinioProvider : IFileProvider
         {
             _logger.LogError(ex, "An error occurred while getting the presigned URL from Minio");
             return Error.Failure("file.presigned-url", "An error occurred while getting the presigned URL from Minio");
+        }
+    }
+    
+    private async Task CreateBucketIfNotExists(string bucketName, CancellationToken cancellationToken)
+    {
+        var bucketExistsArgs = new BucketExistsArgs()
+            .WithBucket(bucketName);
+        
+        var bucketExists = await _minioClient.BucketExistsAsync(bucketExistsArgs, cancellationToken);
+        if (!bucketExists)
+        {
+            var makeBucketArgs = new MakeBucketArgs()
+                .WithBucket(bucketName);
+            
+            await _minioClient.MakeBucketAsync(makeBucketArgs, cancellationToken);
         }
     }
 }
