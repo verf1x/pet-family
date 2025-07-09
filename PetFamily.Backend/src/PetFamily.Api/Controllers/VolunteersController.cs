@@ -1,6 +1,8 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using PetFamily.Api.Extensions;
+using PetFamily.Application.FileProvider;
+using PetFamily.Application.Volunteers.AddPet;
 using PetFamily.Application.Volunteers.Create;
 using PetFamily.Application.Volunteers.Delete;
 using PetFamily.Application.Volunteers.UpdateMainInfo;
@@ -83,6 +85,25 @@ public class VolunteersController : ApplicationController
         if (result.IsFailure)
             return result.Error.ToResponse();
 
+        return Ok(result.Value);
+    }
+
+    [HttpPost("pet")]
+    public async Task<IActionResult> AddPet(
+        IFormFile file,
+        [FromServices] AddPetHandler handler,
+        CancellationToken cancellationToken = default)
+    {
+        await using var stream = file.OpenReadStream();
+
+        var path = Guid.NewGuid().ToString();
+
+        var fileData = new FileData(stream, "photos", path);
+
+        var result = await handler.HandleAsync(fileData, cancellationToken);
+        if(result.IsFailure)
+            return result.Error.ToResponse();
+        
         return Ok(result.Value);
     }
 } 
