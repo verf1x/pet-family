@@ -10,6 +10,8 @@ namespace PetFamily.Infrastructure.Providers;
 
 public class MinioProvider : IFileProvider
 {
+    private const int MaxParallelUploads = 5;
+    
     private readonly IMinioClient _minioClient;
     private readonly ILogger<MinioProvider> _logger;
 
@@ -19,29 +21,49 @@ public class MinioProvider : IFileProvider
         _logger = logger;
     }
 
-    public async Task<Result<string, Error>> UploadFileAsync(
-        FileData fileData, 
+    public async Task<UnitResult<Error>> UploadFilesAsync(
+        FilesData filesData, 
         CancellationToken cancellationToken = default)
     {
+        var semaphoreSlim = new SemaphoreSlim(MaxParallelUploads);
+
         try
         {
-            await CreateBucketIfNotExists(fileData.BucketName, cancellationToken);
+            await CreateBucketIfNotExists(filesData.BucketName, cancellationToken);
 
-            var putObjectArgs = new PutObjectArgs()
-                .WithBucket(fileData.BucketName)
-                .WithStreamData(fileData.Stream)
-                .WithObjectSize(fileData.Stream.Length)
-                .WithObject(fileData.ObjectName);
-        
-            var result = await _minioClient.PutObjectAsync(putObjectArgs, cancellationToken);
-            
-            return result.ObjectName;
+            var uploadTasks = new List<Task>();
+
+            foreach (var file in filesData.Files)
+            {
+                await semaphoreSlim.WaitAsync(cancellationToken);
+
+                var putObjectArgs = new PutObjectArgs()
+                    .WithBucket(filesData.BucketName)
+                    .WithStreamData(file.Stream)
+                    .WithObjectSize(file.Stream.Length)
+                    .WithObject(file.ObjectName);
+
+                var task = _minioClient.PutObjectAsync(putObjectArgs, cancellationToken);
+
+                semaphoreSlim.Release();
+
+                uploadTasks.Add(task);
+            }
+
+            await Task.WhenAll(uploadTasks);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An error occurred while uploading the file to Minio");
-            return Error.Failure("file.upload", "An error occurred while uploading the file to Minio");
+            _logger.LogError(ex, "An error occurred while uploading the files to Minio");
+            return Error.Failure("files.upload", "An error occurred while uploading the files to Minio");
         }
+        finally
+        {
+            semaphoreSlim.Release();
+            semaphoreSlim.Dispose();
+        }
+        
+        return UnitResult.Success<Error>();
     }
 
     public async Task<Result<string, Error>> RemoveFileAsync(string bucketName, string objectName, CancellationToken cancellationToken = default)

@@ -6,9 +6,9 @@ using PetFamily.Domain.Volunteers.ValueObjects;
 
 namespace PetFamily.Application.Volunteers.UpdateMainInfo;
 
-public class UpdateMainInfoRequestValidator : AbstractValidator<UpdateMainInfoDto>
+public class UpdateMainInfoCommandValidator : AbstractValidator<UpdateMainInfoDto>
 {
-    public UpdateMainInfoRequestValidator()
+    public UpdateMainInfoCommandValidator()
     {
         RuleFor(d => d.FullName)
             .MustBeValueObject(fn => FullName.Create(fn.FirstName, fn.LastName, fn.MiddleName));
@@ -27,7 +27,7 @@ public class UpdateMainInfoRequestValidator : AbstractValidator<UpdateMainInfoDt
     }
 }
 
-public class UpdateMainInfoDtoValidator : AbstractValidator<UpdateMainInfoRequest>
+public class UpdateMainInfoDtoValidator : AbstractValidator<UpdateMainInfoCommand>
 {
     public UpdateMainInfoDtoValidator()
     {

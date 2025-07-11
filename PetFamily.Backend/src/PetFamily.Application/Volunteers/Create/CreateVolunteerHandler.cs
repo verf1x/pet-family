@@ -22,11 +22,11 @@ public class CreateVolunteerHandler
     }
     
     public async Task<Result<Guid, Error>> HandleAsync(
-        CreateVolunteerRequest request,
+        CreateVolunteerCommand command,
         CancellationToken cancellationToken = default)
     {
-        var email = Email.Create(request.Email).Value;
-        var phoneNumber = PhoneNumber.Create(request.PhoneNumber).Value;
+        var email = Email.Create(command.Email).Value;
+        var phoneNumber = PhoneNumber.Create(command.PhoneNumber).Value;
 
         var volunteerByEmail = 
             await _volunteersRepository.GetByEmailAsync(email, cancellationToken);
@@ -40,20 +40,20 @@ public class CreateVolunteerHandler
         var id = VolunteerId.CreateNew();
         
         var fullName = FullName.Create(
-            request.FullName.FirstName,
-            request.FullName.LastName,
-            request.FullName.MiddleName!).Value;
+            command.FullName.FirstName,
+            command.FullName.LastName,
+            command.FullName.MiddleName!).Value;
         
-        var description = Description.Create(request.Description).Value;
-        var experience = Experience.Create(request.ExperienceYears).Value;
+        var description = Description.Create(command.Description).Value;
+        var experience = Experience.Create(command.ExperienceYears).Value;
         
         var socialNetworks = new SocialNetworks(
-            request.SocialNetworks
+            command.SocialNetworks
                 .Select(s => SocialNetwork.Create(s.Name, s.Url).Value)
                 .ToList());
         
         var helpRequisites = new HelpRequisites(
-            request.HelpRequisites
+            command.HelpRequisites
                 .Select(r => HelpRequisite.Create(r.Name, r.Description).Value)
                 .ToList());
         

@@ -68,8 +68,8 @@ namespace PetFamily.Infrastructure.Migrations
                     health_status = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
                     is_neutered = table.Column<bool>(type: "boolean", nullable: false),
                     is_vaccinated = table.Column<bool>(type: "boolean", nullable: false),
-                    height = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
-                    weight = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
+                    height = table.Column<float>(type: "real", nullable: false, defaultValue: 0f),
+                    weight = table.Column<float>(type: "real", nullable: false, defaultValue: 0f),
                     nickname = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     owner_phone_number = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     serial_number = table.Column<int>(type: "integer", nullable: false),
@@ -77,7 +77,8 @@ namespace PetFamily.Infrastructure.Migrations
                     species_id = table.Column<Guid>(type: "uuid", nullable: false),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false),
                     deletion_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    pet_help_requisites = table.Column<string>(type: "jsonb", nullable: false)
+                    pet_help_requisites = table.Column<string>(type: "jsonb", nullable: false),
+                    pet_photos = table.Column<string>(type: "jsonb", nullable: false)
                 },
                 constraints: table =>
                 {

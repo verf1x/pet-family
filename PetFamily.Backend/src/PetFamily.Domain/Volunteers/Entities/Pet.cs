@@ -34,6 +34,8 @@ public class Pet : SoftDeletableEntity<PetId>
     
     public HelpRequisites HelpRequisites { get; private set; }
     
+    public Photos Photos { get; private set; }
+    
     public DateTime CreatedAt { get; private set; }
     
     // ef core ctor
@@ -51,7 +53,8 @@ public class Pet : SoftDeletableEntity<PetId>
         PhoneNumber ownerPhoneNumber,
         DateOnly dateOfBirth,
         HelpStatus helpStatus,
-        HelpRequisites helpRequisites) : base(id)
+        HelpRequisites helpRequisites,
+        Photos photos) : base(id)
     {
         Nickname = nickname;
         Description = description;
@@ -64,6 +67,7 @@ public class Pet : SoftDeletableEntity<PetId>
         DateOfBirth = dateOfBirth;
         HelpStatus = helpStatus;
         HelpRequisites = helpRequisites;
+        Photos = photos;
         CreatedAt = DateTime.UtcNow;
     }
     

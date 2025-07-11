@@ -6,8 +6,8 @@ namespace PetFamily.Application.Providers;
 
 public interface IFileProvider
 {
-    Task<Result<string, Error>> UploadFileAsync(
-        FileData fileData,
+    Task<UnitResult<Error>> UploadFilesAsync(
+        FilesData filesData,
         CancellationToken cancellationToken = default);
     
     Task<Result<string, Error>> RemoveFileAsync(

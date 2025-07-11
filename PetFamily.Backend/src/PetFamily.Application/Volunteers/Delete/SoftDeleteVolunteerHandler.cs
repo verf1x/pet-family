@@ -19,10 +19,10 @@ public class SoftDeleteVolunteerHandler
     }
     
     public async Task<Result<Guid, Error>> HandleAsync(
-        DeleteVolunteerRequest request,
+        DeleteVolunteerCommand command,
         CancellationToken cancellationToken = default)
     {
-        var volunteerId = VolunteerId.Create(request.VolunteerId);
+        var volunteerId = VolunteerId.Create(command.VolunteerId);
         var volunteerResult = await _volunteersRepository.GetByIdAsync(volunteerId, cancellationToken);
         if (volunteerResult.IsFailure)
             return volunteerResult.Error;
@@ -31,7 +31,7 @@ public class SoftDeleteVolunteerHandler
         
         var result = await _volunteersRepository.SaveAsync(volunteerResult.Value, cancellationToken);
         
-        _logger.LogInformation("Soft deleted volunteer with ID: {VolunteerId}", request.VolunteerId); 
+        _logger.LogInformation("Soft deleted volunteer with ID: {VolunteerId}", command.VolunteerId); 
         
         return result;
     }
