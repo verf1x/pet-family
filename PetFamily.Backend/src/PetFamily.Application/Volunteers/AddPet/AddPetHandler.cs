@@ -36,8 +36,8 @@ public class AddPetHandler
         var nickname = Nickname.Create(command.Nickname).Value;
         var description = Description.Create(command.Description).Value;
         var speciesBreed = SpeciesBreed.Create(
-            SpeciesId.CreateEmpty(), //TODO: Заменить на реальный ID вида
-            BreedId.CreateEmpty()).Value;
+            SpeciesId.Create(command.SpeciesBreedDto.SpeciesId),
+            BreedId.Create(command.SpeciesBreedDto.BreedId)).Value;
         
         var color = Color.Create(command.Color).Value;
         var healthInfo = HealthInfo.Create(

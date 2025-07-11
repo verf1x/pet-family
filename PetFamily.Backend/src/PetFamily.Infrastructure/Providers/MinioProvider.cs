@@ -25,7 +25,7 @@ public class MinioProvider : IFileProvider
         FilesData filesData, 
         CancellationToken cancellationToken = default)
     {
-        var semaphoreSlim = new SemaphoreSlim(MaxParallelUploads);
+        using var semaphoreSlim = new SemaphoreSlim(MaxParallelUploads);
 
         try
         {
@@ -60,7 +60,6 @@ public class MinioProvider : IFileProvider
         finally
         {
             semaphoreSlim.Release();
-            semaphoreSlim.Dispose();
         }
         
         return UnitResult.Success<Error>();

@@ -1,14 +1,14 @@
 using PetFamily.Application.Dtos;
-using PetFamily.Application.Volunteers.AddPet; //TODO: мб нужны dto для api слоя, иначе архитектура ломается
+using PetFamily.Application.Volunteers.AddPet;
 using PetFamily.Domain.Volunteers.Enums;
+//TODO: мб нужны dto для api слоя, иначе архитектура ломается
 
-namespace PetFamily.Api.Contracts;
+namespace PetFamily.Api.Controllers.Volunteers;
 
 public record AddPetRequest(
-    Guid VolunteerId,
     string Nickname,
     string Description,
-    SpeciesBreedDto SpeciesBreedDto,
+    // SpeciesBreedDto SpeciesBreedDto,
     string Color,
     HealthInfoDto HealthInfoDto,
     AddressDto AddressDto,

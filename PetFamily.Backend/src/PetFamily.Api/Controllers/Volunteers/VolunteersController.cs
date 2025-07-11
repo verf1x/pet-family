@@ -1,6 +1,5 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
-using PetFamily.Api.Contracts;
 using PetFamily.Api.Extensions;
 using PetFamily.Application.Dtos.Pet;
 using PetFamily.Application.Volunteers.AddPet;
@@ -8,7 +7,7 @@ using PetFamily.Application.Volunteers.Create;
 using PetFamily.Application.Volunteers.Delete;
 using PetFamily.Application.Volunteers.UpdateMainInfo;
 
-namespace PetFamily.Api.Controllers;
+namespace PetFamily.Api.Controllers.Volunteers;
 
 public class VolunteersController : ApplicationController
 {
@@ -109,7 +108,7 @@ public class VolunteersController : ApplicationController
                 id,
                 request.Nickname,
                 request.Description,
-                // request.SpeciesBreedDto, //TODO
+                new SpeciesBreedDto(Guid.Empty, Guid.Empty), //TODO: убрать плейсхолдер
                 request.Color,
                 request.HealthInfoDto,
                 request.AddressDto,
