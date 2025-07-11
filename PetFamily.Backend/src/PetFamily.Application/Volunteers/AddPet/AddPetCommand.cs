@@ -8,7 +8,7 @@ public record AddPetCommand(
     Guid VolunteerId,
     string Nickname,
     string Description,
-    // SpeciesBreedDto SpeciesBreedDto, //TODO
+    SpeciesBreedDto SpeciesBreedDto,
     string Color,
     HealthInfoDto HealthInfoDto,
     AddressDto AddressDto,

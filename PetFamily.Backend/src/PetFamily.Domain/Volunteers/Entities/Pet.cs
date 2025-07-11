@@ -32,9 +32,9 @@ public class Pet : SoftDeletableEntity<PetId>
     
     public HelpStatus HelpStatus { get; private set; }
     
-    public HelpRequisites HelpRequisites { get; private set; }
+    public ValueObjectList<HelpRequisite> HelpRequisites { get; private set; }
     
-    public Photos Photos { get; private set; }
+    public ValueObjectList<Photo> Photos { get; private set; }
     
     public DateTime CreatedAt { get; private set; }
     
@@ -53,8 +53,8 @@ public class Pet : SoftDeletableEntity<PetId>
         PhoneNumber ownerPhoneNumber,
         DateOnly dateOfBirth,
         HelpStatus helpStatus,
-        HelpRequisites helpRequisites,
-        Photos photos) : base(id)
+        ValueObjectList<HelpRequisite> helpRequisites,
+        ValueObjectList<Photo> photos) : base(id)
     {
         Nickname = nickname;
         Description = description;
