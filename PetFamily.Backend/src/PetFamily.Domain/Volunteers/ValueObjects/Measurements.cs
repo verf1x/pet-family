@@ -5,17 +5,17 @@ namespace PetFamily.Domain.Volunteers.ValueObjects;
 
 public record Measurements
 {
-    public int Height { get; }
+    public float Height { get; }
     
-    public int Weight { get; }
+    public float Weight { get; }
     
-    private Measurements(int height, int weight)
+    private Measurements(float height, float weight)
     {
         Height = height;
         Weight = weight;
     }
     
-    public static Result<Measurements, Error> Create(int height, int weight)
+    public static Result<Measurements, Error> Create(float height, float weight)
     {
         if (height <= 0)
             return Errors.General.ValueIsInvalid(nameof(height));

@@ -8,25 +8,25 @@ namespace PetFamily.Api.Controllers;
 
 public class FilesController : ApplicationController
 {
-    [HttpPost("upload")]
-    public async Task<IActionResult> UploadFileAsync(
-        IFormFile file,
-        [FromServices] UploadFileHandler handler,
-        CancellationToken cancellationToken = default)
-    {
-        await using var fileContent = file.OpenReadStream();
-        
-        var fileData = new UploadFileRequest(
-            fileContent,
-            "photos",
-            Guid.NewGuid().ToString());
-        
-        var result = await handler.HandleAsync(fileData, cancellationToken);
-        if (result.IsFailure)
-            return result.Error.ToResponse();
-        
-        return Ok(result.Value);
-    }
+    // [HttpPost("upload")]
+    // public async Task<IActionResult> UploadFileAsync(
+    //     IFormFile file,
+    //     [FromServices] UploadFileHandler handler,
+    //     CancellationToken cancellationToken = default)
+    // {
+    //     await using var fileContent = file.OpenReadStream();
+    //     
+    //     var fileData = new UploadFileRequest(
+    //         fileContent,
+    //         "photos",
+    //         Guid.NewGuid().ToString());
+    //     
+    //     var result = await handler.HandleAsync(fileData, cancellationToken);
+    //     if (result.IsFailure)
+    //         return result.Error.ToResponse();
+    //     
+    //     return Ok(result.Value);
+    // }
     
     [HttpDelete("remove/{bucket}/{file}")]
     public async Task<IActionResult> RemoveFileAsync(

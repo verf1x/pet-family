@@ -12,7 +12,12 @@ public record Address
     public string? PostalCode { get; }
     public string CountryCode { get; }
 
-    private Address(IReadOnlyList<string> addressLines, string locality, string region, string postalCode, string countryCode)
+    private Address(
+        IReadOnlyList<string> addressLines,
+        string locality,
+        string? region,
+        string? postalCode,
+        string countryCode)
     {
         AddressLines = addressLines;
         Locality = locality;
@@ -22,10 +27,10 @@ public record Address
     }
     
     public static Result<Address, Error> Create(
-        List<string> addressLines,
+        IList<string> addressLines,
         string locality,
-        string region,
-        string postalCode,
+        string? region,
+        string? postalCode,
         string countryCode)
     {
         if(addressLines.Count is < Constants.MinAddressLines or > Constants.MaxAddressLines)
@@ -37,7 +42,7 @@ public record Address
         if (string.IsNullOrWhiteSpace(countryCode) || !Regex.IsMatch(countryCode, @"^[A-Z]{2}$"))
             return Errors.General.ValueIsRequired(nameof(countryCode));
         
-        return new Address(addressLines, locality, region, postalCode, countryCode);
+        return new Address(addressLines.AsReadOnly(), locality, region, postalCode, countryCode);
     }
     
     public override string ToString()

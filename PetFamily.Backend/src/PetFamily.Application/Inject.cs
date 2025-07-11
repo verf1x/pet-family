@@ -19,7 +19,7 @@ public static class Inject
         services.AddScoped<HardDeleteVolunteerHandler>();
         services.AddScoped<SoftDeleteVolunteerHandler>();
         services.AddScoped<AddPetHandler>();
-        services.AddScoped<UploadFileHandler>();
+        // services.AddScoped<UploadFileHandler>();
         services.AddScoped<RemoveFileHandler>();
         services.AddScoped<GetPresignedUrlHandler>();
         

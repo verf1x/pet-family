@@ -5,6 +5,7 @@ using PetFamily.Domain.Shared;
 using PetFamily.Domain.Shared.EntityIds;
 using PetFamily.Domain.Volunteers.Entities;
 using PetFamily.Domain.Volunteers.Enums;
+using PetFamily.Domain.Volunteers.ValueObjects;
 
 namespace PetFamily.Infrastructure.Configurations;
 
@@ -121,12 +122,12 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
                 mb.Property(m => m.Height)
                     .IsRequired()
                     .HasColumnName("height")
-                    .HasDefaultValue(0);
+                    .HasDefaultValue(0.0f);
 
                 mb.Property(m => m.Weight)
                     .IsRequired()
                     .HasColumnName("weight")
-                    .HasDefaultValue(0);
+                    .HasDefaultValue(0.0f);
             });
 
         builder.ComplexProperty(p => p.OwnerPhoneNumber,
@@ -161,6 +162,23 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
                             .IsRequired()
                             .HasMaxLength(Constants.MaxMediumTextLength)
                             .HasColumnName("help_requisite_description");
+                    });
+            });
+
+        builder.OwnsOne(p => p.Photos,
+            pb =>
+            {
+                pb.ToJson("pet_photos");
+                pb.OwnsMany(p => p.Values,
+                    pnb =>
+                    {
+                        pnb.Property(p => p.PhotoPath)
+                            .HasConversion(
+                                p => p.Path,
+                                value => PhotoPath.Create(value).Value)
+                            .IsRequired()
+                            .HasMaxLength(Constants.MaxMediumTextLength)
+                            .HasColumnName("photo_path");
                     });
             });
 

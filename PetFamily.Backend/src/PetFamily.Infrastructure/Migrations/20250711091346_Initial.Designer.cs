@@ -13,7 +13,7 @@ using PetFamily.Infrastructure;
 namespace PetFamily.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250703082027_Initial")]
+    [Migration("20250711091346_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -165,16 +165,16 @@ namespace PetFamily.Infrastructure.Migrations
                         {
                             b1.IsRequired();
 
-                            b1.Property<int>("Height")
+                            b1.Property<float>("Height")
                                 .ValueGeneratedOnAdd()
-                                .HasColumnType("integer")
-                                .HasDefaultValue(0)
+                                .HasColumnType("real")
+                                .HasDefaultValue(0f)
                                 .HasColumnName("height");
 
-                            b1.Property<int>("Weight")
+                            b1.Property<float>("Weight")
                                 .ValueGeneratedOnAdd()
-                                .HasColumnType("integer")
-                                .HasDefaultValue(0)
+                                .HasColumnType("real")
+                                .HasDefaultValue(0f)
                                 .HasColumnName("weight");
                         });
 
@@ -200,7 +200,7 @@ namespace PetFamily.Infrastructure.Migrations
                                 .HasColumnName("owner_phone_number");
                         });
 
-                    b.ComplexProperty<Dictionary<string, object>>("SerialNumber", "PetFamily.Domain.Volunteers.Entities.Pet.SerialNumber#SerialNumber", b1 =>
+                    b.ComplexProperty<Dictionary<string, object>>("Position", "PetFamily.Domain.Volunteers.Entities.Pet.Position#Position", b1 =>
                         {
                             b1.IsRequired();
 
@@ -459,7 +459,54 @@ namespace PetFamily.Infrastructure.Migrations
                             b1.Navigation("Values");
                         });
 
+                    b.OwnsOne("PetFamily.Domain.Volunteers.ValueObjects.Photos", "Photos", b1 =>
+                        {
+                            b1.Property<Guid>("PetId")
+                                .HasColumnType("uuid");
+
+                            b1.HasKey("PetId");
+
+                            b1.ToTable("pets");
+
+                            b1.ToJson("pet_photos");
+
+                            b1.WithOwner()
+                                .HasForeignKey("PetId")
+                                .HasConstraintName("fk_pets_pets_id");
+
+                            b1.OwnsMany("PetFamily.Domain.Volunteers.ValueObjects.Photo", "Values", b2 =>
+                                {
+                                    b2.Property<Guid>("PhotosPetId")
+                                        .HasColumnType("uuid");
+
+                                    b2.Property<int>("__synthesizedOrdinal")
+                                        .ValueGeneratedOnAdd()
+                                        .HasColumnType("integer");
+
+                                    b2.Property<string>("PhotoPath")
+                                        .IsRequired()
+                                        .HasMaxLength(1000)
+                                        .HasColumnType("character varying(1000)")
+                                        .HasColumnName("photo_path");
+
+                                    b2.HasKey("PhotosPetId", "__synthesizedOrdinal");
+
+                                    b2.ToTable("pets");
+
+                                    b2.ToJson("pet_photos");
+
+                                    b2.WithOwner()
+                                        .HasForeignKey("PhotosPetId")
+                                        .HasConstraintName("fk_pets_pets_photos_pet_id");
+                                });
+
+                            b1.Navigation("Values");
+                        });
+
                     b.Navigation("HelpRequisites")
+                        .IsRequired();
+
+                    b.Navigation("Photos")
                         .IsRequired();
                 });
 

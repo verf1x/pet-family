@@ -276,6 +276,11 @@ public class VolunteersTests
                 HelpRequisite.Create("string", "string").Value,
                 HelpRequisite.Create("string", "string").Value
             ]);
+        var photos = new Photos(
+            [
+                new Photo(PhotoPath.Create("photo1.jpg").Value),
+                new Photo(PhotoPath.Create("photo2.jpg").Value)
+            ]);
 
         return new Pet(
             PetId.CreateNew(),
@@ -289,6 +294,7 @@ public class VolunteersTests
             phoneNumber,
             dateOfBirth,
             HelpStatus.LookingForHome,
-            helpRequisites);
+            helpRequisites,
+            photos);
     }
 }

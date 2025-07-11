@@ -21,23 +21,23 @@ public class UpdateMainInfoHandler
     }
     
     public async Task<Result<Guid, Error>> HandleAsync(
-        UpdateMainInfoRequest request,
+        UpdateMainInfoCommand command,
         CancellationToken cancellationToken = default)
     {
-        var volunteerId = VolunteerId.Create(request.VolunteerId);
+        var volunteerId = VolunteerId.Create(command.VolunteerId);
         var volunteerResult = await _volunteersRepository.GetByIdAsync(volunteerId, cancellationToken);
         if (volunteerResult.IsFailure)
             return volunteerResult.Error;
         
         var fullName = FullName.Create(
-            request.Dto.FullName.FirstName,
-            request.Dto.FullName.LastName,
-            request.Dto.FullName.MiddleName).Value;
+            command.Dto.FullName.FirstName,
+            command.Dto.FullName.LastName,
+            command.Dto.FullName.MiddleName).Value;
         
-        var email = Email.Create(request.Dto.Email).Value;
-        var description = Description.Create(request.Dto.Description).Value;
-        var experienceYears = Experience.Create(request.Dto.ExperienceYears).Value;
-        var phoneNumber = PhoneNumber.Create(request.Dto.PhoneNumber).Value;
+        var email = Email.Create(command.Dto.Email).Value;
+        var description = Description.Create(command.Dto.Description).Value;
+        var experienceYears = Experience.Create(command.Dto.ExperienceYears).Value;
+        var phoneNumber = PhoneNumber.Create(command.Dto.PhoneNumber).Value;
         
         volunteerResult.Value.UpdateMainInfo(
             fullName,
@@ -48,7 +48,7 @@ public class UpdateMainInfoHandler
         
         var result = await _volunteersRepository.SaveAsync(volunteerResult.Value, cancellationToken);
         
-        _logger.LogInformation("Updated volunteer with ID: {VolunteerId}", request.VolunteerId); 
+        _logger.LogInformation("Updated volunteer with ID: {VolunteerId}", command.VolunteerId); 
         
         return result;
     }

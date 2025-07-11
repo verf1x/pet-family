@@ -2,7 +2,7 @@ using CSharpFunctionalExtensions;
 using PetFamily.Domain.Shared;
 using PetFamily.Domain.Shared.EntityIds;
 
-namespace PetFamily.Domain.Species.ValueObjects;
+namespace PetFamily.Domain.Volunteers.ValueObjects;
 
 public record SpeciesBreed
 {
@@ -17,11 +17,12 @@ public record SpeciesBreed
     
     public static Result<SpeciesBreed, Error> Create(SpeciesId speciesId, BreedId breedId)
     {
-        if (speciesId.Value == Guid.Empty)
-            return Errors.General.ValueIsInvalid(nameof(speciesId));
-
-        if (breedId.Value == Guid.Empty)
-            return Errors.General.ValueIsInvalid(nameof(breedId));
+        //TODO:
+        // if (speciesId.Value == Guid.Empty)
+        //     return Errors.General.ValueIsInvalid(nameof(speciesId));
+        //
+        // if (breedId.Value == Guid.Empty)
+        //     return Errors.General.ValueIsInvalid(nameof(breedId));
         
         return new SpeciesBreed(speciesId, breedId);
     }

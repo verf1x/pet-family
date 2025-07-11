@@ -2,7 +2,7 @@ using PetFamily.Application.Dtos;
 
 namespace PetFamily.Application.Volunteers.UpdateMainInfo;
 
-public record UpdateMainInfoRequest(
+public record UpdateMainInfoCommand(
     Guid VolunteerId, 
     UpdateMainInfoDto Dto);
     
