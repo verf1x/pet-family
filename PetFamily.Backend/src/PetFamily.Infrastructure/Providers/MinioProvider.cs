@@ -66,51 +66,6 @@ public class MinioProvider : IFileProvider
         return UnitResult.Success<Error>();
     }
 
-    public async Task<Result<string, Error>> RemoveFileAsync(string bucketName, string objectName, CancellationToken cancellationToken = default)
-    {
-        try
-        {
-            await CreateBucketIfNotExists(bucketName, cancellationToken);
-            
-            var removeObjectArgs = new RemoveObjectArgs()
-                .WithBucket(bucketName)
-                .WithObject(objectName);
-            
-            await _minioClient.RemoveObjectAsync(removeObjectArgs, cancellationToken);
-            
-            return objectName;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "An error occurred while removing the file from Minio");
-            return Error.Failure("file.delete", "An error occurred while removing the file from Minio");
-        }
-    }
-
-    public async Task<Result<string, Error>> GetPresignedUrlAsync(
-        GetPresignedUrlData data,
-        CancellationToken cancellationToken = default)
-    {
-        try
-        {
-            await CreateBucketIfNotExists(data.BucketName, cancellationToken);
-            
-            var presignedUrlArgs = new PresignedGetObjectArgs()
-                .WithBucket(data.BucketName)
-                .WithObject(data.ObjectName)
-                .WithExpiry((int)data.ExpirationTime.TotalSeconds);
-            
-            var result = await _minioClient.PresignedGetObjectAsync(presignedUrlArgs);
-            
-            return result;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "An error occurred while getting the presigned URL from Minio");
-            return Error.Failure("file.presigned-url", "An error occurred while getting the presigned URL from Minio");
-        }
-    }
-    
     private async Task CreateBucketIfNotExists(string bucketName, CancellationToken cancellationToken)
     {
         var bucketExistsArgs = new BucketExistsArgs()
