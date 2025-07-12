@@ -172,10 +172,10 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
                 pb.OwnsMany(p => p.Values,
                     pnb =>
                     {
-                        pnb.Property(p => p.PhotoPath)
+                        pnb.Property(p => p.FilePath)
                             .HasConversion(
                                 p => p.Path,
-                                value => PhotoPath.Create(value).Value)
+                                value => FilePath.Create(value).Value)
                             .IsRequired()
                             .HasMaxLength(Constants.MaxMediumTextLength)
                             .HasColumnName("photo_path");

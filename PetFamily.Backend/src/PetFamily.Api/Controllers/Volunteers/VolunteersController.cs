@@ -1,7 +1,7 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using PetFamily.Api.Extensions;
-using PetFamily.Application.Dtos.Pet;
+using PetFamily.Api.Processors;
 using PetFamily.Application.Volunteers.AddPet;
 using PetFamily.Application.Volunteers.Create;
 using PetFamily.Application.Volunteers.Delete;
@@ -95,41 +95,30 @@ public class VolunteersController : ApplicationController
         [FromServices] AddPetHandler handler,
         CancellationToken cancellationToken = default)
     {
-        var filesDto = new List<FileDto>();
+        await using var fileProcessor = new FormFileProcessor();
 
-        try
-        {
-            filesDto.AddRange(
-                from file in request.Files
-                let stream = file.OpenReadStream()
-                select new FileDto(stream, file.FileName));
-            
-            var command = new AddPetCommand(
-                id,
-                request.Nickname,
-                request.Description,
-                new SpeciesBreedDto(Guid.Empty, Guid.Empty), //TODO: убрать плейсхолдер
-                request.Color,
-                request.HealthInfoDto,
-                request.AddressDto,
-                request.MeasurementsDto,
-                request.OwnerPhoneNumber,
-                request.DateOfBirth,
-                request.HelpStatus,
-                request.HelpRequisites,
-                filesDto);
+        var fileDtos = fileProcessor.Process(request.Files);
 
-            var result = await handler.HandleAsync(command, cancellationToken);
+        var command = new AddPetCommand(
+            id,
+            request.Nickname,
+            request.Description,
+            new SpeciesBreedDto(Guid.Empty, Guid.Empty), //TODO: убрать плейсхолдер после добавления фичи с видами
+            request.Color,
+            request.HealthInfoDto,
+            request.AddressDto,
+            request.MeasurementsDto,
+            request.OwnerPhoneNumber,
+            request.DateOfBirth,
+            request.HelpStatus,
+            request.HelpRequisites,
+            fileDtos);
 
-            if (result.IsFailure)
-                return result.Error.ToResponse();
+        var result = await handler.HandleAsync(command, cancellationToken);
 
-            return Ok(result.Value);
-        }
-        finally
-        {
-            foreach (var fileDto in filesDto)
-                await fileDto.Content.DisposeAsync();
-        }
+        if (result.IsFailure)
+            return result.Error.ToResponse();
+
+        return Ok(result.Value);
     }
 }
