@@ -16,7 +16,7 @@ public static class Inject
         IConfiguration configuration)
     {
         services.AddScoped<ApplicationDbContext>();
-        services.AddScoped<IVolunteerRepository, VolunteerRepository>();
+        services.AddScoped<IVolunteersRepository, VolunteersRepository>();
         services.AddMinio(configuration);
         
         return services;

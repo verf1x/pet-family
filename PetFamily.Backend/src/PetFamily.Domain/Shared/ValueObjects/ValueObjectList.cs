@@ -10,11 +10,11 @@ public class ValueObjectList<T> : IReadOnlyList<T>
     
     public int Count => Values.Count;
     
-    public ValueObjectList() { }
+    private ValueObjectList() { }
 
     public ValueObjectList(IEnumerable<T> list)
     {
-        Values = new List<T>(list);
+        Values = new List<T>(list).AsReadOnly();
     }
     
     public IEnumerator<T> GetEnumerator() => Values.GetEnumerator();

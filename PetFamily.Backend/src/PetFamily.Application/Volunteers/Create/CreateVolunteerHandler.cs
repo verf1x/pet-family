@@ -10,14 +10,14 @@ namespace PetFamily.Application.Volunteers.Create;
 
 public class CreateVolunteerHandler
 {
-    private readonly IVolunteerRepository _volunteersRepository;
+    private readonly IVolunteersRepository _volunteersesRepository;
     private readonly ILogger<CreateVolunteerHandler> _logger;
 
     public CreateVolunteerHandler(
-        IVolunteerRepository volunteersRepository,
+        IVolunteersRepository volunteersesRepository,
         ILogger<CreateVolunteerHandler> logger)
     {
-        _volunteersRepository = volunteersRepository;
+        _volunteersesRepository = volunteersesRepository;
         _logger = logger;
     }
     
@@ -29,10 +29,10 @@ public class CreateVolunteerHandler
         var phoneNumber = PhoneNumber.Create(command.PhoneNumber).Value;
 
         var volunteerByEmail = 
-            await _volunteersRepository.GetByEmailAsync(email, cancellationToken);
+            await _volunteersesRepository.GetByEmailAsync(email, cancellationToken);
         
         var volunteerByPhoneNumber = 
-            await _volunteersRepository.GetByPhoneNumberAsync(phoneNumber, cancellationToken);
+            await _volunteersesRepository.GetByPhoneNumberAsync(phoneNumber, cancellationToken);
         
         if (volunteerByEmail.IsSuccess || volunteerByPhoneNumber.IsSuccess)
             return Errors.Module.AlreadyExists();
@@ -67,7 +67,7 @@ public class CreateVolunteerHandler
             socialNetworks, 
             helpRequisites);
         
-        await _volunteersRepository.AddAsync(volunteer, cancellationToken);
+        await _volunteersesRepository.AddAsync(volunteer, cancellationToken);
         
         _logger.LogInformation("Created volunteer with ID: {id}", id);
 

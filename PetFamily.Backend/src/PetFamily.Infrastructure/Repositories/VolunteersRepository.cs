@@ -8,11 +8,11 @@ using PetFamily.Domain.Volunteers.Entities;
 
 namespace PetFamily.Infrastructure.Repositories;
 
-public class VolunteerRepository : IVolunteerRepository
+public class VolunteersRepository : IVolunteersRepository
 {
     private readonly ApplicationDbContext _dbContext;
 
-    public VolunteerRepository(ApplicationDbContext dbContext)
+    public VolunteersRepository(ApplicationDbContext dbContext)
     {
         _dbContext = dbContext;
     }

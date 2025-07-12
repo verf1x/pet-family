@@ -5,6 +5,7 @@ using PetFamily.Domain.Shared.ValueObjects;
 using PetFamily.Domain.Species.ValueObjects;
 using PetFamily.Domain.Volunteers.Enums;
 using PetFamily.Domain.Volunteers.ValueObjects;
+using File = PetFamily.Domain.Volunteers.ValueObjects.File;
 
 namespace PetFamily.Domain.Volunteers.Entities;
 
@@ -34,7 +35,7 @@ public class Pet : SoftDeletableEntity<PetId>
     
     public ValueObjectList<HelpRequisite> HelpRequisites { get; private set; }
     
-    public ValueObjectList<Photo> Photos { get; private set; }
+    public ValueObjectList<File> Photos { get; private set; }
     
     public DateTime CreatedAt { get; private set; }
     
@@ -54,7 +55,7 @@ public class Pet : SoftDeletableEntity<PetId>
         DateOnly dateOfBirth,
         HelpStatus helpStatus,
         ValueObjectList<HelpRequisite> helpRequisites,
-        ValueObjectList<Photo> photos) : base(id)
+        ValueObjectList<File> photos) : base(id)
     {
         Nickname = nickname;
         Description = description;

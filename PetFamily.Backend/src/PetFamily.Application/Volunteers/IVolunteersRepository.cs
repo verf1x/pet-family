@@ -6,7 +6,7 @@ using PetFamily.Domain.Volunteers.Entities;
 
 namespace PetFamily.Application.Volunteers;
 
-public interface IVolunteerRepository
+public interface IVolunteersRepository
 {
     Task<Guid> AddAsync(Volunteer volunteer, CancellationToken cancellationToken = default);
     
