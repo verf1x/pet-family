@@ -1,6 +1,6 @@
-using PetFamily.Domain.Species.ValueObjects;
+using PetFamily.Domain.SpeciesManagement.ValueObjects;
 
-namespace PetFamily.Domain.Volunteers.ValueObjects;
+namespace PetFamily.Domain.VolunteersManagement.ValueObjects;
 
 public record Breeds
 {

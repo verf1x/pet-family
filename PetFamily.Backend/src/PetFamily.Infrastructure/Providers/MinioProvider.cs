@@ -5,7 +5,7 @@ using Minio.DataModel.Args;
 using PetFamily.Application.FileProvider;
 using PetFamily.Application.Providers;
 using PetFamily.Domain.Shared;
-using PetFamily.Domain.Volunteers.ValueObjects;
+using PetFamily.Domain.VolunteersManagement.ValueObjects;
 
 namespace PetFamily.Infrastructure.Providers;
 

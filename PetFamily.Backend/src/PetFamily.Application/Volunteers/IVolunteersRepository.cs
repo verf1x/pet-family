@@ -2,17 +2,15 @@ using CSharpFunctionalExtensions;
 using PetFamily.Domain.Shared;
 using PetFamily.Domain.Shared.EntityIds;
 using PetFamily.Domain.Shared.ValueObjects;
-using PetFamily.Domain.Volunteers.Entities;
+using PetFamily.Domain.VolunteersManagement.Entities;
 
 namespace PetFamily.Application.Volunteers;
 
 public interface IVolunteersRepository
 {
     Task<Guid> AddAsync(Volunteer volunteer, CancellationToken cancellationToken = default);
-    
-    Task<Guid> SaveAsync(Volunteer volunteer, CancellationToken cancellationToken = default);
-    
-    Task<Guid> DeleteAsync(Volunteer volunteer, CancellationToken cancellationToken = default);
+
+    Task<Guid> RemoveAsync(Volunteer volunteer, CancellationToken cancellationToken = default);
     
     Task<Result<Volunteer, Error>> GetByIdAsync(VolunteerId volunteerId, CancellationToken cancellationToken = default);
     

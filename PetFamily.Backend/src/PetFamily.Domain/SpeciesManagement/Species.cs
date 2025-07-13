@@ -1,9 +1,9 @@
 using CSharpFunctionalExtensions;
 using PetFamily.Domain.Shared;
 using PetFamily.Domain.Shared.EntityIds;
-using PetFamily.Domain.Volunteers.ValueObjects;
+using PetFamily.Domain.VolunteersManagement.ValueObjects;
 
-namespace PetFamily.Domain.Species;
+namespace PetFamily.Domain.SpeciesManagement;
 
 public class Species : Shared.Entity<SpeciesId>
 {
