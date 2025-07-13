@@ -1,5 +1,5 @@
-using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using PetFamily.Api.Controllers.Volunteers.Requests;
 using PetFamily.Api.Extensions;
 using PetFamily.Api.Processors;
 using PetFamily.Application.Volunteers.AddPet;
@@ -14,10 +14,10 @@ public class VolunteersController : ApplicationController
     [HttpPost]
     public async Task<ActionResult<Guid>> CreateAsync(
         [FromServices] CreateVolunteerHandler handler,
-        [FromBody] CreateVolunteerCommand command,
+        [FromBody] CreateVolunteerRequest request,
         CancellationToken cancellationToken = default)
     {
-        var result = await handler.HandleAsync(command, cancellationToken);
+        var result = await handler.HandleAsync(request.ToCommand(), cancellationToken);
         if (result.IsFailure)
             return result.Error.ToResponse();
 
@@ -27,19 +27,11 @@ public class VolunteersController : ApplicationController
     [HttpPut("{id:guid}/main-info")]
     public async Task<IActionResult> UpdateMainInfoAsync(
         [FromRoute] Guid id,
-        [FromBody] UpdateMainInfoDto dto,
+        [FromBody] UpdateMainInfoRequest request,
         [FromServices] UpdateMainInfoHandler handler,
-        [FromServices] IValidator<UpdateMainInfoCommand> validator,
         CancellationToken cancellationToken = default)
     {
-        var command = new UpdateMainInfoCommand(id, dto);
-
-        var validationResult = await validator.ValidateAsync(command, cancellationToken);
-        if (validationResult.IsValid is false)
-            return validationResult.ToValidationErrorResponse();
-
-        var result = await handler.HandleAsync(command, cancellationToken);
-
+        var result = await handler.HandleAsync(request.ToCommand(id), cancellationToken);
         if (result.IsFailure)
             return result.Error.ToResponse();
 
@@ -50,17 +42,10 @@ public class VolunteersController : ApplicationController
     public async Task<IActionResult> DeleteAsync(
         [FromRoute] Guid id,
         [FromServices] SoftDeleteVolunteerHandler handler,
-        [FromServices] IValidator<DeleteVolunteerCommand> validator,
         CancellationToken cancellationToken = default)
     {
         var command = new DeleteVolunteerCommand(id);
-
-        var validationResult = await validator.ValidateAsync(command, cancellationToken);
-        if (validationResult.IsValid is false)
-            return validationResult.ToValidationErrorResponse();
-
         var result = await handler.HandleAsync(command, cancellationToken);
-
         if (result.IsFailure)
             return result.Error.ToResponse();
 
@@ -71,17 +56,10 @@ public class VolunteersController : ApplicationController
     public async Task<IActionResult> DeleteAsync(
         [FromRoute] Guid id,
         [FromServices] HardDeleteVolunteerHandler handler,
-        [FromServices] IValidator<DeleteVolunteerCommand> validator,
         CancellationToken cancellationToken = default)
     {
         var command = new DeleteVolunteerCommand(id);
-
-        var validationResult = await validator.ValidateAsync(command, cancellationToken);
-        if (validationResult.IsValid is false)
-            return validationResult.ToValidationErrorResponse();
-
         var result = await handler.HandleAsync(command, cancellationToken);
-
         if (result.IsFailure)
             return result.Error.ToResponse();
 
@@ -98,22 +76,8 @@ public class VolunteersController : ApplicationController
         await using var fileProcessor = new FormFileProcessor();
 
         var fileDtos = fileProcessor.Process(request.Files);
-
-        var command = new AddPetCommand(
-            id,
-            request.Nickname,
-            request.Description,
-            new SpeciesBreedDto(Guid.Empty, Guid.Empty), //TODO: убрать плейсхолдер после добавления фичи с видами
-            request.Color,
-            request.HealthInfoDto,
-            request.AddressDto,
-            request.MeasurementsDto,
-            request.OwnerPhoneNumber,
-            request.DateOfBirth,
-            request.HelpStatus,
-            request.HelpRequisites,
-            fileDtos);
-
+        
+        var command = request.ToCommand(id, fileDtos);
         var result = await handler.HandleAsync(command, cancellationToken);
 
         if (result.IsFailure)

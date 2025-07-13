@@ -9,7 +9,7 @@ public static class Errors
         public static Error ValueIsInvalid(string? name = null)
         {
             var label = name ?? "value";
-            return Error.Validation("value.is.invalid", $"{label} is invalid");
+            return Error.Validation("value.is.invalid", $"{label} is invalid", label);
         }
         
         public static Error NotFound(Guid? id = null)
@@ -35,7 +35,7 @@ public static class Errors
     {
         public static Error AlreadyExists()
         {
-            return Error.Validation("record.already.exists", $"Module already exists");
+            return Error.Validation("record.already.exists", $"Module already exists", null);
         }
     }
 }

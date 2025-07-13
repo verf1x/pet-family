@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PetFamily.Domain.Shared;
 using PetFamily.Domain.Shared.EntityIds;
-using PetFamily.Domain.Volunteers.Entities;
-using PetFamily.Domain.Volunteers.Enums;
-using PetFamily.Domain.Volunteers.ValueObjects;
+using PetFamily.Domain.VolunteersManagement.Entities;
+using PetFamily.Domain.VolunteersManagement.Enums;
+using PetFamily.Domain.VolunteersManagement.ValueObjects;
 
 namespace PetFamily.Infrastructure.Configurations;
 

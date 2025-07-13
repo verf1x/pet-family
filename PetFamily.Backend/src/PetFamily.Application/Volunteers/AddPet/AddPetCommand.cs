@@ -1,6 +1,6 @@
 using PetFamily.Application.Dtos;
 using PetFamily.Application.Dtos.Pet;
-using PetFamily.Domain.Volunteers.Enums;
+using PetFamily.Domain.VolunteersManagement.Enums;
 
 namespace PetFamily.Application.Volunteers.AddPet;
 
@@ -17,4 +17,8 @@ public record AddPetCommand(
     DateOnly DateOfBirth,
     HelpStatus HelpStatus,
     IEnumerable<HelpRequisiteDto> HelpRequisites,
-    IEnumerable<CreateFileDto> Files);
+    IEnumerable<CreateFileCommand> Files);
+    
+public record CreateFileCommand(
+    Stream Content,
+    string FileName);

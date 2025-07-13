@@ -1,4 +1,4 @@
-namespace PetFamily.Application.Volunteers.AddPet;
+namespace PetFamily.Application.Dtos.Pet;
 
 public record AddressDto(
     IEnumerable<string> AddressLines,

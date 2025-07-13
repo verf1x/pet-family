@@ -1,12 +1,11 @@
 using FluentValidation;
 using PetFamily.Application.Validation;
-using PetFamily.Domain.Shared;
 using PetFamily.Domain.Shared.ValueObjects;
-using PetFamily.Domain.Volunteers.ValueObjects;
+using PetFamily.Domain.VolunteersManagement.ValueObjects;
 
 namespace PetFamily.Application.Volunteers.UpdateMainInfo;
 
-public class UpdateMainInfoCommandValidator : AbstractValidator<UpdateMainInfoDto>
+public class UpdateMainInfoCommandValidator : AbstractValidator<UpdateMainInfoCommand>
 {
     public UpdateMainInfoCommandValidator()
     {
@@ -24,15 +23,5 @@ public class UpdateMainInfoCommandValidator : AbstractValidator<UpdateMainInfoDt
 
         RuleFor(d => d.PhoneNumber)
             .MustBeValueObject(PhoneNumber.Create);
-    }
-}
-
-public class UpdateMainInfoDtoValidator : AbstractValidator<UpdateMainInfoCommand>
-{
-    public UpdateMainInfoDtoValidator()
-    {
-        RuleFor(r => r.VolunteerId)
-            .NotEmpty()
-            .WithError(Errors.General.ValueIsRequired());
     }
 }

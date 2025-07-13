@@ -1,17 +1,17 @@
-using PetFamily.Application.Dtos.Pet;
+using PetFamily.Application.Volunteers.AddPet;
 
 namespace PetFamily.Api.Processors;
 
 public class FormFileProcessor : IAsyncDisposable
 {
-    private readonly List<CreateFileDto> _fileDtos = [];
+    private readonly List<CreateFileCommand> _fileDtos = [];
 
-    public List<CreateFileDto> Process(IEnumerable<IFormFile> files)
+    public List<CreateFileCommand> Process(IEnumerable<IFormFile> files)
     {
         foreach (var file in files)
         {
             var stream = file.OpenReadStream();
-            var fileDto = new CreateFileDto(stream, file.FileName);
+            var fileDto = new CreateFileCommand(stream, file.FileName);
             _fileDtos.Add(fileDto);
         }
         

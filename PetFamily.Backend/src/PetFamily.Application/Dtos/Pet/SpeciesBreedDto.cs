@@ -1,3 +1,3 @@
-namespace PetFamily.Application.Volunteers.AddPet;
+namespace PetFamily.Application.Dtos.Pet;
 
 public record SpeciesBreedDto(Guid SpeciesId, Guid BreedId);

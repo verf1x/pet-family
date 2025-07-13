@@ -2,7 +2,7 @@ using CSharpFunctionalExtensions;
 using PetFamily.Domain.Shared;
 using PetFamily.Domain.Shared.EntityIds;
 
-namespace PetFamily.Domain.Volunteers.ValueObjects;
+namespace PetFamily.Domain.VolunteersManagement.ValueObjects;
 
 public record SpeciesBreed
 {

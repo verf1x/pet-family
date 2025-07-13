@@ -2,12 +2,11 @@
 using PetFamily.Domain.Shared;
 using PetFamily.Domain.Shared.EntityIds;
 using PetFamily.Domain.Shared.ValueObjects;
-using PetFamily.Domain.Species.ValueObjects;
-using PetFamily.Domain.Volunteers.Enums;
-using PetFamily.Domain.Volunteers.ValueObjects;
-using File = PetFamily.Domain.Volunteers.ValueObjects.File;
+using PetFamily.Domain.VolunteersManagement.Enums;
+using PetFamily.Domain.VolunteersManagement.ValueObjects;
+using File = PetFamily.Domain.VolunteersManagement.ValueObjects.File;
 
-namespace PetFamily.Domain.Volunteers.Entities;
+namespace PetFamily.Domain.VolunteersManagement.Entities;
 
 public class Pet : SoftDeletableEntity<PetId>
 {

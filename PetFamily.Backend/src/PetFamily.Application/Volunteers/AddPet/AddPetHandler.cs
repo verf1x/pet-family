@@ -6,9 +6,9 @@ using PetFamily.Application.Providers;
 using PetFamily.Domain.Shared;
 using PetFamily.Domain.Shared.EntityIds;
 using PetFamily.Domain.Shared.ValueObjects;
-using PetFamily.Domain.Volunteers.Entities;
-using PetFamily.Domain.Volunteers.ValueObjects;
-using File = PetFamily.Domain.Volunteers.ValueObjects.File;
+using PetFamily.Domain.VolunteersManagement.Entities;
+using PetFamily.Domain.VolunteersManagement.ValueObjects;
+using File = PetFamily.Domain.VolunteersManagement.ValueObjects.File;
 
 namespace PetFamily.Application.Volunteers.AddPet;
 
@@ -18,18 +18,18 @@ public class AddPetHandler
 
     private readonly IFileProvider _fileProvider;
     private readonly IVolunteersRepository _volunteersRepository;
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly IApplicationDbContext _dbContext;
     private readonly ILogger<AddPetHandler> _logger;
 
     public AddPetHandler(
         IFileProvider fileProvider,
         IVolunteersRepository volunteersRepository,
-        IUnitOfWork unitOfWork,
+        IApplicationDbContext dbContext,
         ILogger<AddPetHandler> logger)
     {
         _fileProvider = fileProvider;
         _volunteersRepository = volunteersRepository;
-        _unitOfWork = unitOfWork;
+        _dbContext = dbContext;
         _logger = logger;
     }
 
@@ -37,7 +37,7 @@ public class AddPetHandler
         AddPetCommand command,
         CancellationToken cancellationToken = default)
     {
-        var transaction = await _unitOfWork.BeginTransactionAsync(cancellationToken);
+        var transaction = await _dbContext.BeginTransactionAsync(cancellationToken);
 
         try
         {
@@ -60,7 +60,7 @@ public class AddPetHandler
                 command.HealthInfoDto.IsNeutered,
                 command.HealthInfoDto.IsVaccinated).Value;
 
-            var address = Address.Create(
+            var address = Address.Create( 
                 command.AddressDto.AddressLines.ToList(),
                 command.AddressDto.Locality,
                 command.AddressDto.Region,
@@ -102,13 +102,13 @@ public class AddPetHandler
 
             volunteerResult.Value.AddPet(pet);
             
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            await _dbContext.SaveChangesAsync(cancellationToken);
 
             var uploadResult = await _fileProvider.UploadFilesAsync(filesData.Value, cancellationToken);
             if (uploadResult.IsFailure)
                 return uploadResult.Error;
             
-            transaction.Commit();
+            await transaction.CommitAsync(cancellationToken);
 
             return pet.Id.Value;
         }
@@ -116,7 +116,7 @@ public class AddPetHandler
         {
             _logger.LogError(ex, "Cannot add pet for volunteer with id {VolunteerId}", command.VolunteerId);
             
-            transaction.Rollback();
+            await transaction.RollbackAsync(cancellationToken);
             
             return Error.Failure(
                     "volunteer.pet.failure",

@@ -1,3 +1,3 @@
-namespace PetFamily.Application.Volunteers.AddPet;
+namespace PetFamily.Application.Dtos.Pet;
 
 public record HealthInfoDto(string HealthStatus, bool IsNeutered, bool IsVaccinated);
