@@ -17,9 +17,9 @@ public record AddPetRequest(
     DateOnly DateOfBirth,
     HelpStatus HelpStatus,
     IEnumerable<HelpRequisiteDto> HelpRequisites,
-    IFormFileCollection Files)
+    IFormFileCollection Photos)
 {
-    public AddPetCommand ToCommand(Guid volunteerId, List<CreateFileCommand> files)
+    public AddPetCommand ToCommand(Guid volunteerId, List<CreateFileDto> files)
         => new AddPetCommand(
             volunteerId,
             Nickname,
@@ -34,4 +34,20 @@ public record AddPetRequest(
             HelpStatus,
             HelpRequisites,
             files);
+}
+
+public record AddPetRequestImpl(
+    string Nickname,
+    string Description,
+    SpeciesBreedDto SpeciesBreedDto,
+    string Color,
+    HealthInfoDto HealthInfoDto,
+    AddressDto AddressDto,
+    MeasurementsDto MeasurementsDto,
+    string OwnerPhoneNumber,
+    DateOnly DateOfBirth,
+    HelpStatus HelpStatus,
+    IEnumerable<HelpRequisiteDto> HelpRequisites,
+    IFormFileCollection Photos) : AddPetRequest(Nickname, Description, SpeciesBreedDto, Color, HealthInfoDto, AddressDto, MeasurementsDto, OwnerPhoneNumber, DateOfBirth, HelpStatus, HelpRequisites, Photos)
+{
 }

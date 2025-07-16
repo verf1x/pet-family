@@ -7,7 +7,11 @@ namespace PetFamily.Application.Providers;
 
 public interface IFileProvider
 {
-    public Task<Result<IReadOnlyList<FilePath>, Error>> UploadFilesAsync(
-        IEnumerable<FileData> filesData,
+    public Task<Result<List<PhotoPath>, Error>> UploadPhotosAsync(
+        IEnumerable<AddPhotoData> filesData,
+        CancellationToken cancellationToken = default);
+    
+    public Task<Result<List<string>, Error>> RemovePhotosAsync(
+        IEnumerable<string> photoPaths,
         CancellationToken cancellationToken = default);
 }

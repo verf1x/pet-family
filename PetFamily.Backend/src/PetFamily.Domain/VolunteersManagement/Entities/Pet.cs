@@ -4,12 +4,14 @@ using PetFamily.Domain.Shared.EntityIds;
 using PetFamily.Domain.Shared.ValueObjects;
 using PetFamily.Domain.VolunteersManagement.Enums;
 using PetFamily.Domain.VolunteersManagement.ValueObjects;
-using File = PetFamily.Domain.VolunteersManagement.ValueObjects.File;
 
 namespace PetFamily.Domain.VolunteersManagement.Entities;
 
 public class Pet : SoftDeletableEntity<PetId>
 {
+    private readonly List<HelpRequisite> _helpRequisites;
+    private readonly List<Photo> _photos;
+    
     public Nickname Nickname { get; private set; }
     
     public Description Description { get; private set; }
@@ -31,10 +33,10 @@ public class Pet : SoftDeletableEntity<PetId>
     public DateOnly DateOfBirth { get; private set; }
     
     public HelpStatus HelpStatus { get; private set; }
-    
-    public ValueObjectList<HelpRequisite> HelpRequisites { get; private set; }
-    
-    public ValueObjectList<File> Photos { get; private set; }
+
+    public IReadOnlyList<HelpRequisite> HelpRequisites => _helpRequisites;
+
+    public IReadOnlyList<Photo> Photos => _photos;
     
     public DateTime CreatedAt { get; private set; }
     
@@ -53,8 +55,8 @@ public class Pet : SoftDeletableEntity<PetId>
         PhoneNumber ownerPhoneNumber,
         DateOnly dateOfBirth,
         HelpStatus helpStatus,
-        ValueObjectList<HelpRequisite> helpRequisites,
-        ValueObjectList<File> photos) : base(id)
+        List<HelpRequisite> helpRequisites,
+        List<Photo> photos) : base(id)
     {
         Nickname = nickname;
         Description = description;
@@ -66,9 +68,24 @@ public class Pet : SoftDeletableEntity<PetId>
         OwnerPhoneNumber = ownerPhoneNumber;
         DateOfBirth = dateOfBirth;
         HelpStatus = helpStatus;
-        HelpRequisites = helpRequisites;
-        Photos = photos;
+        _helpRequisites = helpRequisites;
+        _photos = photos;
         CreatedAt = DateTime.UtcNow;
+    }
+    
+    public void AddPhotos(List<Photo> photos)
+    {
+        foreach (var photo in photos)
+        {
+            if(!_photos.Contains(photo))
+                _photos.Add(photo);
+        }
+    }
+    
+    public void RemovePhotos(List<Photo> photos)
+    {
+        foreach (var photo in photos)
+            _photos.Remove(photo);
     }
     
     public void SetSerialNumber(Position position)

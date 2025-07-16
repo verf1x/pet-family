@@ -21,9 +21,9 @@ public class Volunteer : SoftDeletableEntity<VolunteerId>
 
     public PhoneNumber PhoneNumber { get; private set; }
 
-    public ValueObjectList<SocialNetwork> SocialNetworks { get; private set; }
+    public IReadOnlyList<SocialNetwork> SocialNetworks { get; private set; }
 
-    public ValueObjectList<HelpRequisite> HelpRequisites { get; private set; }
+    public IReadOnlyList<HelpRequisite> HelpRequisites { get; private set; }
 
     public IReadOnlyList<Pet> Pets => _pets;
 
@@ -43,8 +43,8 @@ public class Volunteer : SoftDeletableEntity<VolunteerId>
         Description description,
         Experience experience,
         PhoneNumber phoneNumber,
-        ValueObjectList<SocialNetwork> socialNetworks,
-        ValueObjectList<HelpRequisite> helpRequisites) : base(id)
+        IReadOnlyList<SocialNetwork> socialNetworks,
+        IReadOnlyList<HelpRequisite> helpRequisites) : base(id)
     {
         FullName = fullName;
         Email = email;
@@ -55,6 +55,15 @@ public class Volunteer : SoftDeletableEntity<VolunteerId>
         HelpRequisites = helpRequisites;
     }
 
+    public Result<Pet, Error> GetPetById(PetId petId)
+    {
+        var pet = _pets.FirstOrDefault(p => p.Id == petId);
+        if (pet is null)
+            return Errors.General.NotFound(petId.Value);
+
+        return pet;
+    }
+    
     public UnitResult<Error> AddPet(Pet pet)
     {
         if (_pets.Contains(pet))

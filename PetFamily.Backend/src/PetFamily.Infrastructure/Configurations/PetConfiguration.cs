@@ -146,40 +146,32 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
             .IsRequired()
             .HasDefaultValue(HelpStatus.NeedsHelp);
 
-        builder.OwnsOne(p => p.HelpRequisites,
+        builder.OwnsMany(p => p.HelpRequisites,
             hdb =>
             {
                 hdb.ToJson("pet_help_requisites");
-                hdb.OwnsMany(hd => hd.Values,
-                    db =>
-                    {
-                        db.Property(d => d.Name)
+                        hdb.Property(d => d.Name)
                             .IsRequired()
                             .HasMaxLength(Constants.MaxLowTextLength)
                             .HasColumnName("help_requisite_name");
 
-                        db.Property(d => d.Description)
+                        hdb.Property(d => d.Description)
                             .IsRequired()
                             .HasMaxLength(Constants.MaxMediumTextLength)
                             .HasColumnName("help_requisite_description");
-                    });
             });
 
-        builder.OwnsOne(p => p.Photos,
+        builder.OwnsMany(p => p.Photos,
             pb =>
             {
                 pb.ToJson("pet_photos");
-                pb.OwnsMany(p => p.Values,
-                    pnb =>
-                    {
-                        pnb.Property(p => p.FilePath)
-                            .HasConversion(
-                                p => p.Path,
-                                value => FilePath.Create(value).Value)
-                            .IsRequired()
-                            .HasMaxLength(Constants.MaxMediumTextLength)
-                            .HasColumnName("photo_path");
-                    });
+                pb.Property(p => p.PhotoPath)
+                    .HasConversion(
+                        p => p.Path,
+                        value => PhotoPath.Create(value).Value)
+                    .IsRequired()
+                    .HasMaxLength(Constants.MaxMediumTextLength)
+                    .HasColumnName("photo_path");
             });
 
         builder.Property(p => p.CreatedAt)
