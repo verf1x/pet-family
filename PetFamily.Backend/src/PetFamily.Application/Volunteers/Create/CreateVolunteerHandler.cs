@@ -60,15 +60,15 @@ public class CreateVolunteerHandler
         var description = Description.Create(command.Description).Value;
         var experience = Experience.Create(command.ExperienceYears).Value;
         
-        var socialNetworks = new ValueObjectList<SocialNetwork>(
+        var socialNetworks = new List<SocialNetwork>(
             command.SocialNetworks
                 .Select(s => SocialNetwork.Create(s.Name, s.Url).Value)
-                .ToList());
+                .ToList()).AsReadOnly();
         
-        var helpRequisites = new ValueObjectList<HelpRequisite>(
+        var helpRequisites = new List<HelpRequisite>(
             command.HelpRequisites
                 .Select(r => HelpRequisite.Create(r.Name, r.Description).Value)
-                .ToList());
+                .ToList()).AsReadOnly();
         
         Volunteer volunteer = new(
             id,

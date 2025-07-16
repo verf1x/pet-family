@@ -1,0 +1,40 @@
+using FluentValidation;
+using PetFamily.Application.Validation;
+using PetFamily.Domain.Shared;
+using PetFamily.Domain.Shared.ValueObjects;
+using PetFamily.Domain.VolunteersManagement.ValueObjects;
+
+namespace PetFamily.Application.Volunteers.AddPet;
+
+public class AddPetCommandValidator : AbstractValidator<AddPetCommand>
+{
+    public AddPetCommandValidator()
+    {
+        RuleFor(c => c.VolunteerId)
+            .NotEmpty()
+            .WithError(Errors.General.ValueIsRequired(nameof(AddPetCommand.VolunteerId)));
+
+        RuleFor(c => c.Nickname)
+            .MustBeValueObject(Nickname.Create);
+
+        RuleFor(c => c.Description)
+            .MustBeValueObject(Description.Create);
+        
+        RuleFor(c => c.Color)
+            .MustBeValueObject(Color.Create);
+
+        RuleFor(c => c.HealthInfoDto)
+            .Must(cb => !string.IsNullOrWhiteSpace(cb.HealthStatus));
+
+        RuleFor(c => c.AddressDto)
+            .MustBeValueObject(c => 
+                Address.Create(
+                    c.AddressLines.ToList(),
+                    c.Locality,
+                    c.Region,
+                    c.PostalCode,
+                    c.CountryCode));
+        
+        RuleFor(c => c.)
+    }
+}

@@ -38,8 +38,8 @@ namespace PetFamily.Infrastructure.Migrations
                     phone_number = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false),
                     deletion_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    help_requisites = table.Column<string>(type: "jsonb", nullable: false),
-                    social_networks = table.Column<string>(type: "jsonb", nullable: false)
+                    help_requisites = table.Column<string>(type: "jsonb", nullable: true),
+                    social_networks = table.Column<string>(type: "jsonb", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -77,8 +77,8 @@ namespace PetFamily.Infrastructure.Migrations
                     species_id = table.Column<Guid>(type: "uuid", nullable: false),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false),
                     deletion_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    pet_help_requisites = table.Column<string>(type: "jsonb", nullable: false),
-                    pet_photos = table.Column<string>(type: "jsonb", nullable: false)
+                    pet_help_requisites = table.Column<string>(type: "jsonb", nullable: true),
+                    pet_photos = table.Column<string>(type: "jsonb", nullable: true)
                 },
                 constraints: table =>
                 {

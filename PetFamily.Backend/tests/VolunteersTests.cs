@@ -4,7 +4,6 @@ using PetFamily.Domain.Shared.ValueObjects;
 using PetFamily.Domain.VolunteersManagement.Entities;
 using PetFamily.Domain.VolunteersManagement.Enums;
 using PetFamily.Domain.VolunteersManagement.ValueObjects;
-using File = PetFamily.Domain.VolunteersManagement.ValueObjects.File;
 
 namespace PetFamily.Domain.UnitTests;
 
@@ -276,10 +275,10 @@ public class VolunteersTests
                 HelpRequisite.Create("string", "string").Value,
                 HelpRequisite.Create("string", "string").Value
             ]);
-        var photos = new List<File>(
+        var photos = new List<Photo>(
             [
-                new File(FilePath.Create("photo1.jpg").Value),
-                new File(FilePath.Create("photo2.jpg").Value)
+                new Photo(PhotoPath.Create("photo1.jpg").Value),
+                new Photo(PhotoPath.Create("photo2.jpg").Value)
             ]);
 
         return new Pet(

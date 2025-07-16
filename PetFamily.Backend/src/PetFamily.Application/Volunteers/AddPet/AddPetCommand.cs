@@ -17,8 +17,4 @@ public record AddPetCommand(
     DateOnly DateOfBirth,
     HelpStatus HelpStatus,
     IEnumerable<HelpRequisiteDto> HelpRequisites,
-    IEnumerable<CreateFileCommand> Files);
-    
-public record CreateFileCommand(
-    Stream Content,
-    string FileName);
+    IEnumerable<CreateFileDto> Photos);

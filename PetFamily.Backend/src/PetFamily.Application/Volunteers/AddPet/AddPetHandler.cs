@@ -1,21 +1,18 @@
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using PetFamily.Application.Database;
-using PetFamily.Application.FileProvider;
+using PetFamily.Application.Extensions;
 using PetFamily.Application.Providers;
 using PetFamily.Domain.Shared;
 using PetFamily.Domain.Shared.EntityIds;
 using PetFamily.Domain.Shared.ValueObjects;
 using PetFamily.Domain.VolunteersManagement.Entities;
 using PetFamily.Domain.VolunteersManagement.ValueObjects;
-using File = PetFamily.Domain.VolunteersManagement.ValueObjects.File;
 
 namespace PetFamily.Application.Volunteers.AddPet;
 
 public class AddPetHandler
 {
-    private const string BucketName = "photos";
-
     private readonly IFileProvider _fileProvider;
     private readonly IVolunteersRepository _volunteersRepository;
     private readonly IApplicationDbContext _dbContext;
@@ -79,11 +76,11 @@ public class AddPetHandler
                 .Select(r => HelpRequisite.Create(r.Name, r.Description).Value)
                 .ToList();
 
-            var filesData = GetFilesData(command);
+            var filesData = command.Photos.ToDataCollection();
             if (filesData.IsFailure)
                 return filesData.Error;
 
-            var petFiles = GetFilesFromFilesData(filesData.Value);
+            var petFiles = filesData.Value.ToPhotosCollection();
 
             var pet = new Pet(
                 petId,
@@ -104,7 +101,7 @@ public class AddPetHandler
             
             await _dbContext.SaveChangesAsync(cancellationToken);
 
-            var uploadResult = await _fileProvider.UploadFilesAsync(filesData.Value, cancellationToken);
+            var uploadResult = await _fileProvider.UploadPhotosAsync(filesData.Value, cancellationToken);
             if (uploadResult.IsFailure)
                 return uploadResult.Error;
             
@@ -122,32 +119,5 @@ public class AddPetHandler
                     "volunteer.pet.failure",
                     "Cannot add pet for volunteer with id " + command.VolunteerId);
         }
-    }
-
-    private Result<List<FileData>, Error> GetFilesData(AddPetCommand command)
-    {
-        var result = new List<FileData>();
-
-        foreach (var file in command.Files)
-        {
-            var extension = Path.GetExtension(file.FileName);
-
-            var pathResult = FilePath.Create(Guid.NewGuid(), extension);
-            if (pathResult.IsFailure)
-                return pathResult.Error;
-
-            var fileContent = new FileData(file.Content, pathResult.Value, BucketName);
-            result.Add(fileContent);
-        }
-
-        return result;
-    }
-
-    private List<File> GetFilesFromFilesData(List<FileData> filesData)
-    {
-        return filesData
-            .Select(f => f.FilePath)
-            .Select(f => new File(f))
-            .ToList();
     }
 }

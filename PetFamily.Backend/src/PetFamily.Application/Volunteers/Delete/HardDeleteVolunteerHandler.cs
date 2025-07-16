@@ -1,7 +1,6 @@
 using CSharpFunctionalExtensions;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
-using PetFamily.Application.Database;
 using PetFamily.Application.Extensions;
 using PetFamily.Domain.Shared;
 using PetFamily.Domain.Shared.EntityIds;
@@ -12,18 +11,15 @@ public class HardDeleteVolunteerHandler
 {
     private readonly IVolunteersRepository _volunteersRepository;
     private readonly IValidator<DeleteVolunteerCommand> _validator;
-    private readonly IApplicationDbContext _dbContext;
     private readonly ILogger<SoftDeleteVolunteerHandler> _logger;
 
     public HardDeleteVolunteerHandler(
         IVolunteersRepository volunteersRepository,
         IValidator<DeleteVolunteerCommand> validator,
-        IApplicationDbContext dbContext,
         ILogger<SoftDeleteVolunteerHandler> logger)
     {
         _volunteersRepository = volunteersRepository;
         _validator = validator;
-        _dbContext = dbContext;
         _logger = logger;
     }
     

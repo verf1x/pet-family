@@ -35,7 +35,6 @@ public class VolunteersRepository : IVolunteersRepository
         
         return volunteer.Id;
     }
-
     
     public async Task<Result<Volunteer, Error>> GetByIdAsync(
         VolunteerId volunteerId,
