@@ -19,7 +19,7 @@ public class AddPetCommandValidator : AbstractValidator<AddPetCommand>
 
         RuleFor(c => c.Description)
             .MustBeValueObject(Description.Create);
-        
+
         RuleFor(c => c.Color)
             .MustBeValueObject(Color.Create);
 
@@ -27,14 +27,34 @@ public class AddPetCommandValidator : AbstractValidator<AddPetCommand>
             .Must(cb => !string.IsNullOrWhiteSpace(cb.HealthStatus));
 
         RuleFor(c => c.AddressDto)
-            .MustBeValueObject(c => 
+            .MustBeValueObject(c =>
                 Address.Create(
                     c.AddressLines.ToList(),
                     c.Locality,
                     c.Region,
                     c.PostalCode,
                     c.CountryCode));
-        
-        RuleFor(c => c.)
+
+        RuleFor(c => c.MeasurementsDto)
+            .MustBeValueObject(c => Measurements.Create(c.Height, c.Weight));
+
+        RuleFor(c => c.OwnerPhoneNumber)
+            .MustBeValueObject(PhoneNumber.Create);
+
+        RuleFor(c => c.DateOfBirth)
+            .NotEmpty();
+
+        RuleFor(c => c.HelpStatus)
+            .NotEmpty();
+
+        RuleForEach(c => c.HelpRequisites)
+            .MustBeValueObject(
+                cb => HelpRequisite.Create(
+                    cb.Name,
+                    cb.Description));
+
+        RuleForEach(c => c.Photos)
+            .Must(cb => cb.Content.Length != 0)
+            .MustBeValueObject(cb => PhotoPath.Create(cb.FileName));
     }
 }
