@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PetFamily.Domain.Shared;
 using PetFamily.Domain.Shared.EntityIds;
-using PetFamily.Domain.Volunteers.Entities;
+using PetFamily.Domain.VolunteersManagement.Entities;
 
 namespace PetFamily.Infrastructure.Configurations;
 
@@ -75,42 +75,36 @@ public class VolunteerConfiguration : IEntityTypeConfiguration<Volunteer>
                     .HasColumnName("phone_number");
             });
 
-        builder.OwnsOne(
+        builder.OwnsMany(
             v => v.SocialNetworks,
             b =>
             {
                 b.ToJson("social_networks");
-                b.OwnsMany(snb => snb.Values, sn =>
-                {
-                    sn.Property(snn => snn.Name)
+                    b.Property(snn => snn.Name)
                         .IsRequired()
                         .HasColumnName("name")
                         .HasMaxLength(Constants.MaxLowTextLength);
 
-                    sn.Property(snn => snn.Url)
+                    b.Property(snn => snn.Url)
                         .IsRequired()
                         .HasColumnName("url")
                         .HasMaxLength(Constants.MaxUrlLength);
-                });
             });
 
-        builder.OwnsOne(
+        builder.OwnsMany(
             v => v.HelpRequisites,
             hdb =>
             {
                 hdb.ToJson("help_requisites");
-                hdb.OwnsMany(hd => hd.Values, b =>
-                {
-                    b.Property(d => d.Name)
-                        .IsRequired()
-                        .HasColumnName("name")
-                        .HasMaxLength(Constants.MaxLowTextLength);
+                hdb.Property(d => d.Name)
+                    .IsRequired()
+                    .HasColumnName("name")
+                    .HasMaxLength(Constants.MaxLowTextLength);
 
-                    b.Property(d => d.Description)
-                        .IsRequired()
-                        .HasColumnName("description")
-                        .HasMaxLength(Constants.MaxLowTextLength);
-                });
+                hdb.Property(d => d.Description)
+                    .IsRequired()
+                    .HasColumnName("description")
+                    .HasMaxLength(Constants.MaxLowTextLength);
             });
 
         builder.HasMany(v => v.Pets)
@@ -124,7 +118,7 @@ public class VolunteerConfiguration : IEntityTypeConfiguration<Volunteer>
 
         builder.Property<bool>("IsDeleted")
             .HasColumnName("is_deleted");
-        
+
         builder.Property<DateTime?>("DeletionDate")
             .HasColumnName("deletion_date");
     }
