@@ -3,8 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PetFamily.Domain.Shared;
 using PetFamily.Domain.Shared.EntityIds;
-using PetFamily.Domain.Volunteers.Entities;
-using PetFamily.Domain.Volunteers.Enums;
+using PetFamily.Domain.VolunteersManagement.Entities;
+using PetFamily.Domain.VolunteersManagement.Enums;
+using PetFamily.Domain.VolunteersManagement.ValueObjects;
 
 namespace PetFamily.Infrastructure.Configurations;
 
@@ -121,12 +122,12 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
                 mb.Property(m => m.Height)
                     .IsRequired()
                     .HasColumnName("height")
-                    .HasDefaultValue(0);
+                    .HasDefaultValue(0.0f);
 
                 mb.Property(m => m.Weight)
                     .IsRequired()
                     .HasColumnName("weight")
-                    .HasDefaultValue(0);
+                    .HasDefaultValue(0.0f);
             });
 
         builder.ComplexProperty(p => p.OwnerPhoneNumber,
@@ -145,23 +146,32 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
             .IsRequired()
             .HasDefaultValue(HelpStatus.NeedsHelp);
 
-        builder.OwnsOne(p => p.HelpRequisites,
+        builder.OwnsMany(p => p.HelpRequisites,
             hdb =>
             {
                 hdb.ToJson("pet_help_requisites");
-                hdb.OwnsMany(hd => hd.Values,
-                    db =>
-                    {
-                        db.Property(d => d.Name)
+                        hdb.Property(d => d.Name)
                             .IsRequired()
                             .HasMaxLength(Constants.MaxLowTextLength)
                             .HasColumnName("help_requisite_name");
 
-                        db.Property(d => d.Description)
+                        hdb.Property(d => d.Description)
                             .IsRequired()
                             .HasMaxLength(Constants.MaxMediumTextLength)
                             .HasColumnName("help_requisite_description");
-                    });
+            });
+
+        builder.OwnsMany(p => p.Photos,
+            pb =>
+            {
+                pb.ToJson("pet_photos");
+                pb.Property(p => p.PhotoPath)
+                    .HasConversion(
+                        p => p.Path,
+                        value => PhotoPath.Create(value).Value)
+                    .IsRequired()
+                    .HasMaxLength(Constants.MaxMediumTextLength)
+                    .HasColumnName("photo_path");
             });
 
         builder.Property(p => p.CreatedAt)

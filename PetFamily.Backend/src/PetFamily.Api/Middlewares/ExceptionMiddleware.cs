@@ -1,4 +1,5 @@
 using PetFamily.Api.Response;
+using PetFamily.Domain.Shared;
 
 namespace PetFamily.Api.Middlewares;
 
@@ -23,8 +24,8 @@ public class ExceptionMiddleware
         {
             _logger.LogError(ex, ex.Message);
             
-            ResponseError responseError = new("internal.server.error", ex.Message, null);
-            var envelope = Envelope.Error([responseError]);
+            var error = Error.Failure("internal.server.error", ex.Message);
+            var envelope = Envelope.Error(error);
             
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = StatusCodes.Status500InternalServerError;
@@ -32,7 +33,7 @@ public class ExceptionMiddleware
             await context.Response.WriteAsJsonAsync(envelope);
         }
     }
-}
+} 
 
 public static class ExceptionMiddlewareExtensions
 {

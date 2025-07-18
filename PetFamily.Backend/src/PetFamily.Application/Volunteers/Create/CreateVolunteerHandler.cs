@@ -1,32 +1,45 @@
 using CSharpFunctionalExtensions;
+using FluentValidation;
 using Microsoft.Extensions.Logging;
+using PetFamily.Application.Database;
+using PetFamily.Application.Extensions;
 using PetFamily.Domain.Shared;
 using PetFamily.Domain.Shared.EntityIds;
 using PetFamily.Domain.Shared.ValueObjects;
-using PetFamily.Domain.Volunteers.Entities;
-using PetFamily.Domain.Volunteers.ValueObjects;
+using PetFamily.Domain.VolunteersManagement.Entities;
+using PetFamily.Domain.VolunteersManagement.ValueObjects;
 
 namespace PetFamily.Application.Volunteers.Create;
 
 public class CreateVolunteerHandler
 {
-    private readonly IVolunteerRepository _volunteersRepository;
+    private readonly IVolunteersRepository _volunteersRepository;
+    private readonly IValidator<CreateVolunteerCommand> _validator;
+    private readonly IApplicationDbContext _dbContext;
     private readonly ILogger<CreateVolunteerHandler> _logger;
 
     public CreateVolunteerHandler(
-        IVolunteerRepository volunteersRepository,
+        IVolunteersRepository volunteersRepository,
+        IValidator<CreateVolunteerCommand> validator,
+        IApplicationDbContext dbContext,
         ILogger<CreateVolunteerHandler> logger)
     {
         _volunteersRepository = volunteersRepository;
+        _validator = validator;
+        _dbContext = dbContext;
         _logger = logger;
     }
     
-    public async Task<Result<Guid, Error>> HandleAsync(
-        CreateVolunteerRequest request,
+    public async Task<Result<Guid, ErrorList>> HandleAsync(
+        CreateVolunteerCommand command,
         CancellationToken cancellationToken = default)
     {
-        var email = Email.Create(request.Email).Value;
-        var phoneNumber = PhoneNumber.Create(request.PhoneNumber).Value;
+        var validationResult = await _validator.ValidateAsync(command, cancellationToken);
+        if (validationResult.IsValid == false)
+            return validationResult.ToErrorList();
+        
+        var email = Email.Create(command.Email).Value;
+        var phoneNumber = PhoneNumber.Create(command.PhoneNumber).Value;
 
         var volunteerByEmail = 
             await _volunteersRepository.GetByEmailAsync(email, cancellationToken);
@@ -35,27 +48,27 @@ public class CreateVolunteerHandler
             await _volunteersRepository.GetByPhoneNumberAsync(phoneNumber, cancellationToken);
         
         if (volunteerByEmail.IsSuccess || volunteerByPhoneNumber.IsSuccess)
-            return Errors.Module.AlreadyExists();
+            return Errors.Module.AlreadyExists().ToErrorList();
         
         var id = VolunteerId.CreateNew();
         
         var fullName = FullName.Create(
-            request.FullName.FirstName,
-            request.FullName.LastName,
-            request.FullName.MiddleName!).Value;
+            command.FullName.FirstName,
+            command.FullName.LastName,
+            command.FullName.MiddleName!).Value;
         
-        var description = Description.Create(request.Description).Value;
-        var experience = Experience.Create(request.ExperienceYears).Value;
+        var description = Description.Create(command.Description).Value;
+        var experience = Experience.Create(command.ExperienceYears).Value;
         
-        var socialNetworks = new SocialNetworks(
-            request.SocialNetworks
+        var socialNetworks = new List<SocialNetwork>(
+            command.SocialNetworks
                 .Select(s => SocialNetwork.Create(s.Name, s.Url).Value)
-                .ToList());
+                .ToList()).AsReadOnly();
         
-        var helpRequisites = new HelpRequisites(
-            request.HelpRequisites
+        var helpRequisites = new List<HelpRequisite>(
+            command.HelpRequisites
                 .Select(r => HelpRequisite.Create(r.Name, r.Description).Value)
-                .ToList());
+                .ToList()).AsReadOnly();
         
         Volunteer volunteer = new(
             id,
@@ -67,10 +80,10 @@ public class CreateVolunteerHandler
             socialNetworks, 
             helpRequisites);
         
-        await _volunteersRepository.AddAsync(volunteer, cancellationToken);
+        var result = await _volunteersRepository.AddAsync(volunteer, cancellationToken);
         
         _logger.LogInformation("Created volunteer with ID: {id}", id);
 
-        return (Guid)volunteer.Id;
+        return result;
     }
 }

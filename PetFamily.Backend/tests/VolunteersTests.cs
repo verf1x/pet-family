@@ -1,10 +1,9 @@
 ﻿using FluentAssertions;
 using PetFamily.Domain.Shared.EntityIds;
 using PetFamily.Domain.Shared.ValueObjects;
-using PetFamily.Domain.Species.ValueObjects;
-using PetFamily.Domain.Volunteers.Entities;
-using PetFamily.Domain.Volunteers.Enums;
-using PetFamily.Domain.Volunteers.ValueObjects;
+using PetFamily.Domain.VolunteersManagement.Entities;
+using PetFamily.Domain.VolunteersManagement.Enums;
+using PetFamily.Domain.VolunteersManagement.ValueObjects;
 
 namespace PetFamily.Domain.UnitTests;
 
@@ -222,13 +221,13 @@ public class VolunteersTests
         var description = Description.Create("description").Value;
         var experience = Experience.Create(5).Value;
         var phoneNumber = GetRandomPhoneNumber();
-        var socialNetworks = new SocialNetworks(
+        var socialNetworks = new List<SocialNetwork>(
             [
                 SocialNetwork.Create("string", "https://exampleone.com/johndoe").Value,
                 SocialNetwork.Create("string", "https://exampletwo.com/johndoe").Value
             ]
         );
-        var helpRequisites = new HelpRequisites(
+        var helpRequisites = new List<HelpRequisite>(
             [
                 HelpRequisite.Create("string", "string").Value,
                 HelpRequisite.Create("string", "string").Value
@@ -271,10 +270,15 @@ public class VolunteersTests
             17).Value;
         var phoneNumber = GetRandomPhoneNumber();
         var dateOfBirth = new DateOnly(2022, 1, 1);
-        var helpRequisites = new HelpRequisites(
+        var helpRequisites = new List<HelpRequisite>(
             [
                 HelpRequisite.Create("string", "string").Value,
                 HelpRequisite.Create("string", "string").Value
+            ]);
+        var photos = new List<Photo>(
+            [
+                new Photo(PhotoPath.Create("photo1.jpg").Value),
+                new Photo(PhotoPath.Create("photo2.jpg").Value)
             ]);
 
         return new Pet(
@@ -289,6 +293,7 @@ public class VolunteersTests
             phoneNumber,
             dateOfBirth,
             HelpStatus.LookingForHome,
-            helpRequisites);
+            helpRequisites,
+            photos);
     }
 }
