@@ -3,8 +3,8 @@ using FluentValidation;
 using Microsoft.Extensions.Logging;
 using PetFamily.Application.Database;
 using PetFamily.Application.Extensions;
-using PetFamily.Application.Providers;
-using PetFamily.Application.Volunteers.AddPetPhotos;
+using PetFamily.Application.FileProvider;
+using PetFamily.Application.Volunteers.UploadPetPhotos;
 using PetFamily.Domain.Shared;
 using PetFamily.Domain.Shared.EntityIds;
 using PetFamily.Domain.VolunteersManagement.ValueObjects;
@@ -17,14 +17,14 @@ public class RemovePetPhotosHandler
     private readonly IApplicationDbContext _dbContext;
     private readonly IVolunteersRepository _volunteersRepository;
     private readonly IValidator<RemovePetPhotosCommand> _validator;
-    private readonly ILogger<AddPetPhotosHandler> _logger;
+    private readonly ILogger<UploadPetPhotosHandler> _logger;
 
     public RemovePetPhotosHandler(
         IFileProvider fileProvider,
         IApplicationDbContext dbContext,
         IVolunteersRepository volunteersRepository,
         IValidator<RemovePetPhotosCommand> validator,
-        ILogger<AddPetPhotosHandler> logger)
+        ILogger<UploadPetPhotosHandler> logger)
     {
         _fileProvider = fileProvider;
         _dbContext = dbContext;

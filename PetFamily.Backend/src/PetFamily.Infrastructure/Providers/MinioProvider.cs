@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using Minio;
 using Minio.DataModel.Args;
 using PetFamily.Application.FileProvider;
-using PetFamily.Application.Providers;
 using PetFamily.Domain.Shared;
 using PetFamily.Domain.VolunteersManagement.ValueObjects;
 
@@ -95,18 +94,18 @@ public class MinioProvider : IFileProvider
             .WithBucket(BucketName)
             .WithStreamData(addPhotoData.Stream)
             .WithObjectSize(addPhotoData.Stream.Length)
-            .WithObject(addPhotoData.PhotoPath.Path);
+            .WithObject(addPhotoData.Path.Path);
 
         try
         {
             await _minioClient.PutObjectAsync(putObjectArgs, cancellationToken);
 
-            return addPhotoData.PhotoPath;
+            return addPhotoData.Path;
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to upload file to MinIO with path {path} in bucket {bucket}",
-                addPhotoData.PhotoPath.Path,
+                addPhotoData.Path.Path,
                 BucketName);
 
             return Error.Failure("file.upload",

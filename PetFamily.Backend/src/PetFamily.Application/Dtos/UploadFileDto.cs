@@ -1,5 +1,5 @@
 namespace PetFamily.Application.Dtos;
 
-public record CreateFileDto(
+public record UploadFileDto(
     Stream Content,
     string FileName);

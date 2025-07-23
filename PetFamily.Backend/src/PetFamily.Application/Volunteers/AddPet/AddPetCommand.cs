@@ -17,4 +17,4 @@ public record AddPetCommand(
     DateOnly DateOfBirth,
     HelpStatus HelpStatus,
     IEnumerable<HelpRequisiteDto> HelpRequisites,
-    IEnumerable<CreateFileDto> Photos);
+    IEnumerable<UploadFileDto> Photos);

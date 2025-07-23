@@ -19,7 +19,7 @@ public record AddPetRequest(
     IEnumerable<HelpRequisiteDto> HelpRequisites,
     IFormFileCollection Photos)
 {
-    public AddPetCommand ToCommand(Guid volunteerId, List<CreateFileDto> files)
+    public AddPetCommand ToCommand(Guid volunteerId, List<UploadFileDto> files)
         => new AddPetCommand(
             volunteerId,
             Nickname,
