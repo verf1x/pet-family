@@ -3,11 +3,11 @@ using PetFamily.Api.Controllers.Volunteers.Requests;
 using PetFamily.Api.Extensions;
 using PetFamily.Api.Processors;
 using PetFamily.Application.Volunteers.AddPet;
-using PetFamily.Application.Volunteers.AddPetPhotos;
 using PetFamily.Application.Volunteers.Create;
 using PetFamily.Application.Volunteers.Delete;
 using PetFamily.Application.Volunteers.RemovePetPhotos;
 using PetFamily.Application.Volunteers.UpdateMainInfo;
+using PetFamily.Application.Volunteers.UploadPetPhotos;
 
 namespace PetFamily.Api.Controllers.Volunteers;
 
@@ -93,7 +93,7 @@ public class VolunteersController : ApplicationController
         [FromRoute] Guid volunteerId,
         [FromRoute] Guid petId,
         [FromForm] AddPetPhotosRequest request,
-        [FromServices] AddPetPhotosHandler handler,
+        [FromServices] UploadPetPhotosHandler handler,
         CancellationToken cancellationToken = default)
     {
         await using var fileProcessor = new FormFileProcessor();

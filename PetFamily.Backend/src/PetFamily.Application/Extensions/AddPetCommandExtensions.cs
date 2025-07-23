@@ -8,7 +8,7 @@ namespace PetFamily.Application.Extensions;
 
 public static class AddPetCommandExtensions
 {
-    public static Result<List<AddPhotoData>, Error> ToDataCollection(this IEnumerable<CreateFileDto> photos)
+    public static Result<List<AddPhotoData>, Error> ToDataCollection(this IEnumerable<UploadFileDto> photos)
     {
         var result = new List<AddPhotoData>();
 
