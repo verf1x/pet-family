@@ -21,6 +21,12 @@ namespace PetFamily.Application.UnitTests;
 
 public class UploadPetPhotosTests
 {
+    private readonly Mock<IFileProvider> _fileProviderMock = new();
+    private readonly Mock<IVolunteersRepository> _volunteersRepositoryMock = new();
+    private readonly Mock<IApplicationDbContext> _dbContextMock = new();
+    private readonly Mock<IValidator<UploadPetPhotosCommand>> _validatorMock = new();
+    private readonly Mock<ILogger<UploadPetPhotosHandler>> _loggerMock = new();
+
     [Fact]
     public async Task HandlerShould_UploadPhotos_ToPet()
     {
@@ -30,7 +36,7 @@ public class UploadPetPhotosTests
         volunteer.AddPet(pet);
 
         var stream = new MemoryStream();
-        const string fileName = "test.jpg";
+        const string fileName = "test.jpg"; 
 
         var uploadFileDto = new UploadFileDto(stream, fileName);
         List<UploadFileDto> files = [uploadFileDto, uploadFileDto];
@@ -44,38 +50,32 @@ public class UploadPetPhotosTests
         var command = new UploadPetPhotosCommand(volunteer.Id, pet.Id, files);
         var cancellationToken = new CancellationTokenSource().Token;
         
-        var fileProviderMock = new Mock<IFileProvider>();
-        fileProviderMock
+        _fileProviderMock
             .Setup(v => v.UploadPhotosAsync(It.IsAny<List<PhotoData>>(), cancellationToken))
             .ReturnsAsync(Result.Success<List<PhotoPath>, Error>(photoPaths));
         
-        var volunteersRepositoryMock = new Mock<IVolunteersRepository>();
-        volunteersRepositoryMock.
+        _volunteersRepositoryMock.
             Setup(v => v.GetByIdAsync(volunteer.Id, cancellationToken))
             .ReturnsAsync(volunteer);
         
-        var dbContextMock = new Mock<IApplicationDbContext>();
-        dbContextMock
+        _dbContextMock
             .Setup(v => v.SaveChangesAsync(cancellationToken))
             .ReturnsAsync(1);
         
-        dbContextMock.Setup(v => v.BeginTransactionAsync(cancellationToken))
+        _dbContextMock
+            .Setup(v => v.BeginTransactionAsync(cancellationToken))
             .ReturnsAsync(Mock.Of<IDbContextTransaction>());
-
-        var validatorMock = new Mock<IValidator<UploadPetPhotosCommand>>();
-        validatorMock
+        
+        _validatorMock
             .Setup(v => v.ValidateAsync(command, cancellationToken))
             .ReturnsAsync(new ValidationResult());
         
-        var logger = LoggerFactory.Create(builder => builder.AddConsole())
-            .CreateLogger<UploadPetPhotosHandler>();
-        
         var handler = new UploadPetPhotosHandler(
-            fileProviderMock.Object,
-            dbContextMock.Object,
-            volunteersRepositoryMock.Object,
-            validatorMock.Object,
-            logger);
+            _fileProviderMock.Object,
+            _dbContextMock.Object,
+            _volunteersRepositoryMock.Object,
+            _validatorMock.Object,
+            _loggerMock.Object);
         
         // Act
         var result = await handler.HandleAsync(command, cancellationToken);
