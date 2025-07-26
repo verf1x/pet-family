@@ -5,10 +5,10 @@ namespace PetFamily.Application.Extensions;
 
 public static class PhotosDataExtensions
 {
-    public static List<Photo> ToPhotosCollection(this IEnumerable<AddPhotoData> photosData)
+    public static List<Photo> ToPhotosCollection(this IEnumerable<PhotoData> photosData)
     {
         return photosData
-            .Select(f => f.PhotoPath)
+            .Select(f => f.Path)
             .Select(f => new Photo(f))
             .ToList();
     }

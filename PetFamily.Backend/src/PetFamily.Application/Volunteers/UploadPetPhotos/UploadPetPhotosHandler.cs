@@ -3,26 +3,26 @@ using FluentValidation;
 using Microsoft.Extensions.Logging;
 using PetFamily.Application.Database;
 using PetFamily.Application.Extensions;
-using PetFamily.Application.Providers;
+using PetFamily.Application.FileProvider;
 using PetFamily.Domain.Shared;
 using PetFamily.Domain.Shared.EntityIds;
 
-namespace PetFamily.Application.Volunteers.AddPetPhotos;
+namespace PetFamily.Application.Volunteers.UploadPetPhotos;
 
-public class AddPetPhotosHandler
+public class UploadPetPhotosHandler
 {
     private readonly IFileProvider _fileProvider;
     private readonly IApplicationDbContext _dbContext;
     private readonly IVolunteersRepository _volunteersRepository;
-    private readonly IValidator<AddPetPhotosCommand> _validator;
-    private readonly ILogger<AddPetPhotosHandler> _logger;
+    private readonly IValidator<UploadPetPhotosCommand> _validator;
+    private readonly ILogger<UploadPetPhotosHandler> _logger;
 
-    public AddPetPhotosHandler(
+    public UploadPetPhotosHandler(
         IFileProvider fileProvider,
         IApplicationDbContext dbContext,
         IVolunteersRepository volunteersRepository,
-        IValidator<AddPetPhotosCommand> validator,
-        ILogger<AddPetPhotosHandler> logger)
+        IValidator<UploadPetPhotosCommand> validator,
+        ILogger<UploadPetPhotosHandler> logger)
     {
         _fileProvider = fileProvider;
         _dbContext = dbContext;
@@ -32,7 +32,7 @@ public class AddPetPhotosHandler
     }
     
     public async Task<Result<List<string>, ErrorList>> HandleAsync(
-        AddPetPhotosCommand command,
+        UploadPetPhotosCommand command,
         CancellationToken cancellationToken = default)
     {
         var validationResult = await _validator.ValidateAsync(command, cancellationToken);
