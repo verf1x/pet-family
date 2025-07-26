@@ -3,11 +3,12 @@ using PetFamily.Api.Controllers.Volunteers.Requests;
 using PetFamily.Api.Extensions;
 using PetFamily.Api.Processors;
 using PetFamily.Application.Volunteers.AddPet;
-using PetFamily.Application.Volunteers.AddPetPhotos;
 using PetFamily.Application.Volunteers.Create;
 using PetFamily.Application.Volunteers.Delete;
+using PetFamily.Application.Volunteers.MovePet;
 using PetFamily.Application.Volunteers.RemovePetPhotos;
 using PetFamily.Application.Volunteers.UpdateMainInfo;
+using PetFamily.Application.Volunteers.UploadPetPhotos;
 
 namespace PetFamily.Api.Controllers.Volunteers;
 
@@ -93,7 +94,7 @@ public class VolunteersController : ApplicationController
         [FromRoute] Guid volunteerId,
         [FromRoute] Guid petId,
         [FromForm] AddPetPhotosRequest request,
-        [FromServices] AddPetPhotosHandler handler,
+        [FromServices] UploadPetPhotosHandler handler,
         CancellationToken cancellationToken = default)
     {
         await using var fileProcessor = new FormFileProcessor();
@@ -118,6 +119,23 @@ public class VolunteersController : ApplicationController
         CancellationToken cancellationToken = default)
     {
         var command = request.ToCommand(volunteerId, petId);
+        var result = await handler.HandleAsync(command, cancellationToken);
+        
+        if (result.IsFailure)
+            return result.Error.ToResponse();
+        
+        return Ok(result.Value);
+    }
+    
+    [HttpPut("{volunteerId:guid}/pet/{petId:guid}/move/{newPosition:int}")]
+    public async Task<IActionResult> MovePet(
+        [FromRoute] Guid volunteerId,
+        [FromRoute] Guid petId,
+        [FromRoute] int newPosition,
+        [FromServices] MovePetHandler handler,
+        CancellationToken cancellationToken = default)
+    {
+        var command = new MovePetCommand(volunteerId, petId, newPosition);
         var result = await handler.HandleAsync(command, cancellationToken);
         
         if (result.IsFailure)

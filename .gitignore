@@ -554,3 +554,6 @@ _ReSharper*/
 # Local environment
 .env
 *.local.json
+
+# powershell scripts
+*.ps1
