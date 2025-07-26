@@ -23,7 +23,7 @@ public class MinioProvider : IFileProvider
     }
 
     public async Task<Result<List<PhotoPath>, Error>> UploadPhotosAsync(
-        IEnumerable<AddPhotoData> filesData,
+        IEnumerable<PhotoData> filesData,
         CancellationToken cancellationToken = default)
     {
         var semaphoreSlim = new SemaphoreSlim(MaxParallelOperations);
@@ -84,7 +84,7 @@ public class MinioProvider : IFileProvider
     }
 
     private async Task<Result<PhotoPath, Error>> PutObjectAsync(
-        AddPhotoData addPhotoData,
+        PhotoData photoData,
         SemaphoreSlim semaphoreSlim,
         CancellationToken cancellationToken = default)
     {
@@ -92,20 +92,20 @@ public class MinioProvider : IFileProvider
 
         var putObjectArgs = new PutObjectArgs()
             .WithBucket(BucketName)
-            .WithStreamData(addPhotoData.Stream)
-            .WithObjectSize(addPhotoData.Stream.Length)
-            .WithObject(addPhotoData.Path.Path);
+            .WithStreamData(photoData.Stream)
+            .WithObjectSize(photoData.Stream.Length)
+            .WithObject(photoData.Path.Path);
 
         try
         {
             await _minioClient.PutObjectAsync(putObjectArgs, cancellationToken);
 
-            return addPhotoData.Path;
+            return photoData.Path;
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to upload file to MinIO with path {path} in bucket {bucket}",
-                addPhotoData.Path.Path,
+                photoData.Path.Path,
                 BucketName);
 
             return Error.Failure("file.upload",

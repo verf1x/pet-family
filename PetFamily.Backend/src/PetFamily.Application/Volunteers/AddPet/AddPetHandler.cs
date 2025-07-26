@@ -26,7 +26,7 @@ public class AddPetHandler
         IValidator<AddPetCommand> validator,
         IApplicationDbContext dbContext,
         ILogger<AddPetHandler> logger)
-    {
+    { 
         _fileProvider = fileProvider;
         _volunteersRepository = volunteersRepository;
         _validator = validator;
@@ -83,7 +83,7 @@ public class AddPetHandler
         }
     }
 
-    private Pet InitializePet(AddPetCommand command, List<AddPhotoData> photosData)
+    private Pet InitializePet(AddPetCommand command, List<PhotoData> photosData)
     {
         var petId = PetId.CreateNew();
         var nickname = Nickname.Create(command.Nickname).Value;

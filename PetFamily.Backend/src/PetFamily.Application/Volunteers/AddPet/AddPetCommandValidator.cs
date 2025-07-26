@@ -44,14 +44,8 @@ public class AddPetCommandValidator : AbstractValidator<AddPetCommand>
         RuleFor(c => c.DateOfBirth)
             .NotEmpty();
 
-        RuleFor(c => c.HelpStatus)
-            .NotEmpty();
-
         RuleForEach(c => c.HelpRequisites)
-            .MustBeValueObject(
-                cb => HelpRequisite.Create(
-                    cb.Name,
-                    cb.Description));
+            .NotNull();
 
         RuleForEach(c => c.Photos)
             .Must(cb => cb.Content.Length != 0)
