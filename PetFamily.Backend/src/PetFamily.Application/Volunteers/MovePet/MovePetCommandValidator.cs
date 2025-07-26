@@ -17,7 +17,7 @@ public class MovePetCommandValidator : AbstractValidator<MovePetCommand>
             .WithError(Errors.General.ValueIsRequired(nameof(MovePetCommand.PetId)));
 
         RuleFor(mp => mp.NewPosition)
-            .Must(p => p > 0)
+            .GreaterThan(0)
             .WithError(Errors.General.ValueIsInvalid(nameof(MovePetCommand.NewPosition)));
     }
 }
