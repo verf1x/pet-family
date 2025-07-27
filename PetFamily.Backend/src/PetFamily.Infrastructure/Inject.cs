@@ -3,7 +3,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Minio;
 using PetFamily.Application.Database;
 using PetFamily.Application.FileProvider;
+using PetFamily.Application.Files;
+using PetFamily.Application.Messaging;
 using PetFamily.Application.Volunteers;
+using PetFamily.Infrastructure.BackgroundServices;
+using PetFamily.Infrastructure.Files;
+using PetFamily.Infrastructure.MessageQueues;
 using PetFamily.Infrastructure.Options;
 using PetFamily.Infrastructure.Providers;
 using PetFamily.Infrastructure.Repositories;
@@ -19,7 +24,13 @@ public static class Inject
         services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
         services.AddScoped<ApplicationDbContext>();
         services.AddScoped<IVolunteersRepository, VolunteersRepository>();
+        services.AddScoped<IFilesCleanerService, FilesCleanerService>();
+        
         services.AddMinio(configuration);
+
+        services.AddHostedService<FilesCleanerBackgroundService>();
+
+        services.AddSingleton<IMessageQueue<IEnumerable<string>>, InMemoryMessageQueue<IEnumerable<string>>>();
         
         return services;
     }

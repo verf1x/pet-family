@@ -8,6 +8,7 @@ using Moq;
 using PetFamily.Application.Database;
 using PetFamily.Application.Dtos;
 using PetFamily.Application.FileProvider;
+using PetFamily.Application.Files;
 using PetFamily.Application.Volunteers;
 using PetFamily.Application.Volunteers.UploadPetPhotos;
 using PetFamily.Domain.Shared;
