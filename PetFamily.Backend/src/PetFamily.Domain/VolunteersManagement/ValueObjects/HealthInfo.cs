@@ -3,7 +3,7 @@ using PetFamily.Domain.Shared;
 
 namespace PetFamily.Domain.VolunteersManagement.ValueObjects;
 
-public record HealthInfo
+public class HealthInfo : ComparableValueObject
 {
     public string HealthStatus { get; }
     
@@ -24,5 +24,12 @@ public record HealthInfo
             return Errors.General.ValueIsRequired(nameof(healthStatus));
         
         return new HealthInfo(healthStatus, isNeutered, isVaccinated);
+    }
+
+    protected override IEnumerable<IComparable> GetComparableEqualityComponents()
+    {
+        yield return HealthStatus;
+        yield return IsNeutered;
+        yield return IsVaccinated;
     }
 }

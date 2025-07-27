@@ -3,7 +3,7 @@ using PetFamily.Domain.Shared;
 
 namespace PetFamily.Domain.VolunteersManagement.ValueObjects;
 
-public record SocialNetwork
+public class SocialNetwork : ComparableValueObject
 {
     public string Name { get; }
     public string Url { get; }
@@ -23,5 +23,11 @@ public record SocialNetwork
             return Errors.General.ValueIsInvalid(nameof(url));
         
         return new SocialNetwork(name, url);
+    }
+
+    protected override IEnumerable<IComparable> GetComparableEqualityComponents()
+    {
+        yield return Name;
+        yield return Url;
     }
 }

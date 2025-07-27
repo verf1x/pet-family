@@ -11,19 +11,19 @@ public class Volunteer : SoftDeletableEntity<VolunteerId>
 {
     private readonly List<Pet> _pets = [];
 
-    public FullName FullName { get; private set; }
+    public FullName FullName { get; private set; } = null!;
 
-    public Email Email { get; private set; }
+    public Email Email { get; private set; } = null!;
 
-    public Description Description { get; private set; }
+    public Description Description { get; private set; } = null!;
 
-    public Experience Experience { get; private set; }
+    public Experience Experience { get; private set; } = null!;
 
-    public PhoneNumber PhoneNumber { get; private set; }
+    public PhoneNumber PhoneNumber { get; private set; } = null!;
 
-    public IReadOnlyList<SocialNetwork> SocialNetworks { get; private set; }
+    public IReadOnlyList<SocialNetwork> SocialNetworks { get; private set; } = null!;
 
-    public IReadOnlyList<HelpRequisite> HelpRequisites { get; private set; }
+    public IReadOnlyList<HelpRequisite> HelpRequisites { get; private set; } = null!;
 
     public IReadOnlyList<Pet> Pets => _pets;
 

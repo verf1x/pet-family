@@ -4,7 +4,7 @@ using PetFamily.Domain.Shared;
 
 namespace PetFamily.Domain.VolunteersManagement.ValueObjects;
 
-public record Address
+public class Address : ComparableValueObject
 {
     public IReadOnlyList<string> AddressLines { get; }
     public string Locality { get; }
@@ -59,5 +59,10 @@ public record Address
         
         parts.Add(CountryCode);
         return string.Join(", ", parts);
+    }
+
+    protected override IEnumerable<IComparable> GetComparableEqualityComponents()
+    {
+        yield return ToString();
     }
 }

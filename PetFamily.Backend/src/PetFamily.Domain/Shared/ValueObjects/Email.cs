@@ -3,9 +3,9 @@ using CSharpFunctionalExtensions;
 
 namespace PetFamily.Domain.Shared.ValueObjects;
 
-public partial record Email
+public partial class Email : ComparableValueObject
 {
-    public string Value { get; } = null!;
+    public string Value { get; }
 
     private Email(string value) => Value = value;
     
@@ -19,4 +19,9 @@ public partial record Email
 
     [GeneratedRegex(@"^[^@\s]+@[^@\s]+\.[^@\s]+$")]
     private static partial Regex EmailRegex();
+
+    protected override IEnumerable<IComparable> GetComparableEqualityComponents()
+    {
+        yield return Value;
+    }
 }
