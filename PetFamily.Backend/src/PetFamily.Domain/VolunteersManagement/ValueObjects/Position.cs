@@ -3,7 +3,7 @@ using PetFamily.Domain.Shared;
 
 namespace PetFamily.Domain.VolunteersManagement.ValueObjects;
 
-public class Position : ValueObject
+public class Position : ComparableValueObject
 {
     public static Position First => new(1);
     
@@ -30,7 +30,7 @@ public class Position : ValueObject
 
     public static implicit operator int(Position position) => position.Value;
     
-    protected override IEnumerable<object> GetEqualityComponents()
+    protected override IEnumerable<IComparable> GetComparableEqualityComponents()
     {
         yield return Value;
     }

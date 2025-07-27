@@ -4,7 +4,7 @@ using PetFamily.Domain.Shared.EntityIds;
 
 namespace PetFamily.Domain.VolunteersManagement.ValueObjects;
 
-public record SpeciesBreed
+public class SpeciesBreed : ComparableValueObject
 {
     public SpeciesId SpeciesId { get; }
     public BreedId BreedId { get; }
@@ -25,5 +25,11 @@ public record SpeciesBreed
         //     return Errors.General.ValueIsInvalid(nameof(breedId));
         
         return new SpeciesBreed(speciesId, breedId);
+    }
+
+    protected override IEnumerable<IComparable> GetComparableEqualityComponents()
+    {
+        yield return SpeciesId;
+        yield return BreedId;
     }
 }

@@ -3,7 +3,7 @@ using PetFamily.Domain.Shared;
 
 namespace PetFamily.Domain.VolunteersManagement.ValueObjects;
 
-public record PhotoPath
+public class PhotoPath : ComparableValueObject
 {
     public string Path { get; }
     
@@ -23,5 +23,10 @@ public record PhotoPath
     public static Result<PhotoPath, Error> Create(string fullPath)
     {
         return new PhotoPath(fullPath);
+    }
+
+    protected override IEnumerable<IComparable> GetComparableEqualityComponents()
+    {
+        yield return Path;
     }
 }

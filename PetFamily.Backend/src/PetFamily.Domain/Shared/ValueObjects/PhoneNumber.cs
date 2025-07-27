@@ -3,7 +3,7 @@ using CSharpFunctionalExtensions;
 
 namespace PetFamily.Domain.Shared.ValueObjects;
 
-public record PhoneNumber
+public class PhoneNumber : ComparableValueObject
 {
     public string Value { get; }
     
@@ -21,5 +21,10 @@ public record PhoneNumber
         }
 
         return new PhoneNumber(phoneNumber);
+    }
+
+    protected override IEnumerable<IComparable> GetComparableEqualityComponents()
+    {
+        yield return Value;
     }
 }

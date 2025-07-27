@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Minio;
 using Minio.DataModel.Args;
 using PetFamily.Application.FileProvider;
+using PetFamily.Application.Files;
 using PetFamily.Domain.Shared;
 using PetFamily.Domain.VolunteersManagement.ValueObjects;
 
@@ -83,13 +84,47 @@ public class MinioProvider : IFileProvider
         }
     }
 
+    public async Task<UnitResult<Error>> RemoveFileAsync(
+        string photoPath,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            await CreateBucketsIfNotExistsAsync(cancellationToken);
+            
+            var statArgs = new StatObjectArgs()
+                .WithBucket(BucketName)
+                .WithObject(photoPath);
+
+            var objectStat = await _minioClient.StatObjectAsync(statArgs, cancellationToken);
+            if (objectStat is null)
+                return UnitResult.Success<Error>();
+
+            var args = new RemoveObjectArgs()
+                .WithBucket(BucketName)
+                .WithObject(photoPath);
+
+            await _minioClient.RemoveObjectAsync(args, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to upload file to MinIO with path {path} in bucket {bucket}",
+                photoPath,
+                BucketName);
+            
+            return Error.Failure("file.remove", "Failed to remove file from MinIO");
+        }
+
+        return Result.Success<Error>();
+    }
+    
     private async Task<Result<PhotoPath, Error>> PutObjectAsync(
         PhotoData photoData,
         SemaphoreSlim semaphoreSlim,
         CancellationToken cancellationToken = default)
     {
         await semaphoreSlim.WaitAsync(cancellationToken);
-
+ 
         var putObjectArgs = new PutObjectArgs()
             .WithBucket(BucketName)
             .WithStreamData(photoData.Stream)

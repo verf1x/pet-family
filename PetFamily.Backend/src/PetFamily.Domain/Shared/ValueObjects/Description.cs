@@ -2,7 +2,7 @@ using CSharpFunctionalExtensions;
 
 namespace PetFamily.Domain.Shared.ValueObjects;
 
-public record Description
+public class Description : ComparableValueObject
 {
     public string Value { get; }
 
@@ -14,5 +14,10 @@ public record Description
             return Errors.General.ValueIsRequired(nameof(value));
 
         return new Description(value);
+    }
+
+    protected override IEnumerable<IComparable> GetComparableEqualityComponents()
+    {
+        yield return Value;
     }
 }
