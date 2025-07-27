@@ -1,9 +1,9 @@
+using CSharpFunctionalExtensions;
+
 namespace PetFamily.Domain.Shared;
 
-public abstract class SoftDeletableEntity<TId> : 
-    Entity<TId>,
-    ISoftDeletableEntity
-    where TId : IEquatable<TId>
+public abstract class SoftDeletableEntity<TId> : Entity<TId>, ISoftDeletableEntity
+    where TId : ComparableValueObject
 {
     public bool IsDeleted { get; private set; }
 

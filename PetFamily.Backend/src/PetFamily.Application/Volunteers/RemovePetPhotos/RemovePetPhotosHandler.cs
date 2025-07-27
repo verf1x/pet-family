@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using PetFamily.Application.Database;
 using PetFamily.Application.Extensions;
 using PetFamily.Application.FileProvider;
+using PetFamily.Application.Files;
 using PetFamily.Application.Volunteers.UploadPetPhotos;
 using PetFamily.Domain.Shared;
 using PetFamily.Domain.Shared.EntityIds;

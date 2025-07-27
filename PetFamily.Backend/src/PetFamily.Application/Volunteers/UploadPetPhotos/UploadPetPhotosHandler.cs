@@ -3,7 +3,8 @@ using FluentValidation;
 using Microsoft.Extensions.Logging;
 using PetFamily.Application.Database;
 using PetFamily.Application.Extensions;
-using PetFamily.Application.FileProvider;
+using PetFamily.Application.Files;
+using PetFamily.Application.Messaging;
 using PetFamily.Domain.Shared;
 using PetFamily.Domain.Shared.EntityIds;
 
@@ -15,6 +16,7 @@ public class UploadPetPhotosHandler
     private readonly IApplicationDbContext _dbContext;
     private readonly IVolunteersRepository _volunteersRepository;
     private readonly IValidator<UploadPetPhotosCommand> _validator;
+    private readonly IMessageQueue<IEnumerable<string>> _messageQueue;
     private readonly ILogger<UploadPetPhotosHandler> _logger;
 
     public UploadPetPhotosHandler(
@@ -22,12 +24,14 @@ public class UploadPetPhotosHandler
         IApplicationDbContext dbContext,
         IVolunteersRepository volunteersRepository,
         IValidator<UploadPetPhotosCommand> validator,
+        IMessageQueue<IEnumerable<string>> messageQueue,
         ILogger<UploadPetPhotosHandler> logger)
     {
         _fileProvider = fileProvider;
         _dbContext = dbContext;
         _volunteersRepository = volunteersRepository;
         _validator = validator;
+        _messageQueue = messageQueue;
         _logger = logger;
     }
     
@@ -65,7 +69,13 @@ public class UploadPetPhotosHandler
             
             var uploadResult = await _fileProvider.UploadPhotosAsync(filesData.Value, cancellationToken);
             if (uploadResult.IsFailure)
-                return uploadResult.Error.ToErrorList();
+            {
+                await _messageQueue.WriteAsync(
+                    filesData.Value.Select(f => f.Path.Path),
+                    cancellationToken);
+                
+                return uploadResult.Error.ToErrorList();   
+            }
             
             await transaction.CommitAsync(cancellationToken);
             

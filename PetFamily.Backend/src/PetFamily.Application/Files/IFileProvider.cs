@@ -1,16 +1,21 @@
 using CSharpFunctionalExtensions;
+using PetFamily.Application.FileProvider;
 using PetFamily.Domain.Shared;
 using PetFamily.Domain.VolunteersManagement.ValueObjects;
 
-namespace PetFamily.Application.FileProvider;
+namespace PetFamily.Application.Files;
 
 public interface IFileProvider
 {
-    public Task<Result<List<PhotoPath>, Error>> UploadPhotosAsync(
+    Task<Result<List<PhotoPath>, Error>> UploadPhotosAsync(
         IEnumerable<PhotoData> filesData,
         CancellationToken cancellationToken = default);
     
-    public Task<Result<List<string>, Error>> RemovePhotosAsync(
+    Task<Result<List<string>, Error>> RemovePhotosAsync(
         IEnumerable<string> photoPaths,
+        CancellationToken cancellationToken = default);
+
+    Task<UnitResult<Error>> RemoveFileAsync(
+        string photoPath,
         CancellationToken cancellationToken = default);
 }

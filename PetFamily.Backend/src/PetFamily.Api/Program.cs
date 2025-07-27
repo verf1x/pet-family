@@ -3,7 +3,6 @@ using PetFamily.Api.Middlewares;
 using PetFamily.Application;
 using PetFamily.Infrastructure;
 using Serilog;
-using Serilog.Events;
 
 var builder = WebApplication.CreateBuilder(args);
 

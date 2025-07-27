@@ -3,7 +3,7 @@ using PetFamily.Domain.Shared;
 
 namespace PetFamily.Domain.VolunteersManagement.ValueObjects;
 
-public record FullName
+public class FullName : ComparableValueObject
 {
     public string FirstName { get; } 
     public string LastName { get; } 
@@ -25,5 +25,12 @@ public record FullName
             return Errors.General.ValueIsRequired(nameof(lastName));
         
         return new FullName(firstName, lastName, middleName!);
+    }
+
+    protected override IEnumerable<IComparable> GetComparableEqualityComponents()
+    {
+        yield return FirstName;
+        yield return LastName;
+        yield return MiddleName!;
     }
 }

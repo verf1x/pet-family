@@ -9,27 +9,27 @@ namespace PetFamily.Domain.VolunteersManagement.Entities;
 
 public class Pet : SoftDeletableEntity<PetId>
 {
-    private readonly List<HelpRequisite> _helpRequisites;
-    private readonly List<Photo> _photos;
+    private readonly List<HelpRequisite> _helpRequisites = null!;
+    private readonly List<Photo> _photos = null!;
     
-    public Nickname Nickname { get; private set; }
-    
-    public Description Description { get; private set; }
-    
-    public Position Position { get; private set; }
-    
-    public SpeciesBreed SpeciesBreed { get; private set; }
-    
-    public Color Color { get; private set; }
-    
-    public HealthInfo HealthInfo { get; private set; }
-    
-    public Address Address { get; private set; }
-    
-    public Measurements Measurements { get; private set; }
-    
-    public PhoneNumber OwnerPhoneNumber { get; private set; }
-    
+    public Nickname Nickname { get; private set; } = null!;
+
+    public Description Description { get; private set; } = null!;
+
+    public Position Position { get; private set; } = null!;
+
+    public SpeciesBreed SpeciesBreed { get; private set; } = null!;
+
+    public Color Color { get; private set; } = null!;
+
+    public HealthInfo HealthInfo { get; private set; } = null!;
+
+    public Address Address { get; private set; } = null!;
+
+    public Measurements Measurements { get; private set; } = null!;
+
+    public PhoneNumber OwnerPhoneNumber { get; private set; } = null!;
+
     public DateOnly DateOfBirth { get; private set; }
     
     public HelpStatus HelpStatus { get; private set; }
