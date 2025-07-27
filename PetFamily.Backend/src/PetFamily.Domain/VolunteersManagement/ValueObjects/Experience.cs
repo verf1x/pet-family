@@ -3,7 +3,7 @@ using PetFamily.Domain.Shared;
 
 namespace PetFamily.Domain.VolunteersManagement.ValueObjects;
 
-public record Experience
+public class Experience : ComparableValueObject
 {
     public int TotalYears { get; }
     
@@ -15,5 +15,10 @@ public record Experience
             return Errors.General.ValueIsInvalid(nameof(totalYears));
 
         return new Experience(totalYears);
+    }
+
+    protected override IEnumerable<IComparable> GetComparableEqualityComponents()
+    {
+        yield return TotalYears;
     }
 }

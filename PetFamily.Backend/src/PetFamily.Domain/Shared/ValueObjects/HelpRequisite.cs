@@ -2,7 +2,7 @@ using CSharpFunctionalExtensions;
 
 namespace PetFamily.Domain.Shared.ValueObjects;
 
-public record HelpRequisite
+public class HelpRequisite : ComparableValueObject
 {
     public string Name { get; }
     public string Description { get; } 
@@ -22,5 +22,11 @@ public record HelpRequisite
             return Errors.General.ValueIsRequired(nameof(description));
         
         return new HelpRequisite(name, description);
+    }
+
+    protected override IEnumerable<IComparable> GetComparableEqualityComponents()
+    {
+        yield return Name;
+        yield return Description;
     }
 }

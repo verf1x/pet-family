@@ -3,7 +3,7 @@ using PetFamily.Domain.Shared;
 
 namespace PetFamily.Domain.VolunteersManagement.ValueObjects;
 
-public record Color
+public class Color : ComparableValueObject
 {
     public string Value { get; }
 
@@ -15,5 +15,10 @@ public record Color
             return Errors.General.ValueIsRequired(nameof(value));
 
         return new Color(value);
+    }
+
+    protected override IEnumerable<IComparable> GetComparableEqualityComponents()
+    {
+        yield return Value;
     }
 }

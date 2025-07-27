@@ -3,7 +3,7 @@ using PetFamily.Domain.Shared;
 
 namespace PetFamily.Domain.VolunteersManagement.ValueObjects;
 
-public record Measurements
+public class Measurements : ComparableValueObject
 {
     public float Height { get; }
     
@@ -24,5 +24,11 @@ public record Measurements
             return Errors.General.ValueIsInvalid(nameof(weight));
         
         return new Measurements(height, weight);
+    }
+
+    protected override IEnumerable<IComparable> GetComparableEqualityComponents()
+    {
+        yield return Height;
+        yield return Weight;
     }
 }

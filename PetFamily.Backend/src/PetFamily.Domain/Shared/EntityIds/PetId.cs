@@ -1,6 +1,8 @@
+using CSharpFunctionalExtensions;
+
 namespace PetFamily.Domain.Shared.EntityIds;
 
-public record PetId
+public class PetId : ComparableValueObject
 {
     public Guid Value { get; }
     
@@ -17,5 +19,10 @@ public record PetId
         ArgumentNullException.ThrowIfNull(id);
 
         return id.Value;
+    }
+
+    protected override IEnumerable<IComparable> GetComparableEqualityComponents()
+    {
+        yield return Value;
     }
 }

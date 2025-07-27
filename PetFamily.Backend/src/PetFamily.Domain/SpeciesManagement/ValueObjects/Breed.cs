@@ -4,7 +4,7 @@ using PetFamily.Domain.Shared.EntityIds;
 
 namespace PetFamily.Domain.SpeciesManagement.ValueObjects;
 
-public record Breed
+public class Breed : ComparableValueObject
 {
     public BreedId Id { get; private set; }
     public string Name { get; private set; }
@@ -21,5 +21,11 @@ public record Breed
             return Errors.General.ValueIsRequired(nameof(name));
         
         return new Breed(name);
+    }
+
+    protected override IEnumerable<IComparable> GetComparableEqualityComponents()
+    {
+        yield return Id;
+        yield return Name;
     }
 }
