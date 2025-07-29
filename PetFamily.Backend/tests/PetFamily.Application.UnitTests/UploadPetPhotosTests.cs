@@ -1,16 +1,16 @@
-﻿using CSharpFunctionalExtensions;
+﻿using System.Data;
+using CSharpFunctionalExtensions;
 using FluentAssertions;
 using FluentValidation;
 using FluentValidation.Results;
-using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 using Moq;
 using PetFamily.Application.Database;
 using PetFamily.Application.Dtos;
-using PetFamily.Application.FileProvider;
 using PetFamily.Application.Files;
-using PetFamily.Application.Volunteers;
-using PetFamily.Application.Volunteers.UploadPetPhotos;
+using PetFamily.Application.Messaging;
+using PetFamily.Application.VolunteersManagement;
+using PetFamily.Application.VolunteersManagement.UseCases.UploadPetPhotos;
 using PetFamily.Domain.Shared;
 using PetFamily.Domain.Shared.EntityIds;
 using PetFamily.Domain.Shared.ValueObjects;
@@ -24,9 +24,10 @@ public class UploadPetPhotosTests
 {
     private readonly Mock<IFileProvider> _fileProviderMock = new();
     private readonly Mock<IVolunteersRepository> _volunteersRepositoryMock = new();
-    private readonly Mock<IApplicationDbContext> _dbContextMock = new();
+    private readonly Mock<IUnitOfWork> _unitOfWorkMock = new();
     private readonly Mock<IValidator<UploadPetPhotosCommand>> _validatorMock = new();
     private readonly Mock<ILogger<UploadPetPhotosHandler>> _loggerMock = new();
+    private readonly Mock<IMessageQueue<IEnumerable<string>>> _messageQueueMock = new();
 
     [Fact]
     public async Task HandlerShould_UploadPhotos_ToPet()
@@ -52,30 +53,40 @@ public class UploadPetPhotosTests
         var cancellationToken = new CancellationTokenSource().Token;
         
         _fileProviderMock
-            .Setup(v => v.UploadPhotosAsync(It.IsAny<List<PhotoData>>(), cancellationToken))
+            .Setup(f => f.UploadPhotosAsync(It.IsAny<List<PhotoData>>(), cancellationToken))
             .ReturnsAsync(Result.Success<List<PhotoPath>, Error>(photoPaths));
         
         _volunteersRepositoryMock.
             Setup(v => v.GetByIdAsync(volunteer.Id, cancellationToken))
             .ReturnsAsync(volunteer);
+
+        _unitOfWorkMock
+            .Setup(u => u.BeginTransactionAsync(cancellationToken))
+            .ReturnsAsync(Mock.Of<IDbTransaction>());
         
-        _dbContextMock
-            .Setup(v => v.SaveChangesAsync(cancellationToken))
-            .ReturnsAsync(1);
-        
-        _dbContextMock
-            .Setup(v => v.BeginTransactionAsync(cancellationToken))
-            .ReturnsAsync(Mock.Of<IDbContextTransaction>());
+        _unitOfWorkMock
+            .Setup(u => u.SaveChangesAsync(cancellationToken))
+            .Returns(Task.CompletedTask);
         
         _validatorMock
             .Setup(v => v.ValidateAsync(command, cancellationToken))
             .ReturnsAsync(new ValidationResult());
+
+        _messageQueueMock
+            .Setup(m => m.WriteAsync(
+                It.IsAny<IEnumerable<string>>(), cancellationToken))
+            .Returns(Task.CompletedTask);
+        
+        _messageQueueMock
+            .Setup(m => m.ReadAsync(cancellationToken))
+            .ReturnsAsync(It.IsAny<IEnumerable<string>>());
         
         var handler = new UploadPetPhotosHandler(
             _fileProviderMock.Object,
-            _dbContextMock.Object,
+            _unitOfWorkMock.Object,
             _volunteersRepositoryMock.Object,
             _validatorMock.Object,
+            _messageQueueMock.Object,
             _loggerMock.Object);
         
         // Act

@@ -2,13 +2,13 @@ using Microsoft.AspNetCore.Mvc;
 using PetFamily.Api.Controllers.Volunteers.Requests;
 using PetFamily.Api.Extensions;
 using PetFamily.Api.Processors;
-using PetFamily.Application.Volunteers.AddPet;
-using PetFamily.Application.Volunteers.Create;
-using PetFamily.Application.Volunteers.Delete;
-using PetFamily.Application.Volunteers.MovePet;
-using PetFamily.Application.Volunteers.RemovePetPhotos;
-using PetFamily.Application.Volunteers.UpdateMainInfo;
-using PetFamily.Application.Volunteers.UploadPetPhotos;
+using PetFamily.Application.VolunteersManagement.UseCases.AddPet;
+using PetFamily.Application.VolunteersManagement.UseCases.Create;
+using PetFamily.Application.VolunteersManagement.UseCases.Delete;
+using PetFamily.Application.VolunteersManagement.UseCases.MovePet;
+using PetFamily.Application.VolunteersManagement.UseCases.RemovePetPhotos;
+using PetFamily.Application.VolunteersManagement.UseCases.UpdateMainInfo;
+using PetFamily.Application.VolunteersManagement.UseCases.UploadPetPhotos;
 
 namespace PetFamily.Api.Controllers.Volunteers;
 

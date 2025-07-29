@@ -27,12 +27,6 @@ public class Volunteer : SoftDeletableEntity<VolunteerId>
 
     public IReadOnlyList<Pet> Pets => _pets;
 
-    public IReadOnlyList<Pet> PetsNeedsHelp => GetPetsNeedsHelp();
-
-    public IReadOnlyList<Pet> PetsLookingForHome => GetPetsLookingForHome();
-
-    public IReadOnlyList<Pet> PetsFoundHome => GetPetsFoundHome();
-
     // ef core ctor
     private Volunteer(VolunteerId id) : base(id) { }
 
@@ -113,9 +107,7 @@ public class Volunteer : SoftDeletableEntity<VolunteerId>
             {
                 var result = petToMove.MoveForward();
                 if (result.IsFailure)
-                {
                     return result.Error;
-                }
             }
         }
         else if (newPosition > currentPosition)
@@ -127,9 +119,7 @@ public class Volunteer : SoftDeletableEntity<VolunteerId>
             {
                 var result = petToMove.MoveBackward();
                 if (result.IsFailure)
-                {
                     return result.Error; 
-                }
             }
         }
 

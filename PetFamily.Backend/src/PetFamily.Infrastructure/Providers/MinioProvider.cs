@@ -2,7 +2,6 @@ using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using Minio;
 using Minio.DataModel.Args;
-using PetFamily.Application.FileProvider;
 using PetFamily.Application.Files;
 using PetFamily.Domain.Shared;
 using PetFamily.Domain.VolunteersManagement.ValueObjects;
