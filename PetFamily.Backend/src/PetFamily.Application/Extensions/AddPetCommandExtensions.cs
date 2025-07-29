@@ -1,6 +1,6 @@
 using CSharpFunctionalExtensions;
 using PetFamily.Application.Dtos;
-using PetFamily.Application.FileProvider;
+using PetFamily.Application.Files;
 using PetFamily.Domain.Shared;
 using PetFamily.Domain.VolunteersManagement.ValueObjects;
 

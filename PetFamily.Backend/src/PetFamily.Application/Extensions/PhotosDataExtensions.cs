@@ -1,4 +1,4 @@
-using PetFamily.Application.FileProvider;
+using PetFamily.Application.Files;
 using PetFamily.Domain.VolunteersManagement.ValueObjects;
 
 namespace PetFamily.Application.Extensions;
