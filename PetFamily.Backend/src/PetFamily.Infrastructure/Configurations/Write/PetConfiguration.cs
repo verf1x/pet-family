@@ -1,6 +1,8 @@
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using PetFamily.Application.Dtos;
 using PetFamily.Domain.Shared.EntityIds;
 using PetFamily.Domain.VolunteersManagement.Entities;
 using PetFamily.Domain.VolunteersManagement.Enums;
@@ -153,29 +155,33 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
             hdb =>
             {
                 hdb.ToJson("help_requisites");
-                        hdb.Property(d => d.Name)
-                            .IsRequired()
-                            .HasMaxLength(Domain.Shared.Constants.MaxLowTextLength)
-                            .HasColumnName("help_requisite_name");
+                hdb.Property(d => d.Name)
+                    .IsRequired()
+                    .HasMaxLength(Domain.Shared.Constants.MaxLowTextLength)
+                    .HasColumnName("help_requisite_name");
 
-                        hdb.Property(d => d.Description)
-                            .IsRequired()
-                            .HasMaxLength(Domain.Shared.Constants.MaxMediumTextLength)
-                            .HasColumnName("help_requisite_description");
-            });
-
-        builder.OwnsMany(p => p.Photos,
-            pb =>
-            {
-                pb.ToJson("pet_photos");
-                pb.Property(p => p.PhotoPath)
-                    .HasConversion(
-                        p => p.Path,
-                        value => PhotoPath.Create(value).Value)
+                hdb.Property(d => d.Description)
                     .IsRequired()
                     .HasMaxLength(Domain.Shared.Constants.MaxMediumTextLength)
-                    .HasColumnName("photo_path");
+                    .HasColumnName("help_requisite_description");
             });
+
+        builder.Property(p => p.Photos)
+            .HasColumnType("jsonb")
+            .HasConversion(
+                photos => JsonSerializer.Serialize(
+                    photos.Select(p => new PetPhotoDto
+                    {
+                        PhotoPath = p.PhotoPath.Path,
+                    }),
+                    JsonSerializerOptions.Default),
+                json => JsonSerializer.Deserialize<List<PetPhotoDto>>(json, JsonSerializerOptions.Default)!
+                    .Select(dto => new Photo(PhotoPath.Create(dto.PhotoPath).Value))
+                    .ToList(),
+                new ValueComparer<IReadOnlyList<Photo>>(
+                    (c1, c2) => c1!.SequenceEqual(c2!),
+                    c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+                    c => c.ToList()));
 
         builder.Property(p => p.CreatedAt)
             .IsRequired();

@@ -53,6 +53,7 @@ namespace PetFamily.Infrastructure.Migrations
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     date_of_birth = table.Column<DateOnly>(type: "date", nullable: false),
                     help_status = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
+                    photos = table.Column<string>(type: "jsonb", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     volunteer_id = table.Column<Guid>(type: "uuid", nullable: false),
                     address_lines = table.Column<string>(type: "jsonb", nullable: false),
@@ -74,8 +75,7 @@ namespace PetFamily.Infrastructure.Migrations
                     species_id = table.Column<Guid>(type: "uuid", nullable: false),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false),
                     deletion_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    help_requisites = table.Column<string>(type: "jsonb", nullable: true),
-                    pet_photos = table.Column<string>(type: "jsonb", nullable: true)
+                    help_requisites = table.Column<string>(type: "jsonb", nullable: true)
                 },
                 constraints: table =>
                 {
