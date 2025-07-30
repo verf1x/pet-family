@@ -1,3 +1,4 @@
+using PetFamily.Application.Abstractions;
 using PetFamily.Application.Dtos;
 using PetFamily.Application.Dtos.Pet;
 using PetFamily.Domain.VolunteersManagement.Enums;
@@ -17,4 +18,4 @@ public record AddPetCommand(
     DateOnly DateOfBirth,
     HelpStatus HelpStatus,
     IEnumerable<HelpRequisiteDto> HelpRequisites,
-    IEnumerable<UploadFileDto> Photos);
+    IEnumerable<UploadFileDto> Photos) : ICommand;
