@@ -1,25 +1,23 @@
-using PetFamily.Domain.VolunteersManagement.ValueObjects;
-
 namespace PetFamily.Application.Dtos;
 
 public class PetDto
 {
-    public Guid Id { get; init; }
+    public Guid Id { get; set; }
     
-    public Guid VolunteerId { get; init; }
+    public Guid VolunteerId { get; set; }
     
-    public string Nickname { get; init; } = null!;
+    public string Nickname { get; set; } = null!;
     
-    public string Description { get; init; } = null!;
+    public string Description { get; set; } = null!;
     
-    public int Position { get; private set; }
+    public int Position { get; set; }
     
-    public string Color { get; init; } = null!;
+    public string Color { get; set; } = null!;
 
-    public PetPhotoDto[] Photos { get; private set; } = null!;
+    public PetPhotoDto[] Photos { get; set; } = null!;
 }
 
 public class PetPhotoDto
 {
-    public string PhotoPath { get; set; } = string.Empty;
+    public string PhotoPath { get; init; } = string.Empty;
 }
