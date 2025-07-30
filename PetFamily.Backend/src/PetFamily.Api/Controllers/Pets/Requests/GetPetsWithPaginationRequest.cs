@@ -2,7 +2,7 @@ using PetFamily.Application.VolunteersManagement.Queries.GetModulesWithPaginatio
 
 namespace PetFamily.Api.Controllers.Pets.Requests;
 
-public record GetPetsWithPaginationRequest(int Page, int PageSize)
+public record GetPetsWithPaginationRequest(string? Nickname, int Page, int PageSize)
 {
-    public GetPetsWithPaginationQuery ToQuery() => new(Page, PageSize);
+    public GetFilteredPetsWithPaginationQuery ToQuery() => new(Nickname, Page, PageSize);
 }

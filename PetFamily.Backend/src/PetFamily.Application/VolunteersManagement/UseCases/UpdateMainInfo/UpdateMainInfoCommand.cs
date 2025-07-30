@@ -1,3 +1,4 @@
+using PetFamily.Application.Abstractions;
 using PetFamily.Application.Dtos.Volunteer;
 
 namespace PetFamily.Application.VolunteersManagement.UseCases.UpdateMainInfo;
@@ -8,4 +9,4 @@ public record UpdateMainInfoCommand(
     string Email,
     string Description,
     int ExperienceYears,
-    string PhoneNumber);
+    string PhoneNumber) : ICommand;

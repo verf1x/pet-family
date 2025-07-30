@@ -1,5 +1,6 @@
 using CSharpFunctionalExtensions;
 using FluentValidation;
+using PetFamily.Application.Abstractions;
 using PetFamily.Application.Database;
 using PetFamily.Application.Extensions;
 using PetFamily.Domain.Shared;
@@ -8,7 +9,7 @@ using PetFamily.Domain.VolunteersManagement.ValueObjects;
 
 namespace PetFamily.Application.VolunteersManagement.UseCases.MovePet;
 
-public class MovePetHandler
+public class MovePetHandler : ICommandHandler<int, MovePetCommand>
 {
     private readonly IVolunteersRepository _volunteersRepository;
     private readonly IUnitOfWork _unitOfWork;

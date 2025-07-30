@@ -1,6 +1,7 @@
 using CSharpFunctionalExtensions;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
+using PetFamily.Application.Abstractions;
 using PetFamily.Application.Database;
 using PetFamily.Application.Extensions;
 using PetFamily.Application.Files;
@@ -13,7 +14,7 @@ using PetFamily.Domain.VolunteersManagement.ValueObjects;
 
 namespace PetFamily.Application.VolunteersManagement.UseCases.AddPet;
 
-public class AddPetHandler
+public class AddPetHandler : ICommandHandler<Guid, AddPetCommand>
 {
     private readonly IFileProvider _fileProvider;
     private readonly IVolunteersRepository _volunteersRepository;
