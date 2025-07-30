@@ -67,7 +67,7 @@ public class Volunteer : SoftDeletableEntity<VolunteerId>
         if (serialNumberResult.IsFailure)
             return serialNumberResult.Error;
 
-        pet.SetSerialNumber(serialNumberResult.Value);
+        pet.SetPosition(serialNumberResult.Value);
 
         _pets.Add(pet);
 

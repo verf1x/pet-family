@@ -20,15 +20,22 @@ public class GetFilteredPetsWithPaginationHandler
         GetFilteredPetsWithPaginationQuery query,
         CancellationToken cancellationToken = default)
     {
-        var petsQuery = _readDbContext.Pets;
+        var petsQuery = _readDbContext.Pets.AsQueryable();
         
-        if(!string.IsNullOrWhiteSpace(query.Nickname))
-            petsQuery = petsQuery
-                .Where(p => p.Nickname.Contains(query.Nickname));
+        petsQuery = petsQuery.WhereIf(
+            !string.IsNullOrEmpty(query.Nickname),
+            p => p.Nickname.Contains(query.Nickname!));
 
-        return await petsQuery.ToPagedList(
-            query.PageNumber,
-            query.PageSize,
-            cancellationToken);
+        petsQuery = petsQuery
+            .WhereIf(query.PositionTo is not null,
+                p => p.Position <= query.PositionTo!.Value);
+            
+        petsQuery = petsQuery
+            .WhereIf(query.PositionFrom is not null,
+                p => p.Position >= query.PositionFrom!.Value);
+
+        return await petsQuery
+            .OrderBy(p => p.Position)
+            .ToPagedList(query.PageNumber, query.PageSize, cancellationToken);
     }
 } 

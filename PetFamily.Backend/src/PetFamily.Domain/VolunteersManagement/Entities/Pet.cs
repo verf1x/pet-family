@@ -88,7 +88,7 @@ public class Pet : SoftDeletableEntity<PetId>
             _photos.Remove(photo);
     }
     
-    public void SetSerialNumber(Position position)
+    public void SetPosition(Position position)
     {
         Position = position;
     }

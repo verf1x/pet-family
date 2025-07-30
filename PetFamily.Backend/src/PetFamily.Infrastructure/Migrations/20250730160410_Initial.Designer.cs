@@ -13,7 +13,7 @@ using PetFamily.Infrastructure.DbContexts;
 namespace PetFamily.Infrastructure.Migrations
 {
     [DbContext(typeof(WriteDbContext))]
-    [Migration("20250729232809_Initial")]
+    [Migration("20250730160410_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -71,6 +71,11 @@ namespace PetFamily.Infrastructure.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean")
                         .HasColumnName("is_deleted");
+
+                    b.Property<string>("Photos")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("photos");
 
                     b.Property<Guid>("volunteer_id")
                         .HasColumnType("uuid")
@@ -382,35 +387,7 @@ namespace PetFamily.Infrastructure.Migrations
                                 .HasConstraintName("fk_pets_pets_pet_id");
                         });
 
-                    b.OwnsMany("PetFamily.Domain.VolunteersManagement.ValueObjects.Photo", "Photos", b1 =>
-                        {
-                            b1.Property<Guid>("PetId")
-                                .HasColumnType("uuid");
-
-                            b1.Property<int>("__synthesizedOrdinal")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("integer");
-
-                            b1.Property<string>("PhotoPath")
-                                .IsRequired()
-                                .HasMaxLength(1000)
-                                .HasColumnType("character varying(1000)")
-                                .HasColumnName("photo_path");
-
-                            b1.HasKey("PetId", "__synthesizedOrdinal");
-
-                            b1.ToTable("pets");
-
-                            b1.ToJson("pet_photos");
-
-                            b1.WithOwner()
-                                .HasForeignKey("PetId")
-                                .HasConstraintName("fk_pets_pets_pet_id");
-                        });
-
                     b.Navigation("HelpRequisites");
-
-                    b.Navigation("Photos");
                 });
 
             modelBuilder.Entity("PetFamily.Domain.VolunteersManagement.Entities.Volunteer", b =>
