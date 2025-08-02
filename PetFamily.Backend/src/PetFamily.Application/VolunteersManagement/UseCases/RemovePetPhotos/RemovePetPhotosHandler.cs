@@ -51,13 +51,13 @@ public class RemovePetPhotosHandler : ICommandHandler<List<string>, RemovePetPho
         if (petResult.IsFailure)
             return petResult.Error.ToErrorList();
 
-        var petPhotos = new List<Photo>();
+        var petPhotos = new List<Domain.VolunteersManagement.ValueObjects.File>();
         foreach (var photoName in command.PhotoNames)
         {
-            var photoPathResult = PhotoPath.Create(photoName);
+            var photoPathResult = FilePath.Create(photoName);
             if (photoPathResult.IsFailure)
                 return photoPathResult.Error.ToErrorList();
-            var photo = new Photo(photoPathResult.Value);
+            var photo = new Domain.VolunteersManagement.ValueObjects.File(photoPathResult.Value);
             
             petPhotos.Add(photo);
         }

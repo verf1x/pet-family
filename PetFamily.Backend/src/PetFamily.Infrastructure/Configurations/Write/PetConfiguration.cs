@@ -7,6 +7,8 @@ using PetFamily.Domain.Shared.EntityIds;
 using PetFamily.Domain.VolunteersManagement.Entities;
 using PetFamily.Domain.VolunteersManagement.Enums;
 using PetFamily.Domain.VolunteersManagement.ValueObjects;
+using PetFamily.Infrastructure.Extensions;
+using File = PetFamily.Domain.VolunteersManagement.ValueObjects.File;
 
 namespace PetFamily.Infrastructure.Configurations.Write;
 
@@ -167,25 +169,31 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
             });
 
         builder.Property(p => p.Photos)
-            .HasColumnType("jsonb")
-            .HasConversion(
-                photos => JsonSerializer.Serialize(
-                    photos.Select(p => new PetPhotoDto
-                    {
-                        PhotoPath = p.PhotoPath.Path,
-                    }),
-                    JsonSerializerOptions.Default),
-                json => JsonSerializer.Deserialize<List<PetPhotoDto>>(json, JsonSerializerOptions.Default)!
-                    .Select(dto => new Photo(PhotoPath.Create(dto.PhotoPath).Value))
-                    .ToList(),
-                new ValueComparer<IReadOnlyList<Photo>>(
-                    (c1, c2) => c1!.SequenceEqual(c2!),
-                    c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
-                    c => c.ToList()));
+            .HasValueObjectCollectionJsonConversion(
+                file => new PetFileDto { FilePath = file.FilePath.Value},
+                dto => new File(FilePath.Create(dto.FilePath).Value))
+            .HasColumnName("photos");
+
+        // builder.Property(p => p.Photos)
+        //     .HasColumnType("jsonb")
+        //     .HasConversion(
+        //         photos => JsonSerializer.Serialize(
+        //             photos.Select(p => new PetPhotoDto 
+        //             {
+        //                 PhotoPath = p.FilePath.Path,
+        //             }),
+        //             JsonSerializerOptions.Default),
+        //         json => JsonSerializer.Deserialize<List<PetPhotoDto>>(json, JsonSerializerOptions.Default)!
+        //             .Select(dto => new Domain.VolunteersManagement.ValueObjects.File(FilePath.Create(dto.PhotoPath).Value))
+        //             .ToList(),
+        //         new ValueComparer<IReadOnlyList<Domain.VolunteersManagement.ValueObjects.File>>(
+        //             (c1, c2) => c1!.SequenceEqual(c2!),
+        //             c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+        //             c => c.ToList()));
 
         builder.Property(p => p.CreatedAt)
             .IsRequired();
-
+ 
         builder.Property<bool>("IsDeleted")
             .HasColumnName("is_deleted");
 

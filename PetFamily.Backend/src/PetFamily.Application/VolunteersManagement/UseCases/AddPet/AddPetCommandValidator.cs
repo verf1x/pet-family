@@ -49,6 +49,6 @@ public class AddPetCommandValidator : AbstractValidator<AddPetCommand>
 
         RuleForEach(c => c.Photos)
             .Must(cb => cb.Content.Length != 0)
-            .MustBeValueObject(cb => PhotoPath.Create(cb.FileName));
+            .MustBeValueObject(cb => FilePath.Create(cb.FileName));
     }
 }

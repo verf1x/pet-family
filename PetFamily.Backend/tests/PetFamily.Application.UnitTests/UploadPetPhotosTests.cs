@@ -43,10 +43,10 @@ public class UploadPetPhotosTests
         var uploadFileDto = new UploadFileDto(stream, fileName);
         List<UploadFileDto> files = [uploadFileDto, uploadFileDto];
 
-        List<PhotoPath> photoPaths =
+        List<FilePath> photoPaths =
         [
-            PhotoPath.Create("test.jpg").Value,
-            PhotoPath.Create("test.jpg").Value
+            FilePath.Create("test.jpg").Value,
+            FilePath.Create("test.jpg").Value
         ];
 
         var command = new UploadPetPhotosCommand(volunteer.Id, pet.Id, files);
@@ -54,7 +54,7 @@ public class UploadPetPhotosTests
         
         _fileProviderMock
             .Setup(f => f.UploadPhotosAsync(It.IsAny<List<PhotoData>>(), cancellationToken))
-            .ReturnsAsync(Result.Success<List<PhotoPath>, Error>(photoPaths));
+            .ReturnsAsync(Result.Success<List<FilePath>, Error>(photoPaths));
         
         _volunteersRepositoryMock.
             Setup(v => v.GetByIdAsync(volunteer.Id, cancellationToken))
@@ -94,7 +94,7 @@ public class UploadPetPhotosTests
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        result.Value.Should().BeEquivalentTo(photoPaths.Select(p => p.Path));
+        result.Value.Should().BeEquivalentTo(photoPaths.Select(p => p.Value));
         volunteer.Pets.First(i => i.Id == pet.Id).Photos.Should().HaveCount(2);
     }
 
@@ -129,7 +129,7 @@ public class UploadPetPhotosTests
             HelpRequisite.Create("string", "string").Value,
             HelpRequisite.Create("string", "string").Value
         ]);
-        var photos = new List<Photo>();
+        var photos = new List<Domain.VolunteersManagement.ValueObjects.File>();
 
         return new Pet(
             PetId.CreateNew(),

@@ -6,7 +6,7 @@ namespace PetFamily.Application.Files;
 
 public interface IFileProvider
 {
-    Task<Result<List<PhotoPath>, Error>> UploadPhotosAsync(
+    Task<Result<List<FilePath>, Error>> UploadPhotosAsync(
         IEnumerable<PhotoData> filesData,
         CancellationToken cancellationToken = default);
     

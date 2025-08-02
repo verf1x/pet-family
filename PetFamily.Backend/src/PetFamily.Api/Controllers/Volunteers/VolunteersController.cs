@@ -3,6 +3,10 @@ using PetFamily.Api.Controllers.Volunteers.Requests;
 using PetFamily.Api.Extensions;
 using PetFamily.Api.Processors;
 using PetFamily.Application.Abstractions;
+using PetFamily.Application.Dtos;
+using PetFamily.Application.Models;
+using PetFamily.Application.VolunteersManagement.Queries.GetVolunteerById;
+using PetFamily.Application.VolunteersManagement.Queries.GetVolunteersWithPagination;
 using PetFamily.Application.VolunteersManagement.UseCases.AddPet;
 using PetFamily.Application.VolunteersManagement.UseCases.Create;
 using PetFamily.Application.VolunteersManagement.UseCases.Delete;
@@ -138,6 +142,36 @@ public class VolunteersController : ApplicationController
     {
         var command = new MovePetCommand(volunteerId, petId, newPosition);
         var result = await handler.HandleAsync(command, cancellationToken);
+        
+        if (result.IsFailure)
+            return result.Error.ToResponse();
+        
+        return Ok(result.Value);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetAsync(
+        [FromQuery] GetVolunteersWithPaginationRequest request,
+        [FromServices] IQueryHandler<PagedList<VolunteerDto>, GetVolunteersWithPaginationQuery> handler,
+        CancellationToken cancellationToken = default)
+    {
+        var query = request.ToQuery();
+        var result = await handler.HandleAsync(query, cancellationToken);
+        
+        if (result.IsFailure)
+            return result.Error.ToResponse();
+        
+        return Ok(result.Value);
+    }
+    
+    [HttpGet("{id:guid}")]
+    public async Task<IActionResult> GetByIdAsync(
+        [FromRoute] Guid id,
+        [FromServices] IQueryHandler<VolunteerDto, GetVolunteerByIdQuery> handler,
+        CancellationToken cancellationToken = default)
+    {
+        var query = new GetVolunteerByIdQuery(id);
+        var result = await handler.HandleAsync(query, cancellationToken);
         
         if (result.IsFailure)
             return result.Error.ToResponse();
