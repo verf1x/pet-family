@@ -1,6 +1,6 @@
 using System.Data;
 
-namespace PetFamily.Infrastructure;
+namespace PetFamily.Application.Database;
 
 public interface ISqlConnectionFactory
 {

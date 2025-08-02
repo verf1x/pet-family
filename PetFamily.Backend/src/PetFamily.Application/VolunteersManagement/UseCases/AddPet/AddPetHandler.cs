@@ -71,7 +71,7 @@ public class AddPetHandler : ICommandHandler<Guid, AddPetCommand>
             if (uploadResult.IsFailure)
             {
                 await _messageQueue.WriteAsync(
-                    photosData.Value.Select(f => f.Path.Path),
+                    photosData.Value.Select(f => f.Path.Value),
                     cancellationToken);
                 
                 return uploadResult.Error.ToErrorList();   

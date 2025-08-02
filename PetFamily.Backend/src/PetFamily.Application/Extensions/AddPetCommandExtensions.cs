@@ -16,7 +16,7 @@ public static class AddPetCommandExtensions
         {
             var extension = Path.GetExtension(file.FileName);
 
-            var pathResult = PhotoPath.Create(Guid.NewGuid(), extension);
+            var pathResult = FilePath.Create(Guid.NewGuid(), extension);
             if (pathResult.IsFailure)
                 return pathResult.Error;
 

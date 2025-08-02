@@ -14,10 +14,10 @@ public class PetDto
     
     public string Color { get; set; } = null!;
 
-    public PetPhotoDto[] Photos { get; set; } = null!;
+    public PetFileDto[] Photos { get; set; } = null!;
 }
 
-public class PetPhotoDto
+public class PetFileDto
 {
-    public string PhotoPath { get; init; } = string.Empty;
+    public string FilePath { get; init; } = string.Empty;
 }

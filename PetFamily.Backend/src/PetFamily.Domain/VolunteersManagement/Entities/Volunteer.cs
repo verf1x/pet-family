@@ -27,7 +27,7 @@ public class Volunteer : SoftDeletableEntity<VolunteerId>
 
     public IReadOnlyList<Pet> Pets => _pets;
 
-    // ef core ctor
+    // ef core
     private Volunteer(VolunteerId id) : base(id) { }
 
     public Volunteer(
@@ -37,8 +37,8 @@ public class Volunteer : SoftDeletableEntity<VolunteerId>
         Description description,
         Experience experience,
         PhoneNumber phoneNumber,
-        IReadOnlyList<SocialNetwork> socialNetworks,
-        IReadOnlyList<HelpRequisite> helpRequisites) : base(id)
+        List<SocialNetwork> socialNetworks,
+        List<HelpRequisite> helpRequisites) : base(id)
     {
         FullName = fullName;
         Email = email;

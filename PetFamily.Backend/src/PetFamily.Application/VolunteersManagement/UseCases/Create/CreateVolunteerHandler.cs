@@ -45,7 +45,7 @@ public class CreateVolunteerHandler : ICommandHandler<Guid, CreateVolunteerComma
             await _volunteersRepository.GetByPhoneNumberAsync(phoneNumber, cancellationToken);
         
         if (volunteerByEmail.IsSuccess || volunteerByPhoneNumber.IsSuccess)
-            return Errors.Module.AlreadyExists().ToErrorList();
+            return Errors.Volunteer.AlreadyExists().ToErrorList();
         
         var id = VolunteerId.CreateNew();
         
@@ -60,12 +60,12 @@ public class CreateVolunteerHandler : ICommandHandler<Guid, CreateVolunteerComma
         var socialNetworks = new List<SocialNetwork>(
             command.SocialNetworks
                 .Select(s => SocialNetwork.Create(s.Name, s.Url).Value)
-                .ToList()).AsReadOnly();
+                .ToList());
         
         var helpRequisites = new List<HelpRequisite>(
             command.HelpRequisites
                 .Select(r => HelpRequisite.Create(r.Name, r.Description).Value)
-                .ToList()).AsReadOnly();
+                .ToList());
         
         Volunteer volunteer = new(
             id,
