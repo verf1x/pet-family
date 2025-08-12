@@ -1,5 +1,5 @@
 using PetFamily.Application.Abstractions;
-using PetFamily.Application.Dtos;
+using PetFamily.Contracts.Dtos;
 
 namespace PetFamily.Application.VolunteersManagement.UseCases.UploadPetPhotos;
 

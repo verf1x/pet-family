@@ -1,4 +1,4 @@
-namespace PetFamily.Application.Dtos;
+namespace PetFamily.Contracts.Dtos;
 
 public class VolunteerDto
 {

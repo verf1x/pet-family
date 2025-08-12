@@ -30,7 +30,7 @@ public class AddPetHandler : ICommandHandler<Guid, AddPetCommand>
         IUnitOfWork unitOfWork,
         IMessageQueue<IEnumerable<string>> messageQueue,
         ILogger<AddPetHandler> logger)
-    { 
+    {
         _fileProvider = fileProvider;
         _volunteersRepository = volunteersRepository;
         _validator = validator;
@@ -46,55 +46,23 @@ public class AddPetHandler : ICommandHandler<Guid, AddPetCommand>
         var validationResult = await _validator.ValidateAsync(command, cancellationToken);
         if (validationResult.IsValid == false)
             return validationResult.ToErrorList();
-        
-        var transaction = await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
-        try
-        {
-            var volunteerResult = await _volunteersRepository
-                .GetByIdAsync(VolunteerId.Create(command.VolunteerId), cancellationToken);
+        var volunteerResult = await _volunteersRepository
+            .GetByIdAsync(VolunteerId.Create(command.VolunteerId), cancellationToken);
 
-            if (volunteerResult.IsFailure)
-                return volunteerResult.Error.ToErrorList();
+        if (volunteerResult.IsFailure)
+            return volunteerResult.Error.ToErrorList();
 
-            var photosData = command.Photos.ToDataCollection();
-            if (photosData.IsFailure)
-                return photosData.Error.ToErrorList();
+        var pet = InitializePet(command);
 
-            var pet = InitializePet(command, photosData.Value);
+        volunteerResult.Value.AddPet(pet);
 
-            volunteerResult.Value.AddPet(pet);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-            var uploadResult = await _fileProvider.UploadPhotosAsync(photosData.Value, cancellationToken);
-            if (uploadResult.IsFailure)
-            {
-                await _messageQueue.WriteAsync(
-                    photosData.Value.Select(f => f.Path.Value),
-                    cancellationToken);
-                
-                return uploadResult.Error.ToErrorList();   
-            }
-
-            transaction.Commit();
-
-            return pet.Id.Value;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Cannot add pet for volunteer with id {VolunteerId}", command.VolunteerId);
-
-            transaction.Rollback();
-
-            return Error.Failure(
-                "volunteer.pet.failure",
-                "Cannot add pet for volunteer with id " + command.VolunteerId)
-                .ToErrorList();
-        }
+        return pet.Id.Value;
     }
 
-    private Pet InitializePet(AddPetCommand command, List<PhotoData> photosData)
+    private Pet InitializePet(AddPetCommand command)
     {
         var petId = PetId.CreateNew();
         var nickname = Nickname.Create(command.Nickname).Value;
@@ -128,8 +96,6 @@ public class AddPetHandler : ICommandHandler<Guid, AddPetCommand>
             .Select(r => HelpRequisite.Create(r.Name, r.Description).Value)
             .ToList();
 
-        var petFiles = photosData.ToPhotosCollection();
-
         var pet = new Pet(
             petId,
             nickname,
@@ -142,8 +108,7 @@ public class AddPetHandler : ICommandHandler<Guid, AddPetCommand>
             ownerPhoneNumber,
             dateOfBirth,
             helpStatus,
-            helpRequisites,
-            petFiles);
+            helpRequisites);
 
         return pet;
     }

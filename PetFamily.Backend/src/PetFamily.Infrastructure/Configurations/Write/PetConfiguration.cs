@@ -1,8 +1,7 @@
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using PetFamily.Application.Dtos;
+using PetFamily.Contracts.Dtos;
 using PetFamily.Domain.Shared.EntityIds;
 using PetFamily.Domain.VolunteersManagement.Entities;
 using PetFamily.Domain.VolunteersManagement.Enums;

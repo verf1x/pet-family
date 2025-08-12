@@ -1,12 +1,10 @@
-using PetFamily.Application.Abstractions;
 using PetFamily.Contracts.Dtos;
 using PetFamily.Contracts.Dtos.Pet;
-using PetFamily.Domain.VolunteersManagement.Enums;
+using PetFamily.Domain.VolunteersManagement.Enums; //TODO: придумать как убрать зависимость от Domain
 
-namespace PetFamily.Application.VolunteersManagement.UseCases.AddPet;
+namespace PetFamily.Contracts.Requests.Volunteers;
 
-public record AddPetCommand(
-    Guid VolunteerId,
+public record AddPetRequest(
     string Nickname,
     string Description,
     SpeciesBreedDto SpeciesBreedDto,
@@ -17,4 +15,4 @@ public record AddPetCommand(
     string OwnerPhoneNumber,
     DateOnly DateOfBirth,
     HelpStatus HelpStatus,
-    IEnumerable<HelpRequisiteDto> HelpRequisites) : ICommand;
+    IEnumerable<HelpRequisiteDto> HelpRequisites);

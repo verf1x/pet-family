@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-using PetFamily.Api.Controllers.Pets.Requests;
 using PetFamily.Application.VolunteersManagement.Queries.GetFilteredPetsWithPagination;
+using PetFamily.Contracts.Requests.Pets;
 
-namespace PetFamily.Api.Controllers.Pets;
+namespace PetFamily.Api.Controllers;
 
 public class PetsController : ApplicationController
 {
@@ -12,7 +12,15 @@ public class PetsController : ApplicationController
         [FromServices] GetFilteredPetsWithPaginationHandler handler,
         CancellationToken cancellationToken = default)
     {
-        var query = request.ToQuery();
+        
+        var query = new GetFilteredPetsWithPaginationQuery(
+            request.Nickname,
+            request.PositionFrom,
+            request.PositionTo,
+            request.SortBy,
+            request.SortAscending,
+            request.PageNumber,
+            request.PageSize);
         
         var response = await handler.HandleAsync(query, cancellationToken);
 
@@ -25,7 +33,14 @@ public class PetsController : ApplicationController
         [FromServices] GetFilteredPetsWithPaginationHandlerDapper handler,
         CancellationToken cancellationToken = default)
     {
-        var query = request.ToQuery();
+        var query = new GetFilteredPetsWithPaginationQuery(
+            request.Nickname,
+            request.PositionFrom,
+            request.PositionTo,
+            request.SortBy,
+            request.SortAscending,
+            request.PageNumber,
+            request.PageSize);
         
         var response = await handler.HandleAsync(query, cancellationToken);
 

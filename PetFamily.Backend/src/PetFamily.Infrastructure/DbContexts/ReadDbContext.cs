@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using PetFamily.Application.Database;
-using PetFamily.Application.Dtos;
+using PetFamily.Contracts.Dtos;
 
 namespace PetFamily.Infrastructure.DbContexts;
 

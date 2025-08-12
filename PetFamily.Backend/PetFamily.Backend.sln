@@ -22,6 +22,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetFamily.Application.UnitT
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetFamily.Domain.UnitTests", "tests\PetFamily.Domain.UnitTests\PetFamily.Domain.UnitTests.csproj", "{7013F3B1-7E79-4B44-8DA2-6FB8620A0F9E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetFamily.Contracts", "src\PetFamily.Contracts\PetFamily.Contracts.csproj", "{96CBD00B-C32E-486F-9D71-FDF485D2DF75}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -104,6 +106,18 @@ Global
 		{7013F3B1-7E79-4B44-8DA2-6FB8620A0F9E}.Release|x64.Build.0 = Release|Any CPU
 		{7013F3B1-7E79-4B44-8DA2-6FB8620A0F9E}.Release|x86.ActiveCfg = Release|Any CPU
 		{7013F3B1-7E79-4B44-8DA2-6FB8620A0F9E}.Release|x86.Build.0 = Release|Any CPU
+		{96CBD00B-C32E-486F-9D71-FDF485D2DF75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{96CBD00B-C32E-486F-9D71-FDF485D2DF75}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{96CBD00B-C32E-486F-9D71-FDF485D2DF75}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{96CBD00B-C32E-486F-9D71-FDF485D2DF75}.Debug|x64.Build.0 = Debug|Any CPU
+		{96CBD00B-C32E-486F-9D71-FDF485D2DF75}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{96CBD00B-C32E-486F-9D71-FDF485D2DF75}.Debug|x86.Build.0 = Debug|Any CPU
+		{96CBD00B-C32E-486F-9D71-FDF485D2DF75}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{96CBD00B-C32E-486F-9D71-FDF485D2DF75}.Release|Any CPU.Build.0 = Release|Any CPU
+		{96CBD00B-C32E-486F-9D71-FDF485D2DF75}.Release|x64.ActiveCfg = Release|Any CPU
+		{96CBD00B-C32E-486F-9D71-FDF485D2DF75}.Release|x64.Build.0 = Release|Any CPU
+		{96CBD00B-C32E-486F-9D71-FDF485D2DF75}.Release|x86.ActiveCfg = Release|Any CPU
+		{96CBD00B-C32E-486F-9D71-FDF485D2DF75}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

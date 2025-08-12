@@ -1,9 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using PetFamily.Api.Controllers.Volunteers.Requests;
 using PetFamily.Api.Extensions;
 using PetFamily.Api.Processors;
 using PetFamily.Application.Abstractions;
-using PetFamily.Application.Dtos;
 using PetFamily.Application.Models;
 using PetFamily.Application.VolunteersManagement.Queries.GetVolunteerById;
 using PetFamily.Application.VolunteersManagement.Queries.GetVolunteersWithPagination;
@@ -14,8 +12,10 @@ using PetFamily.Application.VolunteersManagement.UseCases.MovePet;
 using PetFamily.Application.VolunteersManagement.UseCases.RemovePetPhotos;
 using PetFamily.Application.VolunteersManagement.UseCases.UpdateMainInfo;
 using PetFamily.Application.VolunteersManagement.UseCases.UploadPetPhotos;
+using PetFamily.Contracts.Dtos;
+using PetFamily.Contracts.Requests.Volunteers;
 
-namespace PetFamily.Api.Controllers.Volunteers;
+namespace PetFamily.Api.Controllers;
 
 public class VolunteersController : ApplicationController
 {
@@ -25,7 +25,16 @@ public class VolunteersController : ApplicationController
         [FromBody] CreateVolunteerRequest request,
         CancellationToken cancellationToken = default)
     {
-        var result = await handler.HandleAsync(request.ToCommand(), cancellationToken);
+        var command = new CreateVolunteerCommand(
+            request.FullName,
+            request.Email,
+            request.Description,
+            request.ExperienceYears,
+            request.PhoneNumber,
+            request.SocialNetworks,
+            request.HelpRequisites);
+        
+        var result = await handler.HandleAsync(command, cancellationToken);
         if (result.IsFailure)
             return result.Error.ToResponse();
 
@@ -39,7 +48,15 @@ public class VolunteersController : ApplicationController
         [FromServices] ICommandHandler<Guid, UpdateMainInfoCommand> handler,
         CancellationToken cancellationToken = default)
     {
-        var result = await handler.HandleAsync(request.ToCommand(id), cancellationToken);
+        var command = new UpdateMainInfoCommand(
+            id,
+            request.FullName,
+            request.Email,
+            request.Description,
+            request.ExperienceYears,
+            request.PhoneNumber);
+        
+        var result = await handler.HandleAsync(command, cancellationToken);
         if (result.IsFailure)
             return result.Error.ToResponse();
 
@@ -81,11 +98,20 @@ public class VolunteersController : ApplicationController
         [FromServices] ICommandHandler<Guid, AddPetCommand> handler,
         CancellationToken cancellationToken = default)
     {
-        await using var fileProcessor = new FormFileProcessor();
-
-        var fileDtos = fileProcessor.Process(request.Photos);
+        var command = new AddPetCommand(
+            id,
+            request.Nickname,
+            request.Description,
+            request.SpeciesBreedDto,
+            request.Color,
+            request.HealthInfoDto,
+            request.AddressDto,
+            request.MeasurementsDto,
+            request.OwnerPhoneNumber,
+            request.DateOfBirth,
+            request.HelpStatus,
+            request.HelpRequisites);
         
-        var command = request.ToCommand(id, fileDtos);
         var result = await handler.HandleAsync(command, cancellationToken);
 
         if (result.IsFailure)
@@ -98,15 +124,16 @@ public class VolunteersController : ApplicationController
     public async Task<IActionResult> UploadPetPhotosAsync(
         [FromRoute] Guid volunteerId,
         [FromRoute] Guid petId,
-        [FromForm] AddPetPhotosRequest request,
+        [FromForm] IFormFileCollection photos,
         [FromServices] ICommandHandler<List<string>, UploadPetPhotosCommand> handler,
         CancellationToken cancellationToken = default)
     {
         await using var fileProcessor = new FormFileProcessor();
         
-        var fileDtos = fileProcessor.Process(request.Photos);
+        var fileDtos = fileProcessor.Process(photos);
         
-        var command = request.ToCommand(volunteerId, petId, fileDtos);
+        var command = new UploadPetPhotosCommand(volunteerId, petId, fileDtos);
+        
         var result = await handler.HandleAsync(command, cancellationToken);
         
         if (result.IsFailure)
@@ -123,7 +150,8 @@ public class VolunteersController : ApplicationController
         [FromServices] ICommandHandler<List<string>, RemovePetPhotosCommand> handler,
         CancellationToken cancellationToken = default)
     {
-        var command = request.ToCommand(volunteerId, petId);
+        var command = new RemovePetPhotosCommand(volunteerId, petId, request.PhotoPaths);
+        
         var result = await handler.HandleAsync(command, cancellationToken);
         
         if (result.IsFailure)
@@ -155,7 +183,10 @@ public class VolunteersController : ApplicationController
         [FromServices] IQueryHandler<PagedList<VolunteerDto>, GetVolunteersWithPaginationQuery> handler,
         CancellationToken cancellationToken = default)
     {
-        var query = request.ToQuery();
+        var query = new GetVolunteersWithPaginationQuery(
+            request.PageNumber,
+            request.PageSize);
+        
         var result = await handler.HandleAsync(query, cancellationToken);
         
         if (result.IsFailure)

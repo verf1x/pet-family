@@ -2,9 +2,9 @@ using System.Linq.Expressions;
 using CSharpFunctionalExtensions;
 using PetFamily.Application.Abstractions;
 using PetFamily.Application.Database;
-using PetFamily.Application.Dtos;
 using PetFamily.Application.Extensions;
 using PetFamily.Application.Models;
+using PetFamily.Contracts.Dtos;
 using PetFamily.Domain.Shared;
 
 namespace PetFamily.Application.VolunteersManagement.Queries.GetFilteredPetsWithPagination;
