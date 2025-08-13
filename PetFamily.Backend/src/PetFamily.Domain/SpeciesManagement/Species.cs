@@ -1,5 +1,4 @@
 using CSharpFunctionalExtensions;
-using PetFamily.Domain.Shared;
 using PetFamily.Domain.Shared.EntityIds;
 using PetFamily.Domain.SpeciesManagement.ValueObjects;
 
@@ -7,22 +6,30 @@ namespace PetFamily.Domain.SpeciesManagement;
 
 public class Species : Entity<SpeciesId>
 {
-    public string Name { get; private set; } = null!;
-    public IReadOnlyList<Breed> Breeds { get; private set; } = null!;
+    private readonly List<Breed> _breeds = [];
+    
+    public Name Name { get; private set; } = null!;
+
+    public IReadOnlyList<Breed> Breeds => _breeds;
 
     // ef core ctor
     private Species(SpeciesId id) : base(id) { }
     
-    private Species(SpeciesId id, string name, IReadOnlyList<Breed> breeds) : base(id)
+    public Species(SpeciesId id, Name name) : base(id)
     {
         Name = name;
     }
-
-    public static Result<Species, Error> Create(SpeciesId id, string name, IReadOnlyList<Breed> breeds)
+    
+    public void AddBreeds(List<Breed> breeds)
     {
-        if(string.IsNullOrWhiteSpace(name))
-            return Errors.General.ValueIsRequired(nameof(name));
-        
-        return new Species(id, name, breeds);
+        foreach (var breed in breeds)
+            if(!_breeds.Contains(breed))
+                _breeds.Add(breed);
+    }
+    
+    public void RemoveBreeds(List<Breed> breeds)
+    {
+        foreach (var breed in breeds)
+            _breeds.Remove(breed);
     }
 }

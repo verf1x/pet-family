@@ -12,7 +12,7 @@ using PetFamily.Application.VolunteersManagement.UseCases.MovePet;
 using PetFamily.Application.VolunteersManagement.UseCases.RemovePetPhotos;
 using PetFamily.Application.VolunteersManagement.UseCases.UpdateMainInfo;
 using PetFamily.Application.VolunteersManagement.UseCases.UploadPetPhotos;
-using PetFamily.Contracts.Dtos;
+using PetFamily.Contracts.Dtos.Volunteer;
 using PetFamily.Contracts.Requests.Volunteers;
 
 namespace PetFamily.Api.Controllers;

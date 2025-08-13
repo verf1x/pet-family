@@ -38,4 +38,12 @@ public static class Errors
             return Error.Validation("record.already.exists", $"Volunteer already exists", null);
         }
     }
+
+    public static class Species
+    {
+        public static Error AlreadyExists()
+        {
+            return Error.Validation("record.already.exists", $"Species already exists", null);
+        }
+    }
 }

@@ -1,4 +1,6 @@
 using PetFamily.Contracts.Dtos;
+using PetFamily.Contracts.Dtos.Pet;
+using PetFamily.Contracts.Dtos.Volunteer;
 
 namespace PetFamily.Application.Database;
 

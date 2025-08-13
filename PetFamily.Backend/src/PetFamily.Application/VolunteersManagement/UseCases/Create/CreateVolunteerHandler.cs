@@ -38,13 +38,13 @@ public class CreateVolunteerHandler : ICommandHandler<Guid, CreateVolunteerComma
         var email = Email.Create(command.Email).Value;
         var phoneNumber = PhoneNumber.Create(command.PhoneNumber).Value;
 
-        var volunteerByEmail = 
+        var volunteerByEmailResult = 
             await _volunteersRepository.GetByEmailAsync(email, cancellationToken);
         
-        var volunteerByPhoneNumber = 
+        var volunteerByPhoneNumberResult = 
             await _volunteersRepository.GetByPhoneNumberAsync(phoneNumber, cancellationToken);
         
-        if (volunteerByEmail.IsSuccess || volunteerByPhoneNumber.IsSuccess)
+        if (volunteerByEmailResult.IsSuccess || volunteerByPhoneNumberResult.IsSuccess)
             return Errors.Volunteer.AlreadyExists().ToErrorList();
         
         var id = VolunteerId.CreateNew();
