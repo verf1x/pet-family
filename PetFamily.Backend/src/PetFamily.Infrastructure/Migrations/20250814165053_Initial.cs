@@ -16,7 +16,7 @@ namespace PetFamily.Infrastructure.Migrations
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
-                    name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    name = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
                     species_breeds = table.Column<string>(type: "jsonb", nullable: true)
                 },
                 constraints: table =>

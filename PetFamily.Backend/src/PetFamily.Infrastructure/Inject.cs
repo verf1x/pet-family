@@ -4,6 +4,7 @@ using Minio;
 using PetFamily.Application.Database;
 using PetFamily.Application.Files;
 using PetFamily.Application.Messaging;
+using PetFamily.Application.SpeciesManagement;
 using PetFamily.Application.VolunteersManagement;
 using PetFamily.Infrastructure.BackgroundServices;
 using PetFamily.Infrastructure.Database;
@@ -68,6 +69,7 @@ public static class Inject
     private static IServiceCollection AddRepositories(this IServiceCollection services)
     {
         services.AddScoped<IVolunteersRepository, VolunteersRepository>();
+        services.AddScoped<ISpeciesRepository, SpeciesRepository>();
 
         return services;
     }

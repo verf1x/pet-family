@@ -1,6 +1,8 @@
 using CSharpFunctionalExtensions;
 using Microsoft.EntityFrameworkCore;
 using PetFamily.Application.SpeciesManagement;
+using PetFamily.Domain.Shared;
+using PetFamily.Domain.Shared.EntityIds;
 using PetFamily.Domain.SpeciesManagement;
 using PetFamily.Domain.SpeciesManagement.ValueObjects;
 using PetFamily.Infrastructure.DbContexts;
@@ -31,5 +33,18 @@ public class SpeciesRepository : ISpeciesRepository
             .FirstOrDefaultAsync(s => s.Name == name, cancellationToken);
 
         return species ?? Result.Failure<Species>("Name not found");
+    }
+
+    public async Task<Result<Species, Error>> GetByIdAsync(
+        SpeciesId speciesId,
+        CancellationToken cancellationToken = default)
+    {
+        var species = await _writeDbContext.Species
+            .FirstOrDefaultAsync(s => s.Id == speciesId, cancellationToken);
+
+        if (species is null)
+            return Errors.General.NotFound(speciesId);
+        
+        return species;
     }
 }
