@@ -1,8 +1,8 @@
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using PetFamily.Application.Dtos;
+using PetFamily.Contracts.Dtos;
+using PetFamily.Contracts.Dtos.Pet;
 using PetFamily.Domain.Shared.EntityIds;
 using PetFamily.Domain.VolunteersManagement.Entities;
 using PetFamily.Domain.VolunteersManagement.Enums;
@@ -173,23 +173,6 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
                 file => new PetFileDto { FilePath = file.FilePath.Value},
                 dto => new File(FilePath.Create(dto.FilePath).Value))
             .HasColumnName("photos");
-
-        // builder.Property(p => p.Photos)
-        //     .HasColumnType("jsonb")
-        //     .HasConversion(
-        //         photos => JsonSerializer.Serialize(
-        //             photos.Select(p => new PetPhotoDto 
-        //             {
-        //                 PhotoPath = p.FilePath.Path,
-        //             }),
-        //             JsonSerializerOptions.Default),
-        //         json => JsonSerializer.Deserialize<List<PetPhotoDto>>(json, JsonSerializerOptions.Default)!
-        //             .Select(dto => new Domain.VolunteersManagement.ValueObjects.File(FilePath.Create(dto.PhotoPath).Value))
-        //             .ToList(),
-        //         new ValueComparer<IReadOnlyList<Domain.VolunteersManagement.ValueObjects.File>>(
-        //             (c1, c2) => c1!.SequenceEqual(c2!),
-        //             c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
-        //             c => c.ToList()));
 
         builder.Property(p => p.CreatedAt)
             .IsRequired();

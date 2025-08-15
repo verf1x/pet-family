@@ -6,11 +6,11 @@ using FluentValidation.Results;
 using Microsoft.Extensions.Logging;
 using Moq;
 using PetFamily.Application.Database;
-using PetFamily.Application.Dtos;
 using PetFamily.Application.Files;
 using PetFamily.Application.Messaging;
 using PetFamily.Application.VolunteersManagement;
 using PetFamily.Application.VolunteersManagement.UseCases.UploadPetPhotos;
+using PetFamily.Contracts.Dtos;
 using PetFamily.Domain.Shared;
 using PetFamily.Domain.Shared.EntityIds;
 using PetFamily.Domain.Shared.ValueObjects;
@@ -143,8 +143,7 @@ public class UploadPetPhotosTests
             phoneNumber,
             dateOfBirth,
             HelpStatus.LookingForHome,
-            helpRequisites,
-            photos);
+            helpRequisites);
     }
 
     private Email GetRandomEmail()

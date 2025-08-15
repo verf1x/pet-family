@@ -5,7 +5,8 @@ namespace PetFamily.Application.Extensions;
 
 public static class PhotosDataExtensions
 {
-    public static List<Domain.VolunteersManagement.ValueObjects.File> ToPhotosCollection(this IEnumerable<PhotoData> photosData)
+    public static List<Domain.VolunteersManagement.ValueObjects.File> ToPhotosCollection(
+        this IEnumerable<PhotoData> photosData)
     {
         return photosData
             .Select(f => f.Path)

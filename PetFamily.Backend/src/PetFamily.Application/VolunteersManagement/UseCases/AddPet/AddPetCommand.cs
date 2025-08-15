@@ -1,6 +1,6 @@
 using PetFamily.Application.Abstractions;
-using PetFamily.Application.Dtos;
-using PetFamily.Application.Dtos.Pet;
+using PetFamily.Contracts.Dtos;
+using PetFamily.Contracts.Dtos.Pet;
 using PetFamily.Domain.VolunteersManagement.Enums;
 
 namespace PetFamily.Application.VolunteersManagement.UseCases.AddPet;
@@ -17,5 +17,4 @@ public record AddPetCommand(
     string OwnerPhoneNumber,
     DateOnly DateOfBirth,
     HelpStatus HelpStatus,
-    IEnumerable<HelpRequisiteDto> HelpRequisites,
-    IEnumerable<UploadFileDto> Photos) : ICommand;
+    IEnumerable<HelpRequisiteDto> HelpRequisites) : ICommand;

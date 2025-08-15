@@ -14,6 +14,13 @@ public class SpeciesId : ComparableValueObject
     
     public static SpeciesId Create(Guid id) => new(id);
     
+    public static implicit operator Guid(SpeciesId id)
+    {
+        ArgumentNullException.ThrowIfNull(id);
+
+        return id.Value;
+    }
+    
     protected override IEnumerable<IComparable> GetComparableEqualityComponents()
     {
         yield return Value;

@@ -1,6 +1,6 @@
 using PetFamily.Application.Abstractions;
-using PetFamily.Application.Dtos;
-using PetFamily.Application.Dtos.Volunteer;
+using PetFamily.Contracts.Dtos;
+using PetFamily.Contracts.Dtos.Volunteer;
 
 namespace PetFamily.Application.VolunteersManagement.UseCases.Create;
 

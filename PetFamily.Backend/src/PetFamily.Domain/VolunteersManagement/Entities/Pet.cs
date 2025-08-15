@@ -10,8 +10,8 @@ namespace PetFamily.Domain.VolunteersManagement.Entities;
 
 public class Pet : SoftDeletableEntity<PetId>
 {
-    private readonly List<HelpRequisite> _helpRequisites = null!;
-    private readonly List<File> _photos = null!;
+    private readonly List<HelpRequisite> _helpRequisites = [];
+    private readonly List<File> _photos = [];
     
     public Nickname Nickname { get; private set; } = null!;
 
@@ -56,8 +56,7 @@ public class Pet : SoftDeletableEntity<PetId>
         PhoneNumber ownerPhoneNumber,
         DateOnly dateOfBirth,
         HelpStatus helpStatus,
-        List<HelpRequisite> helpRequisites,
-        List<File> photos) : base(id)
+        List<HelpRequisite> helpRequisites) : base(id)
     {
         Nickname = nickname;
         Description = description;
@@ -70,7 +69,6 @@ public class Pet : SoftDeletableEntity<PetId>
         DateOfBirth = dateOfBirth;
         HelpStatus = helpStatus;
         _helpRequisites = helpRequisites;
-        _photos = photos;
         CreatedAt = DateTime.UtcNow;
     }
     

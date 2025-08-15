@@ -1,6 +1,6 @@
 using CSharpFunctionalExtensions;
-using PetFamily.Application.Dtos;
 using PetFamily.Application.Files;
+using PetFamily.Contracts.Dtos;
 using PetFamily.Domain.Shared;
 using PetFamily.Domain.VolunteersManagement.ValueObjects;
 
@@ -8,11 +8,11 @@ namespace PetFamily.Application.Extensions;
 
 public static class AddPetCommandExtensions
 {
-    public static Result<List<PhotoData>, Error> ToDataCollection(this IEnumerable<UploadFileDto> photos)
+    public static Result<List<PhotoData>, Error> ToDataCollection(this IEnumerable<UploadFileDto> files)
     {
         var result = new List<PhotoData>();
 
-        foreach (var file in photos)
+        foreach (var file in files)
         {
             var extension = Path.GetExtension(file.FileName);
 

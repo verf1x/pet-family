@@ -45,7 +45,7 @@ public class VolunteersRepository : IVolunteersRepository
             .FirstOrDefaultAsync(v => v.Id == volunteerId, cancellationToken);
 
         if (volunteer is null)
-            return Errors.General.NotFound(volunteerId.Value);
+            return Errors.General.NotFound(volunteerId);
 
         return volunteer;
     }
@@ -55,7 +55,7 @@ public class VolunteersRepository : IVolunteersRepository
         var volunteer = await _writeDbContext.Volunteers
             .FirstOrDefaultAsync(v => v.Email == email, cancellationToken);
         
-        return volunteer ?? Result.Failure<Volunteer>("Email number not found");
+        return volunteer ?? Result.Failure<Volunteer>("Email not found");
     }
 
     public async Task<Result<Volunteer>> GetByPhoneNumberAsync(
