@@ -13,4 +13,6 @@ public interface ISpeciesRepository
     Task<Result<Species>> GetByNameAsync(Name name, CancellationToken cancellationToken = default);
     
     Task<Result<Species, Error>> GetByIdAsync(SpeciesId speciesId, CancellationToken cancellationToken = default);
+    
+    Task<Guid> RemoveByIdAsync(Species species, CancellationToken cancellationToken = default);
 }

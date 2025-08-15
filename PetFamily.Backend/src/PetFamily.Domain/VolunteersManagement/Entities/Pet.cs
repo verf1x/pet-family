@@ -10,8 +10,8 @@ namespace PetFamily.Domain.VolunteersManagement.Entities;
 
 public class Pet : SoftDeletableEntity<PetId>
 {
-    private readonly List<HelpRequisite> _helpRequisites = null!;
-    private readonly List<File> _photos = null!;
+    private readonly List<HelpRequisite> _helpRequisites = [];
+    private readonly List<File> _photos = [];
     
     public Nickname Nickname { get; private set; } = null!;
 

@@ -27,9 +27,13 @@ public class Species : Entity<SpeciesId>
                 _breeds.Add(breed);
     }
     
-    public void RemoveBreeds(List<Breed> breeds)
+    public void RemoveBreeds(List<BreedId> breeds)
     {
-        foreach (var breed in breeds)
-            _breeds.Remove(breed);
+        foreach (var breedId in breeds)
+        {
+            var breed = _breeds.FirstOrDefault(b => b.Id == breedId);
+            if (breed != null)
+                _breeds.Remove(breed);
+        }
     }
 }
