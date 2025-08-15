@@ -39,11 +39,11 @@ public class DeleteBreedHandler : ICommandHandler<Guid, DeleteBreedCommand>
 
         var hasPetsWithBreed = await IsAnyPetsWithBreedAsync(breedId);
         if (hasPetsWithBreed)
-            return Error.Failure(
+            return Error.Validation(
                     "breed.is.used.by.pets",
-                    $"Cannot delete breed with id {breedId.Value}, as it is used by one or more pets.")
+                    $"Cannot delete breed with id {breedId.Value}, as it is used by one or more pets.",
+                    nameof(command.BreedId))
                 .ToErrorList();
-        //TODO: заменить на код 4XX
         
         var speciesId = SpeciesId.Create(command.SpeciesId);
 

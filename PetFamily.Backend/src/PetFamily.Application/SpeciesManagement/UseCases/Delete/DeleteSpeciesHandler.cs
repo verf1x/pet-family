@@ -35,11 +35,11 @@ public class DeleteSpeciesHandler : ICommandHandler<Guid, DeleteSpeciesCommand>
 
         var hasPetsWithSpecies = await IsAnyPetsWithSpeciesAsync(speciesId);
         if (hasPetsWithSpecies)
-            return Error.Failure(
+            return Error.Validation(
                     "species.is.used.by.pets",
-                    $"Cannot delete species with id {speciesId.Value}, as it is used by one or more pets.")
+                    $"Cannot delete species with id {speciesId.Value}, as it is used by one or more pets.",
+                    nameof(command.SpeciesId))
                 .ToErrorList();
-        //TODO: заменить на код 4XX
         
         var speciesResult = await _speciesRepository.GetByIdAsync(speciesId, cancellationToken);
         if (speciesResult.IsFailure)
