@@ -5,11 +5,10 @@ using PetFamily.Application.Abstractions;
 using PetFamily.Application.Database;
 using PetFamily.Application.Extensions;
 using PetFamily.Application.Models;
-using PetFamily.Contracts.Dtos;
 using PetFamily.Contracts.Dtos.Volunteer;
 using PetFamily.Domain.Shared;
 
-namespace PetFamily.Application.VolunteersManagement.Queries.GetVolunteersWithPagination;
+namespace PetFamily.Application.VolunteersManagement.Queries.GetWithPagination;
 
 public class GetVolunteersWithPaginationHandlerDapper 
     : IQueryHandler<PagedList<VolunteerDto>, GetVolunteersWithPaginationQuery>

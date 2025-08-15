@@ -1,10 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
 using PetFamily.Api.Extensions;
 using PetFamily.Application.Abstractions;
+using PetFamily.Application.SpeciesManagement.Queries.Get;
+using PetFamily.Application.SpeciesManagement.Queries.GetBreedsBySpeciesId;
 using PetFamily.Application.SpeciesManagement.UseCases.AddBreeds;
 using PetFamily.Application.SpeciesManagement.UseCases.Create;
 using PetFamily.Application.SpeciesManagement.UseCases.Delete;
 using PetFamily.Application.SpeciesManagement.UseCases.DeleteBreed;
+using PetFamily.Contracts.Dtos.Species;
 
 namespace PetFamily.Api.Controllers;
 
@@ -65,6 +68,35 @@ public class SpeciesController : ApplicationController
         var command = new DeleteBreedCommand(speciesId, breedId);
         
         var result = await handler.HandleAsync(command, cancellationToken);
+        if (result.IsFailure)
+            return result.Error.ToResponse();
+        
+        return Ok(result.Value);
+    }
+    
+    [HttpGet]
+    public async Task<IActionResult> GetAsync(
+        [FromServices] IQueryHandler<IReadOnlyList<SpeciesDto>, GetAllSpeciesQuery> handler,
+        CancellationToken cancellationToken = default)
+    {
+        var result = await handler.HandleAsync(new(), cancellationToken); //TODO: убрать пустой GetAllSpeciesQuery
+        
+        if (result.IsFailure)
+            return result.Error.ToResponse();
+        
+        return Ok(result.Value);
+    }
+    
+    [HttpGet("{id:guid}/breeds")]
+    public async Task<IActionResult> GetBreedsAsync(
+        [FromServices] IQueryHandler<IReadOnlyList<BreedDto>, GetBreedsBySpeciesIdQuery> handler,
+        [FromRoute] Guid id,
+        CancellationToken cancellationToken = default)
+    {
+        var query = new GetBreedsBySpeciesIdQuery(id);
+        
+        var result = await handler.HandleAsync(query, cancellationToken);
+        
         if (result.IsFailure)
             return result.Error.ToResponse();
         

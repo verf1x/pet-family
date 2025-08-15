@@ -6,7 +6,6 @@ using PetFamily.Application.Abstractions;
 using PetFamily.Application.Database;
 using PetFamily.Application.Extensions;
 using PetFamily.Application.Models;
-using PetFamily.Contracts.Dtos;
 using PetFamily.Contracts.Dtos.Pet;
 using PetFamily.Domain.Shared;
 

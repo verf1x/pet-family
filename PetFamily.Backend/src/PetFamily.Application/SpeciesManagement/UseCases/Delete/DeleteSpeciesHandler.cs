@@ -45,7 +45,7 @@ public class DeleteSpeciesHandler : ICommandHandler<Guid, DeleteSpeciesCommand>
         if (speciesResult.IsFailure)
             return speciesResult.Error.ToErrorList();
 
-        var removedSpeciesId = await _speciesRepository.RemoveByIdAsync(speciesResult.Value, cancellationToken);
+        var removedSpeciesId = await _speciesRepository.RemoveAsync(speciesResult.Value, cancellationToken);
 
         return removedSpeciesId;
     }

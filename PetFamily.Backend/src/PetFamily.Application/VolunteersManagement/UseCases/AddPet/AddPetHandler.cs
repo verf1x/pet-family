@@ -1,11 +1,9 @@
 using CSharpFunctionalExtensions;
+using Dapper;
 using FluentValidation;
-using Microsoft.Extensions.Logging;
 using PetFamily.Application.Abstractions;
 using PetFamily.Application.Database;
 using PetFamily.Application.Extensions;
-using PetFamily.Application.Files;
-using PetFamily.Application.Messaging;
 using PetFamily.Domain.Shared;
 using PetFamily.Domain.Shared.EntityIds;
 using PetFamily.Domain.Shared.ValueObjects;
@@ -16,27 +14,20 @@ namespace PetFamily.Application.VolunteersManagement.UseCases.AddPet;
 
 public class AddPetHandler : ICommandHandler<Guid, AddPetCommand>
 {
-    private readonly IFileProvider _fileProvider;
     private readonly IVolunteersRepository _volunteersRepository;
     private readonly IValidator<AddPetCommand> _validator;
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IMessageQueue<IEnumerable<string>> _messageQueue;
-    private readonly ILogger<AddPetHandler> _logger;
+    private readonly ISqlConnectionFactory _sqlConnectionFactory;
 
-    public AddPetHandler(
-        IFileProvider fileProvider,
-        IVolunteersRepository volunteersRepository,
+    public AddPetHandler(IVolunteersRepository volunteersRepository,
         IValidator<AddPetCommand> validator,
         IUnitOfWork unitOfWork,
-        IMessageQueue<IEnumerable<string>> messageQueue,
-        ILogger<AddPetHandler> logger)
+        ISqlConnectionFactory sqlConnectionFactory)
     {
-        _fileProvider = fileProvider;
         _volunteersRepository = volunteersRepository;
         _validator = validator;
         _unitOfWork = unitOfWork;
-        _messageQueue = messageQueue;
-        _logger = logger;
+        _sqlConnectionFactory = sqlConnectionFactory;
     }
 
     public async Task<Result<Guid, ErrorList>> HandleAsync(
@@ -53,8 +44,12 @@ public class AddPetHandler : ICommandHandler<Guid, AddPetCommand>
         if (volunteerResult.IsFailure)
             return volunteerResult.Error.ToErrorList();
 
-        var pet = InitializePet(command);
+        var petResult = await InitializePetAsync(command);
+        if (petResult.IsFailure)
+            return petResult.Error;
 
+        var pet = petResult.Value;
+        
         volunteerResult.Value.AddPet(pet);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -62,14 +57,25 @@ public class AddPetHandler : ICommandHandler<Guid, AddPetCommand>
         return pet.Id.Value;
     }
 
-    private Pet InitializePet(AddPetCommand command)
+    private async Task<Result<Pet, ErrorList>> InitializePetAsync(AddPetCommand command)
     {
         var petId = PetId.CreateNew();
         var nickname = Nickname.Create(command.Nickname).Value;
         var description = Description.Create(command.Description).Value;
-        var speciesBreed = SpeciesBreed.Create(
-            SpeciesId.Create(command.SpeciesBreedDto.SpeciesId),
-            BreedId.Create(command.SpeciesBreedDto.BreedId)).Value;
+
+        var speciesId = SpeciesId.Create(command.SpeciesBreedDto.SpeciesId);
+        var speciesExists = await IsSpeciesExistsAsync(speciesId);
+        
+        if(!speciesExists)
+            return Errors.General.ValueIsInvalid(nameof(command.SpeciesBreedDto.SpeciesId)).ToErrorList();
+        
+        var breedId = BreedId.Create(command.SpeciesBreedDto.BreedId);
+        var breedExists = await IsBreedExistsAsync(breedId);
+        
+        if(!breedExists)
+            return Errors.General.ValueIsInvalid(nameof(command.SpeciesBreedDto.BreedId)).ToErrorList();
+
+        var speciesBreed = SpeciesBreed.Create(speciesId, breedId).Value;
 
         var color = Color.Create(command.Color).Value;
         var healthInfo = HealthInfo.Create(
@@ -111,5 +117,49 @@ public class AddPetHandler : ICommandHandler<Guid, AddPetCommand>
             helpRequisites);
 
         return pet;
+    }
+
+    private async Task<bool> IsSpeciesExistsAsync(SpeciesId speciesId)
+    {
+        using var connection = _sqlConnectionFactory.Create();
+
+        const string sql =
+            """
+
+                    SELECT EXISTS (
+                        SELECT 1 
+                        FROM species 
+                        WHERE id = @id
+                    )
+            """;
+
+        var parameters = new DynamicParameters();
+        parameters.Add("id", speciesId.Value);
+
+        var speciesExists = await connection.ExecuteScalarAsync<bool>(sql, parameters);
+
+        return speciesExists;
+    }
+
+    private async Task<bool> IsBreedExistsAsync(BreedId breedId)
+    {
+        using var connection = _sqlConnectionFactory.Create();
+        
+        const string sql =
+            """
+
+                    SELECT EXISTS (
+                        SELECT 1
+                        FROM species, jsonb_array_elements(species_breeds) as breed
+                        WHERE (breed ->> 'Id')::uuid = @breedId
+                    )
+            """;
+        
+        var parameters = new DynamicParameters();
+        parameters.Add("breedId", breedId.Value);
+        
+        var breedExists = await connection.ExecuteScalarAsync<bool>(sql, parameters);
+
+        return breedExists;
     }
 }

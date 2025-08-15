@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using PetFamily.Application.Database;
 using PetFamily.Contracts.Dtos;
 using PetFamily.Contracts.Dtos.Pet;
+using PetFamily.Contracts.Dtos.Species;
 using PetFamily.Contracts.Dtos.Volunteer;
 
 namespace PetFamily.Infrastructure.DbContexts;

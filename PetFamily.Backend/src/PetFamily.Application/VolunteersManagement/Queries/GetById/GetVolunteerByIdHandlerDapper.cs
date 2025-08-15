@@ -2,11 +2,10 @@ using CSharpFunctionalExtensions;
 using Dapper;
 using PetFamily.Application.Abstractions;
 using PetFamily.Application.Database;
-using PetFamily.Contracts.Dtos;
 using PetFamily.Contracts.Dtos.Volunteer;
 using PetFamily.Domain.Shared;
 
-namespace PetFamily.Application.VolunteersManagement.Queries.GetVolunteerById;
+namespace PetFamily.Application.VolunteersManagement.Queries.GetById;
 
 public class GetVolunteerByIdHandlerDapper : IQueryHandler<VolunteerDto, GetVolunteerByIdQuery>
 {
