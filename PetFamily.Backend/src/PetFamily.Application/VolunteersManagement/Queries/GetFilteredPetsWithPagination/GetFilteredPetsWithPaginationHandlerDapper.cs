@@ -29,20 +29,16 @@ public class GetFilteredPetsWithPaginationHandlerDapper
 
         var parameters = new DynamicParameters();
 
-        var sqlQuery = new StringBuilder
-        (
-            "SELECT id, nickname, description, position, color, photos FROM pets"
-        );
+        var sqlQuery = new StringBuilder(
+            "SELECT id, nickname, description, position, color, photos FROM pets");
 
-        var countQuery = new StringBuilder
-        (
-            "SELECT COUNT(*) FROM pets"
-        );
-        
+        var countQuery = new StringBuilder(
+            "SELECT COUNT(*) FROM pets");
+
         if (!string.IsNullOrWhiteSpace(query.Nickname))
         {
             const string filterQuery = "\nWHERE nickname = @Nickname";
-            
+
             sqlQuery.Append(filterQuery);
             countQuery.Append(filterQuery);
             parameters.Add("Nickname", query.Nickname);
@@ -50,11 +46,11 @@ public class GetFilteredPetsWithPaginationHandlerDapper
 
         var totalCount = await connection.ExecuteScalarAsync<long>(
             countQuery.ToString(), parameters);
-        
+
         sqlQuery.ApplySorting(query.SortBy, query.SortAscending);
-        
+
         sqlQuery.ApplyPagination(parameters, query.PageNumber, query.PageSize);
-        
+
         var pets = await connection.QueryAsync<PetDto, string, PetDto>(
             sqlQuery.ToString(),
             (pet, jsonFiles) =>
@@ -73,7 +69,7 @@ public class GetFilteredPetsWithPaginationHandlerDapper
             Items = pets.ToList(),
             TotalCount = totalCount,
             PageSize = query.PageSize,
-            PageNumber = query.PageNumber
+            PageNumber = query.PageNumber,
         };
     }
 }

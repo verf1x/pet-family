@@ -35,7 +35,7 @@ public class UploadPetPhotosHandler : ICommandHandler<List<string>, UploadPetPho
         _messageQueue = messageQueue;
         _logger = logger;
     }
-    
+
     public async Task<Result<List<string>, ErrorList>> HandleAsync(
         UploadPetPhotosCommand command,
         CancellationToken cancellationToken = default)
@@ -43,12 +43,12 @@ public class UploadPetPhotosHandler : ICommandHandler<List<string>, UploadPetPho
         var validationResult = await _validator.ValidateAsync(command, cancellationToken);
         if (validationResult.IsValid == false)
             return validationResult.ToErrorList();
-        
+
         var volunteerId = VolunteerId.Create(command.VolunteerId);
         var volunteerResult = await _volunteersRepository.GetByIdAsync(volunteerId, cancellationToken);
         if (volunteerResult.IsFailure)
             return volunteerResult.Error.ToErrorList();
-        
+
         var petId = PetId.Create(command.PetId);
         var petResult = volunteerResult.Value.GetPetById(petId);
         if (petResult.IsFailure)
@@ -67,19 +67,19 @@ public class UploadPetPhotosHandler : ICommandHandler<List<string>, UploadPetPho
             petResult.Value.AddPhotos(petPhotos);
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
-            
+
             var uploadResult = await _fileProvider.UploadPhotosAsync(filesData.Value, cancellationToken);
             if (uploadResult.IsFailure)
             {
                 await _messageQueue.WriteAsync(
                     filesData.Value.Select(f => f.Path.Value),
                     cancellationToken);
-                
-                return uploadResult.Error.ToErrorList();   
+
+                return uploadResult.Error.ToErrorList();
             }
-            
+
             transaction.Commit();
-            
+
             var photoPaths = uploadResult.Value
                 .Select(file => file.Value)
                 .ToList();
@@ -88,14 +88,16 @@ public class UploadPetPhotosHandler : ICommandHandler<List<string>, UploadPetPho
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, 
-                "Error occurred while adding pet photos for pet with id {PetId} of volunteer {VolunteerId}", 
+            _logger.LogError(
+                ex,
+                "Error occurred while adding pet photos for pet with id {PetId} of volunteer {VolunteerId}",
                 petId,
                 volunteerId);
-            
+
             transaction.Rollback();
 
-            return Error.Failure("volunteer.pet.add_photos.failure",
+            return Error.Failure(
+                "volunteer.pet.add_photos.failure",
                 "An error occurred while adding photos for pet with id" + petId).ToErrorList();
         }
     }

@@ -6,9 +6,9 @@ namespace PetFamily.Domain.VolunteersManagement.ValueObjects;
 public class HealthInfo : ComparableValueObject
 {
     public string HealthStatus { get; }
-    
+
     public bool IsNeutered { get; }
-    
+
     public bool IsVaccinated { get; }
 
     private HealthInfo(string healthStatus, bool isNeutered, bool isVaccinated)
@@ -17,12 +17,12 @@ public class HealthInfo : ComparableValueObject
         IsNeutered = isNeutered;
         IsVaccinated = isVaccinated;
     }
-    
+
     public static Result<HealthInfo, Error> Create(string healthStatus, bool isNeutered, bool isVaccinated)
     {
         if (string.IsNullOrWhiteSpace(healthStatus))
             return Errors.General.ValueIsRequired(nameof(healthStatus));
-        
+
         return new HealthInfo(healthStatus, isNeutered, isVaccinated);
     }
 

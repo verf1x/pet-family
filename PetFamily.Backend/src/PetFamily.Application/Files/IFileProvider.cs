@@ -9,7 +9,7 @@ public interface IFileProvider
     Task<Result<List<FilePath>, Error>> UploadPhotosAsync(
         IEnumerable<PhotoData> filesData,
         CancellationToken cancellationToken = default);
-    
+
     Task<Result<List<string>, Error>> RemovePhotosAsync(
         IEnumerable<string> photoPaths,
         CancellationToken cancellationToken = default);

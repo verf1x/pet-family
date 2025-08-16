@@ -17,7 +17,7 @@ public class GetBreedsBySpeciesIdHandler : IQueryHandler<IReadOnlyList<BreedDto>
     {
         _sqlConnectionFactory = sqlConnectionFactory;
     }
-    
+
     public async Task<Result<IReadOnlyList<BreedDto>, ErrorList>> HandleAsync(
         GetBreedsBySpeciesIdQuery query,
         CancellationToken cancellationToken = default)
@@ -25,17 +25,17 @@ public class GetBreedsBySpeciesIdHandler : IQueryHandler<IReadOnlyList<BreedDto>
         var connection = _sqlConnectionFactory.Create();
 
         var speciesId = SpeciesId.Create(query.SpeciesId);
-        
+
         const string sqlQuery = "SELECT species_breeds FROM species WHERE id = @speciesId";
 
         var parameters = new DynamicParameters();
         parameters.Add("speciesId", speciesId.Value);
-        
+
         var breedsJson = await connection.QueryFirstOrDefaultAsync<string>(sqlQuery, parameters);
 
         if (string.IsNullOrEmpty(breedsJson))
             return Errors.General.NotFound(query.SpeciesId).ToErrorList();
-        
+
         var breeds = JsonSerializer.Deserialize<List<BreedDto>>(breedsJson, JsonSerializerOptions.Default);
 
         return breeds ?? [];

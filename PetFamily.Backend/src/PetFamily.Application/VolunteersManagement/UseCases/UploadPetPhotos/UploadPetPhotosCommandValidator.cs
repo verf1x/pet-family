@@ -11,7 +11,7 @@ public class UploadPetPhotosCommandValidator : AbstractValidator<UploadPetPhotos
         RuleFor(x => x.VolunteerId)
             .NotEmpty()
             .WithError(Errors.General.ValueIsRequired(nameof(UploadPetPhotosCommand.VolunteerId)));
-        
+
         RuleFor(x => x.PetId)
             .NotEmpty()
             .WithError(Errors.General.ValueIsRequired(nameof(UploadPetPhotosCommand.PetId)));

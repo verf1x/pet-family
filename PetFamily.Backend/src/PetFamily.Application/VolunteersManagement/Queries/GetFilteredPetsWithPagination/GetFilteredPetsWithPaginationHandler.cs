@@ -43,11 +43,13 @@ public class GetFilteredPetsWithPaginationHandler
             p => p.Nickname.Contains(query.Nickname!));
 
         petsQuery = petsQuery
-            .WhereIf(query.PositionTo is not null,
+            .WhereIf(
+                query.PositionTo is not null,
                 p => p.Position <= query.PositionTo!.Value);
 
         petsQuery = petsQuery
-            .WhereIf(query.PositionFrom is not null,
+            .WhereIf(
+                query.PositionFrom is not null,
                 p => p.Position >= query.PositionFrom!.Value);
 
         return await petsQuery

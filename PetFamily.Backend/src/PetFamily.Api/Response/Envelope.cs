@@ -5,7 +5,7 @@ namespace PetFamily.Api.Response;
 public record Envelope
 {
     public object? Result { get; }
-    
+
     public ErrorList? Errors { get; }
 
     public DateTime CreationDate { get; }
@@ -17,7 +17,7 @@ public record Envelope
         CreationDate = DateTime.Now;
     }
 
-    public static Envelope Ok(object? result = null) 
+    public static Envelope Ok(object? result = null)
         => new(result, null);
 
     public static Envelope Error(ErrorList errors)

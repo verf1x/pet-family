@@ -19,7 +19,8 @@ public class AddPetHandler : ICommandHandler<Guid, AddPetCommand>
     private readonly IUnitOfWork _unitOfWork;
     private readonly ISqlConnectionFactory _sqlConnectionFactory;
 
-    public AddPetHandler(IVolunteersRepository volunteersRepository,
+    public AddPetHandler(
+        IVolunteersRepository volunteersRepository,
         IValidator<AddPetCommand> validator,
         IUnitOfWork unitOfWork,
         ISqlConnectionFactory sqlConnectionFactory)
@@ -49,7 +50,7 @@ public class AddPetHandler : ICommandHandler<Guid, AddPetCommand>
             return petResult.Error;
 
         var pet = petResult.Value;
-        
+
         volunteerResult.Value.AddPet(pet);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -65,14 +66,14 @@ public class AddPetHandler : ICommandHandler<Guid, AddPetCommand>
 
         var speciesId = SpeciesId.Create(command.SpeciesBreedDto.SpeciesId);
         var speciesExists = await IsSpeciesExistsAsync(speciesId);
-        
-        if(!speciesExists)
+
+        if (!speciesExists)
             return Errors.General.ValueIsInvalid(nameof(command.SpeciesBreedDto.SpeciesId)).ToErrorList();
-        
+
         var breedId = BreedId.Create(command.SpeciesBreedDto.BreedId);
         var breedExists = await IsBreedExistsAsync(breedId);
-        
-        if(!breedExists)
+
+        if (!breedExists)
             return Errors.General.ValueIsInvalid(nameof(command.SpeciesBreedDto.BreedId)).ToErrorList();
 
         var speciesBreed = SpeciesBreed.Create(speciesId, breedId).Value;
@@ -144,7 +145,7 @@ public class AddPetHandler : ICommandHandler<Guid, AddPetCommand>
     private async Task<bool> IsBreedExistsAsync(BreedId breedId)
     {
         using var connection = _sqlConnectionFactory.Create();
-        
+
         const string sql =
             """
 
@@ -154,10 +155,10 @@ public class AddPetHandler : ICommandHandler<Guid, AddPetCommand>
                         WHERE (breed ->> 'Id')::uuid = @breedId
                     )
             """;
-        
+
         var parameters = new DynamicParameters();
         parameters.Add("breedId", breedId.Value);
-        
+
         var breedExists = await connection.ExecuteScalarAsync<bool>(sql, parameters);
 
         return breedExists;

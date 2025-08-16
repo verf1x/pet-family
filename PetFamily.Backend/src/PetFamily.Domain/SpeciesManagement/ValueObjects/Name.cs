@@ -10,8 +10,8 @@ public class Name : ComparableValueObject
     private Name(string value)
     {
         Value = value;
-    } 
-    
+    }
+
     public static Result<Name, Error> Create(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
@@ -19,7 +19,7 @@ public class Name : ComparableValueObject
 
         return new Name(value);
     }
-    
+
     protected override IEnumerable<IComparable> GetComparableEqualityComponents()
     {
         throw new NotImplementedException();

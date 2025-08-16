@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using PetFamily.Domain.SpeciesManagement;
@@ -10,8 +9,13 @@ namespace PetFamily.Infrastructure.DbContexts;
 public class WriteDbContext(IConfiguration configuration) : DbContext
 {
     public DbSet<Volunteer> Volunteers => Set<Volunteer>();
-    
+
     public DbSet<Species> Species => Set<Species>();
+
+    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        return await base.SaveChangesAsync(cancellationToken);
+    }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -33,14 +37,4 @@ public class WriteDbContext(IConfiguration configuration) : DbContext
         {
             builder.AddConsole();
         });
-    
-    public async Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default)
-    {
-        return await base.Database.BeginTransactionAsync(cancellationToken);
-    }
-
-    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-    {
-        return await base.SaveChangesAsync(cancellationToken);
-    }
 }

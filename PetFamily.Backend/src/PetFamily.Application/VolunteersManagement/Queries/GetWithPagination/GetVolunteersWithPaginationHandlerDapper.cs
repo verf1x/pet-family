@@ -10,7 +10,7 @@ using PetFamily.Domain.Shared;
 
 namespace PetFamily.Application.VolunteersManagement.Queries.GetWithPagination;
 
-public class GetVolunteersWithPaginationHandlerDapper 
+public class GetVolunteersWithPaginationHandlerDapper
     : IQueryHandler<PagedList<VolunteerDto>, GetVolunteersWithPaginationQuery>
 {
     private readonly ISqlConnectionFactory _sqlConnectionFactory;
@@ -31,13 +31,11 @@ public class GetVolunteersWithPaginationHandlerDapper
         var totalCount = await connection.ExecuteScalarAsync<long>(
             "SELECT COUNT(*) FROM volunteers");
 
-        var sqlQuery = new StringBuilder
-        (
-            "SELECT id, description, total_years, phone_number FROM volunteers"
-        );
-        
+        var sqlQuery = new StringBuilder(
+            "SELECT id, description, total_years, phone_number FROM volunteers");
+
         sqlQuery.ApplyPagination(parameters, query.PageNumber, query.PageSize);
-        
+
         var volunteers = await connection.QueryAsync<VolunteerDto>(
             sqlQuery.ToString(),
             param: parameters);
@@ -47,7 +45,7 @@ public class GetVolunteersWithPaginationHandlerDapper
             Items = volunteers.ToList(),
             TotalCount = totalCount,
             PageNumber = query.PageNumber,
-            PageSize = query.PageSize
+            PageSize = query.PageSize,
         };
     }
 }

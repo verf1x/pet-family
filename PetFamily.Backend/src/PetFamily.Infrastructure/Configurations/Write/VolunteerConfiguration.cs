@@ -79,15 +79,15 @@ public class VolunteerConfiguration : IEntityTypeConfiguration<Volunteer>
             b =>
             {
                 b.ToJson("social_networks");
-                    b.Property(snn => snn.Name)
-                        .IsRequired()
-                        .HasColumnName("name")
-                        .HasMaxLength(Domain.Shared.Constants.MaxLowTextLength);
+                b.Property(snn => snn.Name)
+                    .IsRequired()
+                    .HasColumnName("name")
+                    .HasMaxLength(Domain.Shared.Constants.MaxLowTextLength);
 
-                    b.Property(snn => snn.Url)
-                        .IsRequired()
-                        .HasColumnName("url")
-                        .HasMaxLength(Domain.Shared.Constants.MaxUrlLength);
+                b.Property(snn => snn.Url)
+                    .IsRequired()
+                    .HasColumnName("url")
+                    .HasMaxLength(Domain.Shared.Constants.MaxUrlLength);
             });
 
         builder.OwnsMany(

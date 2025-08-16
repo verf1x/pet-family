@@ -4,7 +4,7 @@ using PetFamily.Domain.Shared;
 
 namespace PetFamily.Application.VolunteersManagement.Queries.GetWithPagination;
 
-public class GetVolunteersWithPaginationQueryValidator 
+public class GetVolunteersWithPaginationQueryValidator
     : AbstractValidator<GetVolunteersWithPaginationQuery>
 {
     public GetVolunteersWithPaginationQueryValidator()
@@ -12,7 +12,7 @@ public class GetVolunteersWithPaginationQueryValidator
         RuleFor(vq => vq.PageSize)
             .GreaterThan(0)
             .WithError(Errors.General.ValueIsInvalid(nameof(GetVolunteersWithPaginationQuery.PageSize)));
-        
+
         RuleFor(vq => vq.PageNumber)
             .GreaterThan(0)
             .WithError(Errors.General.ValueIsInvalid(nameof(GetVolunteersWithPaginationQuery.PageNumber)));

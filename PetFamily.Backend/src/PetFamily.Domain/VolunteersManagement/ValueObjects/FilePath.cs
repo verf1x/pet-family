@@ -7,7 +7,7 @@ namespace PetFamily.Domain.VolunteersManagement.ValueObjects;
 public class FilePath : ComparableValueObject
 {
     public string Value { get; }
-    
+
     [JsonConstructor]
     private FilePath(string value)
     {
@@ -16,9 +16,9 @@ public class FilePath : ComparableValueObject
 
     public static Result<FilePath, Error> Create(Guid value, string extension)
     {
-        //TODO: валидация
+        // TODO: валидация
         var fullPath = value + extension;
-        
+
         return new FilePath(fullPath);
     }
 

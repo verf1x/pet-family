@@ -15,7 +15,9 @@ public class DeleteSpeciesHandler : ICommandHandler<Guid, DeleteSpeciesCommand>
     private readonly ISpeciesRepository _speciesRepository;
     private readonly IValidator<DeleteSpeciesCommand> _speciesIdValidator;
 
-    public DeleteSpeciesHandler(ISqlConnectionFactory sqlConnectionFactory, ISpeciesRepository speciesRepository,
+    public DeleteSpeciesHandler(
+        ISqlConnectionFactory sqlConnectionFactory,
+        ISpeciesRepository speciesRepository,
         IValidator<DeleteSpeciesCommand> speciesIdValidator)
     {
         _sqlConnectionFactory = sqlConnectionFactory;
@@ -35,12 +37,14 @@ public class DeleteSpeciesHandler : ICommandHandler<Guid, DeleteSpeciesCommand>
 
         var hasPetsWithSpecies = await IsAnyPetsWithSpeciesAsync(speciesId);
         if (hasPetsWithSpecies)
+        {
             return Error.Validation(
                     "species.is.used.by.pets",
                     $"Cannot delete species with id {speciesId.Value}, as it is used by one or more pets.",
                     nameof(command.SpeciesId))
                 .ToErrorList();
-        
+        }
+
         var speciesResult = await _speciesRepository.GetByIdAsync(speciesId, cancellationToken);
         if (speciesResult.IsFailure)
             return speciesResult.Error.ToErrorList();

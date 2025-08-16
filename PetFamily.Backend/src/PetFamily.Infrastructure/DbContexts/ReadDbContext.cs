@@ -13,10 +13,15 @@ namespace PetFamily.Infrastructure.DbContexts;
 public class ReadDbContext(IConfiguration configuration) : DbContext, IReadDbContext
 {
     public IQueryable<VolunteerDto> Volunteers => Set<VolunteerDto>();
-    
+
     public IQueryable<PetDto> Pets => Set<PetDto>();
-    
+
     public IQueryable<SpeciesDto> Species => Set<SpeciesDto>();
+
+    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        return await base.SaveChangesAsync(cancellationToken);
+    }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -40,14 +45,4 @@ public class ReadDbContext(IConfiguration configuration) : DbContext, IReadDbCon
         {
             builder.AddConsole();
         });
-    
-    public async Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default)
-    {
-        return await base.Database.BeginTransactionAsync(cancellationToken);
-    }
-
-    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-    {
-        return await base.SaveChangesAsync(cancellationToken);
-    }
 }

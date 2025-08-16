@@ -26,18 +26,18 @@ public class MovePetHandler : ICommandHandler<int, MovePetCommand>
     }
 
     public async Task<Result<int, ErrorList>> HandleAsync(
-        MovePetCommand command, 
+        MovePetCommand command,
         CancellationToken cancellationToken = default)
     {
         var validationResult = await _validator.ValidateAsync(command, cancellationToken);
         if (validationResult.IsValid == false)
             return validationResult.ToErrorList();
-        
+
         var volunteerId = VolunteerId.Create(command.VolunteerId);
         var volunteerResult = await _volunteersRepository.GetByIdAsync(volunteerId, cancellationToken);
         if (volunteerResult.IsFailure)
             return volunteerResult.Error.ToErrorList();
-        
+
         var petId = PetId.Create(command.PetId);
         var petResult = volunteerResult.Value.GetPetById(petId);
         if (petResult.IsFailure)
@@ -46,7 +46,7 @@ public class MovePetHandler : ICommandHandler<int, MovePetCommand>
         var newPositionResult = Position.Create(command.NewPosition);
         if (newPositionResult.IsFailure)
             return newPositionResult.Error.ToErrorList();
-        
+
         var movePetResult = volunteerResult.Value.MovePet(petResult.Value, newPositionResult.Value);
         if (movePetResult.IsFailure)
             return movePetResult.Error.ToErrorList();

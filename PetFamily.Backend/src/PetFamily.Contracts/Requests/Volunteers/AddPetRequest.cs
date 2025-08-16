@@ -1,6 +1,6 @@
 using PetFamily.Contracts.Dtos;
 using PetFamily.Contracts.Dtos.Pet;
-using PetFamily.Domain.VolunteersManagement.Enums; //TODO: придумать как убрать зависимость от Domain
+using PetFamily.Domain.VolunteersManagement.Enums; // TODO: придумать как убрать зависимость от Domain
 
 namespace PetFamily.Contracts.Requests.Volunteers;
 
