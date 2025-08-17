@@ -122,4 +122,30 @@ public class Pet : SoftDeletableEntity<PetId>
     {
         Position = newPosition;
     }
+
+    public void UpdateMainInfo(
+        Nickname nickname,
+        Description description,
+        SpeciesBreed speciesBreed,
+        Color color,
+        HealthInfo healthInfo,
+        Address address,
+        Measurements measurements,
+        PhoneNumber ownerPhoneNumber,
+        DateOnly dateOfBirth,
+        List<HelpRequisite> helpRequisites)
+    {
+        Nickname = nickname;
+        Description = description;
+        SpeciesBreed = speciesBreed;
+        Color = color;
+        HealthInfo = healthInfo;
+        Address = address;
+        Measurements = measurements;
+        OwnerPhoneNumber = ownerPhoneNumber;
+        DateOfBirth = dateOfBirth;
+
+        _helpRequisites.Clear();
+        _helpRequisites.AddRange(helpRequisites);
+    }
 }

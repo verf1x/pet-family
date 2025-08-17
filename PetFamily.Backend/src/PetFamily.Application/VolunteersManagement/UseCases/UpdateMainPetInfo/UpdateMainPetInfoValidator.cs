@@ -1,38 +1,42 @@
-using FluentValidation;
+﻿using FluentValidation;
 using PetFamily.Application.Validation;
 using PetFamily.Domain.Shared;
 using PetFamily.Domain.Shared.ValueObjects;
 using PetFamily.Domain.VolunteersManagement.ValueObjects;
 
-namespace PetFamily.Application.VolunteersManagement.UseCases.AddPet;
+namespace PetFamily.Application.VolunteersManagement.UseCases.UpdateMainPetInfo;
 
-public class AddPetCommandValidator : AbstractValidator<AddPetCommand>
+public class UpdateMainPetInfoValidator : AbstractValidator<UpdateMainPetInfoCommand>
 {
-    public AddPetCommandValidator()
+    public UpdateMainPetInfoValidator()
     {
-        RuleFor(ap => ap.VolunteerId)
+        RuleFor(u => u.VolunteerId)
             .NotEqual(Guid.Empty)
-            .WithError(Errors.General.ValueIsRequired(nameof(AddPetCommand.VolunteerId)));
+            .WithError(Errors.General.ValueIsRequired(nameof(UpdateMainPetInfoCommand.VolunteerId)));
 
-        RuleFor(ap => ap.Nickname)
+        RuleFor(u => u.PetId)
+            .NotEqual(Guid.Empty)
+            .WithError(Errors.General.ValueIsRequired(nameof(UpdateMainPetInfoCommand.PetId)));
+
+        RuleFor(u => u.Nickname)
             .MustBeValueObject(Nickname.Create);
 
-        RuleFor(ap => ap.Description)
+        RuleFor(u => u.Description)
             .MustBeValueObject(Description.Create);
 
-        RuleFor(ap => ap.Color)
+        RuleFor(u => u.SpeciesBreed)
+            .Must(sb => sb.SpeciesId != Guid.Empty)
+            .WithError(Errors.General.ValueIsRequired(nameof(UpdateMainPetInfoCommand.SpeciesBreed.SpeciesId)))
+            .Must(sb => sb.BreedId != Guid.Empty)
+            .WithError(Errors.General.ValueIsRequired(nameof(UpdateMainPetInfoCommand.SpeciesBreed.BreedId)));
+
+        RuleFor(u => u.Color)
             .MustBeValueObject(Color.Create);
 
-        RuleFor(ap => ap.SpeciesBreedDto)
-            .Must(sb => sb.SpeciesId != Guid.Empty)
-            .WithError(Errors.General.ValueIsRequired(nameof(AddPetCommand.SpeciesBreedDto.SpeciesId)))
-            .Must(sb => sb.BreedId != Guid.Empty)
-            .WithError(Errors.General.ValueIsRequired(nameof(AddPetCommand.SpeciesBreedDto.BreedId)));
-
-        RuleFor(ap => ap.HealthInfoDto)
+        RuleFor(c => c.HealthInfo)
             .Must(cb => !string.IsNullOrWhiteSpace(cb.HealthStatus));
 
-        RuleFor(ap => ap.AddressDto)
+        RuleFor(c => c.Address)
             .MustBeValueObject(c =>
                 Address.Create(
                     c.AddressLines.ToList(),
@@ -41,7 +45,7 @@ public class AddPetCommandValidator : AbstractValidator<AddPetCommand>
                     c.PostalCode,
                     c.CountryCode));
 
-        RuleFor(c => c.MeasurementsDto)
+        RuleFor(c => c.Measurements)
             .MustBeValueObject(c => Measurements.Create(c.Height, c.Weight));
 
         RuleFor(c => c.OwnerPhoneNumber)

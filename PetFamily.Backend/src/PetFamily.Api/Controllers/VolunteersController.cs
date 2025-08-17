@@ -11,6 +11,7 @@ using PetFamily.Application.VolunteersManagement.UseCases.Delete;
 using PetFamily.Application.VolunteersManagement.UseCases.MovePet;
 using PetFamily.Application.VolunteersManagement.UseCases.RemovePetPhotos;
 using PetFamily.Application.VolunteersManagement.UseCases.UpdateMainInfo;
+using PetFamily.Application.VolunteersManagement.UseCases.UpdateMainPetInfo;
 using PetFamily.Application.VolunteersManagement.UseCases.UploadPetPhotos;
 using PetFamily.Contracts.Dtos.Volunteer;
 using PetFamily.Contracts.Requests.Volunteers;
@@ -146,11 +147,11 @@ public class VolunteersController : ApplicationController
     public async Task<IActionResult> RemovePetPhotosAsync(
         [FromRoute] Guid volunteerId,
         [FromRoute] Guid petId,
-        [FromBody] RemovePetPhotosRequest request,
+        [FromQuery] IEnumerable<string> photoPaths,
         [FromServices] ICommandHandler<List<string>, RemovePetPhotosCommand> handler,
         CancellationToken cancellationToken = default)
     {
-        var command = new RemovePetPhotosCommand(volunteerId, petId, request.PhotoPaths);
+        var command = new RemovePetPhotosCommand(volunteerId, petId, photoPaths);
 
         var result = await handler.HandleAsync(command, cancellationToken);
 
@@ -204,6 +205,36 @@ public class VolunteersController : ApplicationController
         var query = new GetVolunteerByIdQuery(id);
         var result = await handler.HandleAsync(query, cancellationToken);
 
+        if (result.IsFailure)
+            return result.Error.ToResponse();
+
+        return Ok(result.Value);
+    }
+
+    [HttpPut("{id:guid}/pet/{petId:guid}/main-info")]
+    public async Task<IActionResult> UpdateMainPetInfoAsync(
+        [FromRoute] Guid id,
+        [FromRoute] Guid petId,
+        [FromBody] UpdateMainPetInfoRequest request,
+        [FromServices] ICommandHandler<Guid, UpdateMainPetInfoCommand> handler,
+        CancellationToken cancellationToken = default)
+    {
+        var command = new UpdateMainPetInfoCommand(
+            id,
+            petId,
+            request.Nickname,
+            request.Description,
+            request.SpeciesBreed,
+            request.Color,
+            request.HealthInfo,
+            request.Address,
+            request.Measurements,
+            request.OwnerPhoneNumber,
+            request.DateOfBirth,
+            request.HelpStatus,
+            request.HelpRequisites);
+
+        var result = await handler.HandleAsync(command, cancellationToken);
         if (result.IsFailure)
             return result.Error.ToResponse();
 

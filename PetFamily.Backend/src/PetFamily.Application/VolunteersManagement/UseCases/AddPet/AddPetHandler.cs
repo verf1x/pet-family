@@ -65,15 +65,11 @@ public class AddPetHandler : ICommandHandler<Guid, AddPetCommand>
         var description = Description.Create(command.Description).Value;
 
         var speciesId = SpeciesId.Create(command.SpeciesBreedDto.SpeciesId);
-        var speciesExists = await IsSpeciesExistsAsync(speciesId);
-
-        if (!speciesExists)
+        if (!(await speciesId.IsSpeciesExistsAsync(_sqlConnectionFactory)))
             return Errors.General.ValueIsInvalid(nameof(command.SpeciesBreedDto.SpeciesId)).ToErrorList();
 
         var breedId = BreedId.Create(command.SpeciesBreedDto.BreedId);
-        var breedExists = await IsBreedExistsAsync(breedId);
-
-        if (!breedExists)
+        if (!(await breedId.IsBreedExistsAsync(_sqlConnectionFactory)))
             return Errors.General.ValueIsInvalid(nameof(command.SpeciesBreedDto.BreedId)).ToErrorList();
 
         var speciesBreed = SpeciesBreed.Create(speciesId, breedId).Value;

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using PetFamily.Api.Extensions;
 using PetFamily.Application.VolunteersManagement.Queries.GetFilteredPetsWithPagination;
 using PetFamily.Contracts.Requests.Pets;
 
@@ -21,9 +22,11 @@ public class PetsController : ApplicationController
             request.PageNumber,
             request.PageSize);
 
-        var response = await handler.HandleAsync(query, cancellationToken);
+        var result = await handler.HandleAsync(query, cancellationToken);
+        if (result.IsFailure)
+            return result.Error.ToResponse();
 
-        return Ok(response);
+        return Ok(result.Value);
     }
 
     [HttpGet("dapper")]
@@ -41,8 +44,10 @@ public class PetsController : ApplicationController
             request.PageNumber,
             request.PageSize);
 
-        var response = await handler.HandleAsync(query, cancellationToken);
+        var result = await handler.HandleAsync(query, cancellationToken);
+        if (result.IsFailure)
+            return result.Error.ToResponse();
 
-        return Ok(response);
+        return Ok(result.Value);
     }
 }
