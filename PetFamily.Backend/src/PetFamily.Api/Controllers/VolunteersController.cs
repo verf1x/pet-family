@@ -8,8 +8,10 @@ using PetFamily.Application.VolunteersManagement.Queries.GetWithPagination;
 using PetFamily.Application.VolunteersManagement.UseCases.AddPet;
 using PetFamily.Application.VolunteersManagement.UseCases.Create;
 using PetFamily.Application.VolunteersManagement.UseCases.Delete;
+using PetFamily.Application.VolunteersManagement.UseCases.HardDeletePet;
 using PetFamily.Application.VolunteersManagement.UseCases.MovePet;
 using PetFamily.Application.VolunteersManagement.UseCases.RemovePetPhotos;
+using PetFamily.Application.VolunteersManagement.UseCases.SoftDeletePet;
 using PetFamily.Application.VolunteersManagement.UseCases.UpdateMainInfo;
 using PetFamily.Application.VolunteersManagement.UseCases.UpdateMainPetInfo;
 using PetFamily.Application.VolunteersManagement.UseCases.UpdatePetHelpStatus;
@@ -251,6 +253,38 @@ public class VolunteersController : ApplicationController
     {
         var command = new UpdatePetHelpStatusCommand(volunteerId, petId, helpStatus);
 
+        var result = await handler.HandleAsync(command, cancellationToken);
+        if (result.IsFailure)
+            return result.Error.ToResponse();
+
+        return Ok(result.Value);
+    }
+
+    [HttpDelete("{volunteerId:guid}/pet/{petId:guid}/soft")]
+    public async Task<IActionResult> DeletePetAsync(
+        [FromRoute] Guid volunteerId,
+        [FromRoute] Guid petId,
+        [FromServices] ICommandHandler<Guid, SoftDeletePetCommand> handler,
+        CancellationToken cancellationToken = default)
+    {
+        var command = new SoftDeletePetCommand(volunteerId, petId);
+        
+        var result = await handler.HandleAsync(command, cancellationToken);
+        if (result.IsFailure)
+            return result.Error.ToResponse();
+
+        return Ok(result.Value);
+    }
+
+    [HttpDelete("{volunteerId:guid}/pet/{petId:guid}/hard")]
+    public async Task<IActionResult> DeletePetAsync(
+        [FromRoute] Guid volunteerId,
+        [FromRoute] Guid petId,
+        [FromServices] ICommandHandler<Guid, HardDeletePetCommand> handler,
+        CancellationToken cancellationToken = default)
+    {
+        var command = new HardDeletePetCommand(volunteerId, petId);
+        
         var result = await handler.HandleAsync(command, cancellationToken);
         if (result.IsFailure)
             return result.Error.ToResponse();

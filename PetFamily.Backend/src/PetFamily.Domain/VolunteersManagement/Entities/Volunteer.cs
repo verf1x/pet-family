@@ -62,6 +62,18 @@ public class Volunteer : SoftDeletableEntity<VolunteerId>
         return pet;
     }
 
+    public Result<Guid, Error> RemovePet(Pet pet)
+    {
+        if (!_pets.Contains(pet))
+            return Errors.General.NotFound(pet.Id.Value);
+
+        _pets.Remove(pet);
+        
+        AdjustPetsPositions();
+
+        return pet.Id.Value;
+    }
+    
     public UnitResult<Error> AddPet(Pet pet)
     {
         if (_pets.Contains(pet))
@@ -135,6 +147,12 @@ public class Volunteer : SoftDeletableEntity<VolunteerId>
             .ToList();
     }
 
+    private void AdjustPetsPositions()
+    {
+        for (int i = 0; i < _pets.Count; i++)
+            _pets[i].SetPosition(Position.Create(i + 1).Value);
+    }
+    
     private UnitResult<Error> MovePetsBetweenPositions(Position newPosition, Position currentPosition)
     {
         if (newPosition < currentPosition)
