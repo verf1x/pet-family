@@ -148,4 +148,9 @@ public class Pet : SoftDeletableEntity<PetId>
         _helpRequisites.Clear();
         _helpRequisites.AddRange(helpRequisites);
     }
+
+    public void UpdateHelpStatus(HelpStatus helpStatus)
+    {
+        HelpStatus = helpStatus;
+    }
 }

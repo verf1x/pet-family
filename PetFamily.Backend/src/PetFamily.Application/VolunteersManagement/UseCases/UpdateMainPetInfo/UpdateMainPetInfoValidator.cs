@@ -33,10 +33,10 @@ public class UpdateMainPetInfoValidator : AbstractValidator<UpdateMainPetInfoCom
         RuleFor(u => u.Color)
             .MustBeValueObject(Color.Create);
 
-        RuleFor(c => c.HealthInfo)
+        RuleFor(u => u.HealthInfo)
             .Must(cb => !string.IsNullOrWhiteSpace(cb.HealthStatus));
 
-        RuleFor(c => c.Address)
+        RuleFor(u => u.Address)
             .MustBeValueObject(c =>
                 Address.Create(
                     c.AddressLines.ToList(),
@@ -45,13 +45,13 @@ public class UpdateMainPetInfoValidator : AbstractValidator<UpdateMainPetInfoCom
                     c.PostalCode,
                     c.CountryCode));
 
-        RuleFor(c => c.Measurements)
+        RuleFor(u => u.Measurements)
             .MustBeValueObject(c => Measurements.Create(c.Height, c.Weight));
 
-        RuleFor(c => c.OwnerPhoneNumber)
+        RuleFor(u => u.OwnerPhoneNumber)
             .MustBeValueObject(PhoneNumber.Create);
 
-        RuleFor(c => c.DateOfBirth)
+        RuleFor(u => u.DateOfBirth)
             .NotEmpty();
 
         RuleForEach(c => c.HelpRequisites)

@@ -17,5 +17,4 @@ public record UpdateMainPetInfoCommand(
     MeasurementsDto Measurements,
     string OwnerPhoneNumber,
     DateOnly DateOfBirth,
-    HelpStatus HelpStatus,
     List<HelpRequisiteDto> HelpRequisites) : ICommand;

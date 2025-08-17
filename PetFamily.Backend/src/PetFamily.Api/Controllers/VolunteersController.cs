@@ -12,6 +12,7 @@ using PetFamily.Application.VolunteersManagement.UseCases.MovePet;
 using PetFamily.Application.VolunteersManagement.UseCases.RemovePetPhotos;
 using PetFamily.Application.VolunteersManagement.UseCases.UpdateMainInfo;
 using PetFamily.Application.VolunteersManagement.UseCases.UpdateMainPetInfo;
+using PetFamily.Application.VolunteersManagement.UseCases.UpdatePetHelpStatus;
 using PetFamily.Application.VolunteersManagement.UseCases.UploadPetPhotos;
 using PetFamily.Contracts.Dtos.Volunteer;
 using PetFamily.Contracts.Requests.Volunteers;
@@ -211,16 +212,16 @@ public class VolunteersController : ApplicationController
         return Ok(result.Value);
     }
 
-    [HttpPut("{id:guid}/pet/{petId:guid}/main-info")]
+    [HttpPut("{volunteerId:guid}/pet/{petId:guid}/main-info")]
     public async Task<IActionResult> UpdateMainPetInfoAsync(
-        [FromRoute] Guid id,
+        [FromRoute] Guid volunteerId,
         [FromRoute] Guid petId,
         [FromBody] UpdateMainPetInfoRequest request,
         [FromServices] ICommandHandler<Guid, UpdateMainPetInfoCommand> handler,
         CancellationToken cancellationToken = default)
     {
         var command = new UpdateMainPetInfoCommand(
-            id,
+            volunteerId,
             petId,
             request.Nickname,
             request.Description,
@@ -231,8 +232,24 @@ public class VolunteersController : ApplicationController
             request.Measurements,
             request.OwnerPhoneNumber,
             request.DateOfBirth,
-            request.HelpStatus,
             request.HelpRequisites);
+
+        var result = await handler.HandleAsync(command, cancellationToken);
+        if (result.IsFailure)
+            return result.Error.ToResponse();
+
+        return Ok(result.Value);
+    }
+
+    [HttpPut("{volunteerId:guid}/pet/{petId:guid}/help-status")]
+    public async Task<IActionResult> UpdatePetHelpStatusAsync(
+        [FromRoute] Guid volunteerId,
+        [FromRoute] Guid petId,
+        [FromBody] int helpStatus,
+        [FromServices] ICommandHandler<int, UpdatePetHelpStatusCommand> handler,
+        CancellationToken cancellationToken = default)
+    {
+        var command = new UpdatePetHelpStatusCommand(volunteerId, petId, helpStatus);
 
         var result = await handler.HandleAsync(command, cancellationToken);
         if (result.IsFailure)

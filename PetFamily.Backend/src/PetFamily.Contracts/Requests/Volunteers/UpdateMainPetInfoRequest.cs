@@ -14,5 +14,4 @@ public record UpdateMainPetInfoRequest(
     MeasurementsDto Measurements,
     string OwnerPhoneNumber,
     DateOnly DateOfBirth,
-    HelpStatus HelpStatus,
     List<HelpRequisiteDto> HelpRequisites);

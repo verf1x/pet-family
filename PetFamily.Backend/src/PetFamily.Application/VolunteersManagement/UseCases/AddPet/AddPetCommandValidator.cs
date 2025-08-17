@@ -47,8 +47,9 @@ public class AddPetCommandValidator : AbstractValidator<AddPetCommand>
         RuleFor(c => c.OwnerPhoneNumber)
             .MustBeValueObject(PhoneNumber.Create);
 
-        RuleFor(c => c.DateOfBirth)
-            .NotEmpty();
+        RuleFor(u => u.HelpStatus)
+            .InclusiveBetween(0, 2)
+            .WithError(Errors.General.ValueIsInvalid(nameof(AddPetCommand.HelpStatus)));
 
         RuleForEach(c => c.HelpRequisites)
             .MustBeValueObject(hr => HelpRequisite.Create(hr.Name, hr.Description));
