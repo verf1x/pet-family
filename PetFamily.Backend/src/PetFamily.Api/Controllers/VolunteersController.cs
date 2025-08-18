@@ -268,7 +268,7 @@ public class VolunteersController : ApplicationController
         CancellationToken cancellationToken = default)
     {
         var command = new SoftDeletePetCommand(volunteerId, petId);
-        
+
         var result = await handler.HandleAsync(command, cancellationToken);
         if (result.IsFailure)
             return result.Error.ToResponse();
@@ -284,7 +284,7 @@ public class VolunteersController : ApplicationController
         CancellationToken cancellationToken = default)
     {
         var command = new HardDeletePetCommand(volunteerId, petId);
-        
+
         var result = await handler.HandleAsync(command, cancellationToken);
         if (result.IsFailure)
             return result.Error.ToResponse();

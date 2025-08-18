@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using PetFamily.Application.Abstractions;
 using PetFamily.Application.Database;
 using PetFamily.Application.Extensions;
+using PetFamily.Application.Messaging;
 using PetFamily.Application.VolunteersManagement.UseCases.Delete;
 using PetFamily.Domain.Shared;
 using PetFamily.Domain.Shared.EntityIds;
@@ -16,19 +17,22 @@ public class HardDeletePetHandler : ICommandHandler<Guid, HardDeletePetCommand>
     private readonly IVolunteersRepository _volunteersRepository;
     private readonly ILogger<HardDeleteVolunteerHandler> _logger;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IMessageQueue<IEnumerable<string>> _messageQueue;
 
     public HardDeletePetHandler(
         IValidator<HardDeletePetCommand> validator,
         IVolunteersRepository volunteersRepository,
         ILogger<HardDeleteVolunteerHandler> logger,
-        IUnitOfWork unitOfWork)
+        IUnitOfWork unitOfWork,
+        IMessageQueue<IEnumerable<string>> messageQueue)
     {
         _validator = validator;
         _volunteersRepository = volunteersRepository;
         _logger = logger;
         _unitOfWork = unitOfWork;
+        _messageQueue = messageQueue;
     }
-    
+
     public async Task<Result<Guid, ErrorList>> HandleAsync(
         HardDeletePetCommand command,
         CancellationToken cancellationToken = default)
@@ -36,28 +40,34 @@ public class HardDeletePetHandler : ICommandHandler<Guid, HardDeletePetCommand>
         var validationResult = await _validator.ValidateAsync(command, cancellationToken);
         if (!validationResult.IsValid)
             return validationResult.ToErrorList();
-        
+
         var volunteerId = VolunteerId.Create(command.VolunteerId);
-        
+
         var volunteerResult = await _volunteersRepository.GetByIdAsync(volunteerId, cancellationToken);
         if (volunteerResult.IsFailure)
             return volunteerResult.Error.ToErrorList();
-        
+
         var petId = PetId.Create(command.PetId);
-        
+
         var petResult = volunteerResult.Value.GetPetById(petId);
-        if(petResult.IsFailure)
+        if (petResult.IsFailure)
             return petResult.Error.ToErrorList();
-        
+
         var pet = petResult.Value;
-        
+
+        await _messageQueue.WriteAsync(
+            pet.Photos.Select(file => file.FilePath.Value),
+            cancellationToken);
+
         volunteerResult.Value.RemovePet(pet);
-        
+
         await _unitOfWork.SaveChangesAsync(cancellationToken);
-        
-        _logger.LogInformation("Pet with ID {PetId} has been hard deleted from volunteer with ID {VolunteerId}.", 
-            pet.Id, volunteerId);
-        
+
+        _logger.LogInformation(
+            "Pet with ID {PetId} has been hard deleted from volunteer with ID {VolunteerId}.",
+            pet.Id,
+            volunteerId);
+
         return pet.Id.Value;
     }
 }
