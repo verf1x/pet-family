@@ -56,7 +56,7 @@ public class HardDeletePetHandler : ICommandHandler<Guid, HardDeletePetCommand>
         var pet = petResult.Value;
 
         await _messageQueue.WriteAsync(
-            pet.Photos.Select(file => file.FilePath.Value),
+            pet.Photos.Select(file => file.Path.Value),
             cancellationToken);
 
         volunteerResult.Value.RemovePet(pet);

@@ -5,12 +5,12 @@ namespace PetFamily.Domain.VolunteersManagement.ValueObjects;
 
 public class File : ComparableValueObject
 {
-    public FilePath FilePath { get; }
+    public FilePath Path { get; }
 
-    public File(FilePath filePath) => FilePath = filePath;
+    public File(FilePath path) => Path = path;
 
     protected override IEnumerable<IComparable> GetComparableEqualityComponents()
     {
-        yield return FilePath;
+        yield return Path;
     }
 }

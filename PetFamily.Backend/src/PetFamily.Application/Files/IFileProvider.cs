@@ -7,14 +7,14 @@ namespace PetFamily.Application.Files;
 public interface IFileProvider
 {
     Task<Result<List<FilePath>, Error>> UploadPhotosAsync(
-        IEnumerable<PhotoData> filesData,
+        IEnumerable<FileData> filesData,
         CancellationToken cancellationToken = default);
 
-    Task<Result<List<string>, Error>> RemovePhotosAsync(
-        IEnumerable<string> photoPaths,
+    Task<Result<List<string>, Error>> RemoveFilesAsync(
+        IEnumerable<string> filesPaths,
         CancellationToken cancellationToken = default);
 
     Task<UnitResult<Error>> RemoveFileAsync(
-        string photoPath,
+        string path,
         CancellationToken cancellationToken = default);
 }

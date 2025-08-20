@@ -53,7 +53,7 @@ public class UploadPetPhotosTests
         var cancellationToken = new CancellationTokenSource().Token;
         
         _fileProviderMock
-            .Setup(f => f.UploadPhotosAsync(It.IsAny<List<PhotoData>>(), cancellationToken))
+            .Setup(f => f.UploadPhotosAsync(It.IsAny<List<FileData>>(), cancellationToken))
             .ReturnsAsync(Result.Success<List<FilePath>, Error>(photoPaths));
         
         _volunteersRepositoryMock.

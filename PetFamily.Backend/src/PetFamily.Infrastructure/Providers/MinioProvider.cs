@@ -23,7 +23,7 @@ public class MinioProvider : IFileProvider
     }
 
     public async Task<Result<List<FilePath>, Error>> UploadPhotosAsync(
-        IEnumerable<PhotoData> filesData,
+        IEnumerable<FileData> filesData,
         CancellationToken cancellationToken = default)
     {
         var semaphoreSlim = new SemaphoreSlim(MaxParallelOperations);
@@ -54,24 +54,24 @@ public class MinioProvider : IFileProvider
         }
     }
 
-    public async Task<Result<List<string>, Error>> RemovePhotosAsync(
-        IEnumerable<string> photoPaths,
+    public async Task<Result<List<string>, Error>> RemoveFilesAsync(
+        IEnumerable<string> filesPaths,
         CancellationToken cancellationToken = default)
     {
         var semaphoreSlim = new SemaphoreSlim(MaxParallelOperations);
-        var photoNames = photoPaths.ToList();
+        var fileNames = filesPaths.ToList();
 
         try
         {
-            var tasks = photoNames.Select(async objectName =>
+            var tasks = fileNames.Select(async objectName =>
                 await RemoveObjectAsync(objectName, semaphoreSlim, cancellationToken));
 
-            var photoNamesResult = await Task.WhenAll(tasks);
+            var fileNamesResult = await Task.WhenAll(tasks);
 
-            if (photoNamesResult.Any(r => r.IsFailure))
-                return photoNamesResult.First().Error;
+            if (fileNamesResult.Any(r => r.IsFailure))
+                return fileNamesResult.First().Error;
 
-            var result = photoNamesResult.Select(p => p.Value).ToList();
+            var result = fileNamesResult.Select(p => p.Value).ToList();
 
             return result;
         }
@@ -85,7 +85,7 @@ public class MinioProvider : IFileProvider
     }
 
     public async Task<UnitResult<Error>> RemoveFileAsync(
-        string photoPath,
+        string path,
         CancellationToken cancellationToken = default)
     {
         try
@@ -94,7 +94,7 @@ public class MinioProvider : IFileProvider
 
             var statArgs = new StatObjectArgs()
                 .WithBucket(BucketName)
-                .WithObject(photoPath);
+                .WithObject(path);
 
             var objectStat = await _minioClient.StatObjectAsync(statArgs, cancellationToken);
             if (objectStat is null)
@@ -102,7 +102,7 @@ public class MinioProvider : IFileProvider
 
             var args = new RemoveObjectArgs()
                 .WithBucket(BucketName)
-                .WithObject(photoPath);
+                .WithObject(path);
 
             await _minioClient.RemoveObjectAsync(args, cancellationToken);
         }
@@ -111,7 +111,7 @@ public class MinioProvider : IFileProvider
             _logger.LogError(
                 ex,
                 "Failed to upload file to MinIO with path {path} in bucket {bucket}",
-                photoPath,
+                path,
                 BucketName);
 
             return Error.Failure("file.remove", "Failed to remove file from MinIO");
@@ -121,7 +121,7 @@ public class MinioProvider : IFileProvider
     }
 
     private async Task<Result<FilePath, Error>> PutObjectAsync(
-        PhotoData photoData,
+        FileData fileData,
         SemaphoreSlim semaphoreSlim,
         CancellationToken cancellationToken = default)
     {
@@ -129,22 +129,22 @@ public class MinioProvider : IFileProvider
 
         var putObjectArgs = new PutObjectArgs()
             .WithBucket(BucketName)
-            .WithStreamData(photoData.Stream)
-            .WithObjectSize(photoData.Stream.Length)
-            .WithObject(photoData.Path.Value);
+            .WithStreamData(fileData.Stream)
+            .WithObjectSize(fileData.Stream.Length)
+            .WithObject(fileData.Path.Value);
 
         try
         {
             await _minioClient.PutObjectAsync(putObjectArgs, cancellationToken);
 
-            return photoData.Path;
+            return fileData.Path;
         }
         catch (Exception ex)
         {
             _logger.LogError(
                 ex,
                 "Failed to upload file to MinIO with path {path} in bucket {bucket}",
-                photoData.Path.Value,
+                fileData.Path.Value,
                 BucketName);
 
             return Error.Failure(

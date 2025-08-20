@@ -39,6 +39,8 @@ public class Pet : SoftDeletableEntity<PetId>
 
     public IReadOnlyList<File> Photos => _photos;
 
+    public File? MainPhoto { get; private set; } = null!;
+
     public DateTime CreatedAt { get; private set; }
 
     public Pet(
@@ -89,6 +91,16 @@ public class Pet : SoftDeletableEntity<PetId>
     {
         foreach (var photo in photos)
             _photos.Remove(photo);
+    }
+
+    public UnitResult<Error> SetMainPhoto(File mainPhoto)
+    {
+        if (!_photos.Contains(mainPhoto))
+            return Errors.General.NotFound();
+
+        MainPhoto = mainPhoto;
+
+        return Result.Success<Error>();
     }
 
     public void SetPosition(Position position)

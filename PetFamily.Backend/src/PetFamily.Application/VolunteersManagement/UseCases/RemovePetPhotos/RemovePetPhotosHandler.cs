@@ -70,7 +70,7 @@ public class RemovePetPhotosHandler : ICommandHandler<List<string>, RemovePetPho
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            var removeResult = await _fileProvider.RemovePhotosAsync(command.PhotoNames, cancellationToken);
+            var removeResult = await _fileProvider.RemoveFilesAsync(command.PhotoNames, cancellationToken);
             if (removeResult.IsFailure)
                 return removeResult.Error.ToErrorList();
 

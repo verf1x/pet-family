@@ -180,7 +180,7 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
 
         builder.Property(p => p.Photos)
             .HasValueObjectCollectionJsonConversion(
-                file => new PetFileDto { FilePath = file.FilePath.Value },
+                file => new PetFileDto { FilePath = file.Path.Value },
                 dto => new File(FilePath.Create(dto.FilePath).Value))
             .HasColumnName("photos");
 

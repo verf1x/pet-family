@@ -58,7 +58,7 @@ public class UploadPetPhotosHandler : ICommandHandler<List<string>, UploadPetPho
         if (filesData.IsFailure)
             return filesData.Error.ToErrorList();
 
-        var petPhotos = filesData.Value.ToPhotosCollection();
+        var petPhotos = filesData.Value.ToFilesCollection();
 
         var transaction = await _unitOfWork.BeginTransactionAsync(cancellationToken);
 

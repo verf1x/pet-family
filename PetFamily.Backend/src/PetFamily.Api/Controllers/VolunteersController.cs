@@ -291,4 +291,23 @@ public class VolunteersController : ApplicationController
 
         return Ok(result.Value);
     }
+    
+    [HttpPut("{volunteerId}/pet/{petId:guid}/main-photo")]
+    public async Task<IActionResult> UpdateMainPetPhotoAsync(
+        [FromRoute] Guid volunteerId,
+        [FromRoute] Guid petId,
+        [FromBody] string photoPath,
+        [FromServices] ICommandHandler<string, UpdateMainPetPhotoCommand> handler,
+        CancellationToken cancellationToken = default)
+    {
+        var command = new UpdateMainPetPhotoCommand(volunteerId, petId, photoPath);
+
+        var result = await handler.HandleAsync(command, cancellationToken);
+
+        if (result.IsFailure)
+            return result.Error.ToResponse();
+
+        return Ok(result.Value);
+    }
+    
 }
