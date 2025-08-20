@@ -2,25 +2,22 @@ using CSharpFunctionalExtensions;
 using PetFamily.Application.Files;
 using PetFamily.Contracts.Dtos;
 using PetFamily.Domain.Shared;
-using PetFamily.Domain.VolunteersManagement.ValueObjects;
 
 namespace PetFamily.Application.Extensions;
 
 public static class AddPetCommandExtensions
 {
-    public static Result<List<FileData>, Error> ToDataCollection(this IEnumerable<UploadFileDto> files)
+    public static Result<List<PhotoData>, Error> ToDataCollection(this IEnumerable<UploadFileDto> files)
     {
-        var result = new List<FileData>();
+        var result = new List<PhotoData>();
 
         foreach (var file in files)
         {
             var extension = Path.GetExtension(file.FileName);
 
-            var pathResult = FilePath.Create(Guid.NewGuid(), extension);
-            if (pathResult.IsFailure)
-                return pathResult.Error;
+            var path = $"{Guid.NewGuid()}{extension}";
 
-            var fileContent = new FileData(file.Content, pathResult.Value);
+            var fileContent = new PhotoData(file.Content, path);
             result.Add(fileContent);
         }
 

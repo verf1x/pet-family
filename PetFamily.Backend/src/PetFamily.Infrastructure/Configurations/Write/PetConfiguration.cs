@@ -8,7 +8,6 @@ using PetFamily.Domain.VolunteersManagement.Entities;
 using PetFamily.Domain.VolunteersManagement.Enums;
 using PetFamily.Domain.VolunteersManagement.ValueObjects;
 using PetFamily.Infrastructure.Extensions;
-using File = PetFamily.Domain.VolunteersManagement.ValueObjects.File;
 
 namespace PetFamily.Infrastructure.Configurations.Write;
 
@@ -180,9 +179,17 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
 
         builder.Property(p => p.Photos)
             .HasValueObjectCollectionJsonConversion(
-                file => new PetFileDto { FilePath = file.Path.Value },
-                dto => new File(FilePath.Create(dto.FilePath).Value))
+                file => new PetFileDto { FilePath = file.Path },
+                dto => new Photo(dto.FilePath))
             .HasColumnName("photos");
+
+        builder.OwnsOne(p => p.MainPhoto, vo =>
+        {
+            vo.Property(v => v.Path)
+                .HasColumnName("main_photo_path")
+                .IsRequired(false)
+                .HasMaxLength(Domain.Shared.Constants.MaxLongTextLength);
+        });
 
         builder.Property(p => p.CreatedAt)
             .IsRequired();

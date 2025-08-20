@@ -38,7 +38,7 @@ public class RemovePetPhotosHandler : ICommandHandler<List<string>, RemovePetPho
         CancellationToken cancellationToken = default)
     {
         var validationResult = await _validator.ValidateAsync(command, cancellationToken);
-        if (validationResult.IsValid == false)
+        if (!validationResult.IsValid)
             return validationResult.ToErrorList();
 
         var volunteerId = VolunteerId.Create(command.VolunteerId);
@@ -51,13 +51,10 @@ public class RemovePetPhotosHandler : ICommandHandler<List<string>, RemovePetPho
         if (petResult.IsFailure)
             return petResult.Error.ToErrorList();
 
-        var petPhotos = new List<Domain.VolunteersManagement.ValueObjects.File>();
-        foreach (var photoName in command.PhotoNames)
+        var petPhotos = new List<Photo>();
+        foreach (var path in command.PhotoPaths)
         {
-            var photoPathResult = FilePath.Create(photoName);
-            if (photoPathResult.IsFailure)
-                return photoPathResult.Error.ToErrorList();
-            var photo = new Domain.VolunteersManagement.ValueObjects.File(photoPathResult.Value);
+            var photo = new Photo(path);
 
             petPhotos.Add(photo);
         }
@@ -70,7 +67,7 @@ public class RemovePetPhotosHandler : ICommandHandler<List<string>, RemovePetPho
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            var removeResult = await _fileProvider.RemoveFilesAsync(command.PhotoNames, cancellationToken);
+            var removeResult = await _fileProvider.RemoveFilesAsync(command.PhotoPaths, cancellationToken);
             if (removeResult.IsFailure)
                 return removeResult.Error.ToErrorList();
 

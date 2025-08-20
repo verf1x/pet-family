@@ -4,14 +4,13 @@ using PetFamily.Domain.Shared.EntityIds;
 using PetFamily.Domain.Shared.ValueObjects;
 using PetFamily.Domain.VolunteersManagement.Enums;
 using PetFamily.Domain.VolunteersManagement.ValueObjects;
-using File = PetFamily.Domain.VolunteersManagement.ValueObjects.File;
 
 namespace PetFamily.Domain.VolunteersManagement.Entities;
 
 public class Pet : SoftDeletableEntity<PetId>
 {
     private readonly List<HelpRequisite> _helpRequisites = [];
-    private readonly List<File> _photos = [];
+    private readonly List<Photo> _photos = [];
 
     public Nickname Nickname { get; private set; } = null!;
 
@@ -37,9 +36,9 @@ public class Pet : SoftDeletableEntity<PetId>
 
     public IReadOnlyList<HelpRequisite> HelpRequisites => _helpRequisites;
 
-    public IReadOnlyList<File> Photos => _photos;
+    public IReadOnlyList<Photo> Photos => _photos;
 
-    public File? MainPhoto { get; private set; } = null!;
+    public Photo? MainPhoto { get; private set; }
 
     public DateTime CreatedAt { get; private set; }
 
@@ -78,7 +77,7 @@ public class Pet : SoftDeletableEntity<PetId>
     {
     }
 
-    public void AddPhotos(List<File> photos)
+    public void AddPhotos(List<Photo> photos)
     {
         foreach (var photo in photos)
         {
@@ -87,18 +86,20 @@ public class Pet : SoftDeletableEntity<PetId>
         }
     }
 
-    public void RemovePhotos(List<File> photos)
+    public void RemovePhotos(List<Photo> photos)
     {
         foreach (var photo in photos)
             _photos.Remove(photo);
     }
 
-    public UnitResult<Error> SetMainPhoto(File mainPhoto)
+    public UnitResult<Error> SetMainPhoto(Photo photo)
     {
-        if (!_photos.Contains(mainPhoto))
+        var candidatePhoto = _photos.FirstOrDefault(p => p == photo);
+
+        if (candidatePhoto is null)
             return Errors.General.NotFound();
 
-        MainPhoto = mainPhoto;
+        MainPhoto = candidatePhoto;
 
         return Result.Success<Error>();
     }

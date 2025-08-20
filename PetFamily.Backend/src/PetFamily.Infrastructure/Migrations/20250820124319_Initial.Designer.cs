@@ -13,7 +13,7 @@ using PetFamily.Infrastructure.DbContexts;
 namespace PetFamily.Infrastructure.Migrations
 {
     [DbContext(typeof(WriteDbContext))]
-    [Migration("20250814165053_Initial")]
+    [Migration("20250820124319_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -392,7 +392,29 @@ namespace PetFamily.Infrastructure.Migrations
                                 .HasConstraintName("fk_pets_pets_pet_id");
                         });
 
+                    b.OwnsOne("PetFamily.Domain.VolunteersManagement.ValueObjects.Photo", "MainPhoto", b1 =>
+                        {
+                            b1.Property<Guid>("PetId")
+                                .HasColumnType("uuid")
+                                .HasColumnName("id");
+
+                            b1.Property<string>("Path")
+                                .HasMaxLength(2000)
+                                .HasColumnType("character varying(2000)")
+                                .HasColumnName("main_photo_path");
+
+                            b1.HasKey("PetId");
+
+                            b1.ToTable("pets");
+
+                            b1.WithOwner()
+                                .HasForeignKey("PetId")
+                                .HasConstraintName("fk_pets_pets_id");
+                        });
+
                     b.Navigation("HelpRequisites");
+
+                    b.Navigation("MainPhoto");
                 });
 
             modelBuilder.Entity("PetFamily.Domain.VolunteersManagement.Entities.Volunteer", b =>

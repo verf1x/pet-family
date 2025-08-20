@@ -1,29 +1,32 @@
 ﻿using CSharpFunctionalExtensions;
 using FluentValidation;
 using PetFamily.Application.Abstractions;
+using PetFamily.Application.Database;
 using PetFamily.Application.Extensions;
 using PetFamily.Domain.Shared;
 using PetFamily.Domain.Shared.EntityIds;
 using PetFamily.Domain.VolunteersManagement.ValueObjects;
-using File = PetFamily.Domain.VolunteersManagement.ValueObjects.File;
 
-namespace PetFamily.Application.VolunteersManagement.UseCases.UpdateMainPetPhoto;
+namespace PetFamily.Application.VolunteersManagement.UseCases.SetMainPetPhoto;
 
-public class UpdateMainPetPhotoHandler : ICommandHandler<string, UpdateMainPetPhotoCommand>
+public class UpdateMainPetPhotoHandler : ICommandHandler<string, SetMainPetPhotoCommand>
 {
-    private readonly IValidator<UpdateMainPetPhotoCommand> _validator;
+    private readonly IValidator<SetMainPetPhotoCommand> _validator;
     private readonly IVolunteersRepository _volunteersRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
     public UpdateMainPetPhotoHandler(
-        IValidator<UpdateMainPetPhotoCommand> validator,
-        IVolunteersRepository volunteersRepository)
+        IValidator<SetMainPetPhotoCommand> validator,
+        IVolunteersRepository volunteersRepository,
+        IUnitOfWork unitOfWork)
     {
         _validator = validator;
         _volunteersRepository = volunteersRepository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<Result<string, ErrorList>> HandleAsync(
-        UpdateMainPetPhotoCommand command,
+        SetMainPetPhotoCommand command,
         CancellationToken cancellationToken = default)
     {
         var validationResult = await _validator.ValidateAsync(command, cancellationToken);
@@ -45,12 +48,14 @@ public class UpdateMainPetPhotoHandler : ICommandHandler<string, UpdateMainPetPh
         if (petResult.IsFailure)
             return petResult.Error.ToErrorList();
 
-        var mainPhoto = new File(FilePath.Create(command.photoPath).Value);
+        var mainPhoto = new Photo(command.PhotoPath);
 
         var mainPhotoPathResult = petResult.Value.SetMainPhoto(mainPhoto);
         if (mainPhotoPathResult.IsFailure)
             return mainPhotoPathResult.Error.ToErrorList();
 
-        return mainPhoto.Path.Value;
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return mainPhoto.Path;
     }
 }

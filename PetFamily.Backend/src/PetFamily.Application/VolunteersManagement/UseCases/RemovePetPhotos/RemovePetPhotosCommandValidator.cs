@@ -16,8 +16,8 @@ public class RemovePetPhotosCommandValidator : AbstractValidator<RemovePetPhotos
             .NotEmpty()
             .WithError(Errors.General.ValueIsRequired(nameof(RemovePetPhotosCommand.PetId)));
 
-        RuleFor(x => x.PhotoNames)
+        RuleFor(x => x.PhotoPaths)
             .Must(x => x.Any())
-            .WithError(Errors.General.ValueIsRequired(nameof(RemovePetPhotosCommand.PhotoNames)));
+            .WithError(Errors.General.ValueIsRequired(nameof(RemovePetPhotosCommand.PhotoPaths)));
     }
 }

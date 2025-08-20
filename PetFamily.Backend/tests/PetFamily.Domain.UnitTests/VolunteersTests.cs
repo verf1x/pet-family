@@ -4,7 +4,6 @@ using PetFamily.Domain.Shared.ValueObjects;
 using PetFamily.Domain.VolunteersManagement.Entities;
 using PetFamily.Domain.VolunteersManagement.Enums;
 using PetFamily.Domain.VolunteersManagement.ValueObjects;
-using File = PetFamily.Domain.VolunteersManagement.ValueObjects.File;
 
 namespace PetFamily.Domain.UnitTests;
 

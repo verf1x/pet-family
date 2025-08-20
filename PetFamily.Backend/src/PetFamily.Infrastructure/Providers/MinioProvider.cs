@@ -4,7 +4,6 @@ using Minio;
 using Minio.DataModel.Args;
 using PetFamily.Application.Files;
 using PetFamily.Domain.Shared;
-using PetFamily.Domain.VolunteersManagement.ValueObjects;
 
 namespace PetFamily.Infrastructure.Providers;
 
@@ -22,18 +21,18 @@ public class MinioProvider : IFileProvider
         _logger = logger;
     }
 
-    public async Task<Result<List<FilePath>, Error>> UploadPhotosAsync(
-        IEnumerable<FileData> filesData,
+    public async Task<Result<List<string>, Error>> UploadPhotosAsync(
+        IEnumerable<PhotoData> filesData,
         CancellationToken cancellationToken = default)
     {
         var semaphoreSlim = new SemaphoreSlim(MaxParallelOperations);
-        var photos = filesData.ToList();
+        var files = filesData.ToList();
 
         try
         {
             await CreateBucketsIfNotExistsAsync(cancellationToken);
 
-            var tasks = photos.Select(async file =>
+            var tasks = files.Select(async file =>
                 await PutObjectAsync(file, semaphoreSlim, cancellationToken));
 
             var pathsResult = await Task.WhenAll(tasks);
@@ -120,8 +119,8 @@ public class MinioProvider : IFileProvider
         return Result.Success<Error>();
     }
 
-    private async Task<Result<FilePath, Error>> PutObjectAsync(
-        FileData fileData,
+    private async Task<Result<string, Error>> PutObjectAsync(
+        PhotoData photoData,
         SemaphoreSlim semaphoreSlim,
         CancellationToken cancellationToken = default)
     {
@@ -129,22 +128,22 @@ public class MinioProvider : IFileProvider
 
         var putObjectArgs = new PutObjectArgs()
             .WithBucket(BucketName)
-            .WithStreamData(fileData.Stream)
-            .WithObjectSize(fileData.Stream.Length)
-            .WithObject(fileData.Path.Value);
+            .WithStreamData(photoData.Stream)
+            .WithObjectSize(photoData.Stream.Length)
+            .WithObject(photoData.Path);
 
         try
         {
             await _minioClient.PutObjectAsync(putObjectArgs, cancellationToken);
 
-            return fileData.Path;
+            return photoData.Path;
         }
         catch (Exception ex)
         {
             _logger.LogError(
                 ex,
                 "Failed to upload file to MinIO with path {path} in bucket {bucket}",
-                fileData.Path.Value,
+                photoData.Path,
                 BucketName);
 
             return Error.Failure(

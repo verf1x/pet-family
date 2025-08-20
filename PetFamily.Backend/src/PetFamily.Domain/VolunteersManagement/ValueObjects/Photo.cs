@@ -1,13 +1,12 @@
-using System.Text.Json.Serialization;
 using CSharpFunctionalExtensions;
 
 namespace PetFamily.Domain.VolunteersManagement.ValueObjects;
 
-public class File : ComparableValueObject
+public class Photo : ComparableValueObject
 {
-    public FilePath Path { get; }
+    public string Path { get; }
 
-    public File(FilePath path) => Path = path;
+    public Photo(string path) => Path = path;
 
     protected override IEnumerable<IComparable> GetComparableEqualityComponents()
     {

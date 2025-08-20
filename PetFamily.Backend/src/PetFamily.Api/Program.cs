@@ -9,7 +9,8 @@ var builder = WebApplication.CreateBuilder(args);
 Log.Logger = LoggerConfigurationFactory.Create(builder.GetSeqConnectionString());
 
 builder.Services.AddControllers();
-builder.Services.AddOpenApi();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 builder.Services.AddSerilog();
 
@@ -24,11 +25,13 @@ app.UseSerilogRequestLogging();
 
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
-    app.UseSwaggerUI(options => options.SwaggerEndpoint("/openapi/v1.json", "PetFamily API"));
+    app.UseSwagger();
+    app.UseSwaggerUI();
 
     await app.ApplyMigrations();
 }
+
+app.UseHttpsRedirection();
 
 app.UseAuthorization();
 

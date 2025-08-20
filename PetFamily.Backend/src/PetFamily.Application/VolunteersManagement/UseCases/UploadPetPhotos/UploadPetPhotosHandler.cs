@@ -72,7 +72,7 @@ public class UploadPetPhotosHandler : ICommandHandler<List<string>, UploadPetPho
             if (uploadResult.IsFailure)
             {
                 await _messageQueue.WriteAsync(
-                    filesData.Value.Select(f => f.Path.Value),
+                    filesData.Value.Select(f => f.Path),
                     cancellationToken);
 
                 return uploadResult.Error.ToErrorList();
@@ -81,7 +81,7 @@ public class UploadPetPhotosHandler : ICommandHandler<List<string>, UploadPetPho
             transaction.Commit();
 
             var photoPaths = uploadResult.Value
-                .Select(file => file.Value)
+                .Select(file => file)
                 .ToList();
 
             return photoPaths;
