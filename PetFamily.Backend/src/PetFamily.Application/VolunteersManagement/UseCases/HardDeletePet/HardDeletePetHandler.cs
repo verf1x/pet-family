@@ -67,7 +67,7 @@ public class HardDeletePetHandler : ICommandHandler<Guid, HardDeletePetCommand>
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             var removeFilesResult =
-                await _fileProvider.RemoveFilesAsync(pet.Photos.Select(file => file.Path), cancellationToken);
+                await _fileProvider.RemoveFilesAsync(photosPaths, cancellationToken);
 
             if (removeFilesResult.IsFailure)
                 return removeFilesResult.Error.ToErrorList();
