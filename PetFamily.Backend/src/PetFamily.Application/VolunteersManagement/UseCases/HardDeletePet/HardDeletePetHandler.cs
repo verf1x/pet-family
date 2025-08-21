@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using PetFamily.Application.Abstractions;
 using PetFamily.Application.Database;
 using PetFamily.Application.Extensions;
+using PetFamily.Application.Files;
 using PetFamily.Application.Messaging;
 using PetFamily.Application.VolunteersManagement.UseCases.Delete;
 using PetFamily.Domain.Shared;
@@ -17,20 +18,20 @@ public class HardDeletePetHandler : ICommandHandler<Guid, HardDeletePetCommand>
     private readonly IVolunteersRepository _volunteersRepository;
     private readonly ILogger<HardDeleteVolunteerHandler> _logger;
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IMessageQueue<IEnumerable<string>> _messageQueue;
+    private readonly IFileProvider _fileProvider;
 
     public HardDeletePetHandler(
         IValidator<HardDeletePetCommand> validator,
         IVolunteersRepository volunteersRepository,
         ILogger<HardDeleteVolunteerHandler> logger,
         IUnitOfWork unitOfWork,
-        IMessageQueue<IEnumerable<string>> messageQueue)
+        IFileProvider fileProvider)
     {
         _validator = validator;
         _volunteersRepository = volunteersRepository;
         _logger = logger;
         _unitOfWork = unitOfWork;
-        _messageQueue = messageQueue;
+        _fileProvider = fileProvider;
     }
 
     public async Task<Result<Guid, ErrorList>> HandleAsync(
@@ -55,19 +56,44 @@ public class HardDeletePetHandler : ICommandHandler<Guid, HardDeletePetCommand>
 
         var pet = petResult.Value;
 
-        await _messageQueue.WriteAsync(
-            pet.Photos.Select(file => file.Path),
-            cancellationToken);
+        var photosPaths = pet.Photos.Select(file => file.Path);
 
-        volunteerResult.Value.RemovePet(pet);
+        var transaction = await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        try
+        {
+            volunteerResult.Value.RemovePet(pet);
 
-        _logger.LogInformation(
-            "Pet with ID {PetId} has been hard deleted from volunteer with ID {VolunteerId}.",
-            pet.Id,
-            volunteerId);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return pet.Id.Value;
+            var removeFilesResult =
+                await _fileProvider.RemoveFilesAsync(pet.Photos.Select(file => file.Path), cancellationToken);
+
+            if (removeFilesResult.IsFailure)
+                return removeFilesResult.Error.ToErrorList();
+
+            transaction.Commit();
+
+            _logger.LogInformation(
+                "Pet with ID {PetId} has been hard deleted from volunteer with ID {VolunteerId}.",
+                pet.Id,
+                volunteerId);
+
+            return pet.Id.Value;
+        }
+        catch (Exception ex)
+        {
+            transaction.Rollback();
+            _logger.LogError(
+                ex,
+                "An error occurred while hard deleting pet with ID {PetId} from volunteer with ID {VolunteerId}.",
+                pet.Id,
+                volunteerId);
+
+            return Error.Failure(
+                    "volunteer.pet.hard_delete.failure",
+                    "An error occurred while hard deleting the pet with ID " + petId)
+                .ToErrorList();
+        }
     }
 }
