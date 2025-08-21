@@ -10,14 +10,14 @@ public static class SqlExtensions
         string? sortBy,
         bool? sortAscending)
     {
-        if(string.IsNullOrWhiteSpace(sortBy) || sortAscending is null)
+        if (string.IsNullOrWhiteSpace(sortBy) || sortAscending is null)
             return;
-        
+
         var sortDirection = sortAscending.Value ? "ASC" : "DESC";
-        
+
         sqlBuilder.Append($"\nORDER BY {sortBy} {sortDirection}");
     }
-    
+
     public static void ApplyPagination(
         this StringBuilder sqlBuilder,
         DynamicParameters parameters,

@@ -16,5 +16,5 @@ public record AddPetCommand(
     MeasurementsDto MeasurementsDto,
     string OwnerPhoneNumber,
     DateOnly DateOfBirth,
-    HelpStatus HelpStatus,
+    int HelpStatus,
     IEnumerable<HelpRequisiteDto> HelpRequisites) : ICommand;

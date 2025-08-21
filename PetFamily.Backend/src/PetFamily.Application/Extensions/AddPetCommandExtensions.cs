@@ -2,7 +2,6 @@ using CSharpFunctionalExtensions;
 using PetFamily.Application.Files;
 using PetFamily.Contracts.Dtos;
 using PetFamily.Domain.Shared;
-using PetFamily.Domain.VolunteersManagement.ValueObjects;
 
 namespace PetFamily.Application.Extensions;
 
@@ -16,11 +15,9 @@ public static class AddPetCommandExtensions
         {
             var extension = Path.GetExtension(file.FileName);
 
-            var pathResult = FilePath.Create(Guid.NewGuid(), extension);
-            if (pathResult.IsFailure)
-                return pathResult.Error;
+            var path = $"{Guid.NewGuid()}{extension}";
 
-            var fileContent = new PhotoData(file.Content, pathResult.Value);
+            var fileContent = new PhotoData(file.Content, path);
             result.Add(fileContent);
         }
 

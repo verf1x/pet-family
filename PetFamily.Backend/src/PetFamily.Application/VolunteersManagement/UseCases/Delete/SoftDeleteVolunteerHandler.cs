@@ -27,7 +27,7 @@ public class SoftDeleteVolunteerHandler : ICommandHandler<Guid, DeleteVolunteerC
         _unitOfWork = unitOfWork;
         _logger = logger;
     }
-    
+
     public async Task<Result<Guid, ErrorList>> HandleAsync(
         DeleteVolunteerCommand command,
         CancellationToken cancellationToken = default)
@@ -35,18 +35,18 @@ public class SoftDeleteVolunteerHandler : ICommandHandler<Guid, DeleteVolunteerC
         var validationResult = await _validator.ValidateAsync(command, cancellationToken);
         if (validationResult.IsValid == false)
             return validationResult.ToErrorList();
-        
+
         var volunteerId = VolunteerId.Create(command.VolunteerId);
         var volunteerResult = await _volunteersRepository.GetByIdAsync(volunteerId, cancellationToken);
         if (volunteerResult.IsFailure)
             return volunteerResult.Error.ToErrorList();
-        
+
         volunteerResult.Value.SoftDelete();
-        
+
         await _unitOfWork.SaveChangesAsync(cancellationToken);
-        
-        _logger.LogInformation("Soft deleted volunteer with ID: {VolunteerId}", command.VolunteerId); 
-        
+
+        _logger.LogInformation("Soft deleted volunteer with ID: {VolunteerId}", command.VolunteerId);
+
         return volunteerId.Value;
     }
 }

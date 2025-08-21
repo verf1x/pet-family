@@ -4,7 +4,6 @@ using Minio;
 using Minio.DataModel.Args;
 using PetFamily.Application.Files;
 using PetFamily.Domain.Shared;
-using PetFamily.Domain.VolunteersManagement.ValueObjects;
 
 namespace PetFamily.Infrastructure.Providers;
 
@@ -22,18 +21,18 @@ public class MinioProvider : IFileProvider
         _logger = logger;
     }
 
-    public async Task<Result<List<FilePath>, Error>> UploadPhotosAsync(
+    public async Task<Result<List<string>, Error>> UploadPhotosAsync(
         IEnumerable<PhotoData> filesData,
         CancellationToken cancellationToken = default)
     {
         var semaphoreSlim = new SemaphoreSlim(MaxParallelOperations);
-        var photos = filesData.ToList();
+        var files = filesData.ToList();
 
         try
         {
             await CreateBucketsIfNotExistsAsync(cancellationToken);
 
-            var tasks = photos.Select(async file =>
+            var tasks = files.Select(async file =>
                 await PutObjectAsync(file, semaphoreSlim, cancellationToken));
 
             var pathsResult = await Task.WhenAll(tasks);
@@ -48,30 +47,31 @@ public class MinioProvider : IFileProvider
         catch (Exception ex)
         {
             _logger.LogError(ex, "An error occurred while uploading the files to Minio");
-            return Error.Failure("files.upload",
+            return Error.Failure(
+                "files.upload",
                 "An error occurred while uploading the files to Minio");
         }
     }
 
-    public async Task<Result<List<string>, Error>> RemovePhotosAsync(
-        IEnumerable<string> photoPaths,
+    public async Task<Result<List<string>, Error>> RemoveFilesAsync(
+        IEnumerable<string> filesPaths,
         CancellationToken cancellationToken = default)
     {
         var semaphoreSlim = new SemaphoreSlim(MaxParallelOperations);
-        var photoNames = photoPaths.ToList();
+        var fileNames = filesPaths.ToList();
 
         try
         {
-            var tasks = photoNames.Select(async objectName =>
+            var tasks = fileNames.Select(async objectName =>
                 await RemoveObjectAsync(objectName, semaphoreSlim, cancellationToken));
-            
-            var photoNamesResult = await Task.WhenAll(tasks);
-            
-            if (photoNamesResult.Any(r => r.IsFailure))
-                return photoNamesResult.First().Error;
-            
-            var result = photoNamesResult.Select(p => p.Value).ToList();
-            
+
+            var fileNamesResult = await Task.WhenAll(tasks);
+
+            if (fileNamesResult.Any(r => r.IsFailure))
+                return fileNamesResult.First().Error;
+
+            var result = fileNamesResult.Select(p => p.Value).ToList();
+
             return result;
         }
         catch (Exception ex)
@@ -84,16 +84,16 @@ public class MinioProvider : IFileProvider
     }
 
     public async Task<UnitResult<Error>> RemoveFileAsync(
-        string photoPath,
+        string path,
         CancellationToken cancellationToken = default)
     {
         try
         {
             await CreateBucketsIfNotExistsAsync(cancellationToken);
-            
+
             var statArgs = new StatObjectArgs()
                 .WithBucket(BucketName)
-                .WithObject(photoPath);
+                .WithObject(path);
 
             var objectStat = await _minioClient.StatObjectAsync(statArgs, cancellationToken);
             if (objectStat is null)
@@ -101,34 +101,36 @@ public class MinioProvider : IFileProvider
 
             var args = new RemoveObjectArgs()
                 .WithBucket(BucketName)
-                .WithObject(photoPath);
+                .WithObject(path);
 
             await _minioClient.RemoveObjectAsync(args, cancellationToken);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to upload file to MinIO with path {path} in bucket {bucket}",
-                photoPath,
+            _logger.LogError(
+                ex,
+                "Failed to upload file to MinIO with path {path} in bucket {bucket}",
+                path,
                 BucketName);
-            
+
             return Error.Failure("file.remove", "Failed to remove file from MinIO");
         }
 
         return Result.Success<Error>();
     }
-    
-    private async Task<Result<FilePath, Error>> PutObjectAsync(
+
+    private async Task<Result<string, Error>> PutObjectAsync(
         PhotoData photoData,
         SemaphoreSlim semaphoreSlim,
         CancellationToken cancellationToken = default)
     {
         await semaphoreSlim.WaitAsync(cancellationToken);
- 
+
         var putObjectArgs = new PutObjectArgs()
             .WithBucket(BucketName)
             .WithStreamData(photoData.Stream)
             .WithObjectSize(photoData.Stream.Length)
-            .WithObject(photoData.Path.Value);
+            .WithObject(photoData.Path);
 
         try
         {
@@ -138,11 +140,14 @@ public class MinioProvider : IFileProvider
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to upload file to MinIO with path {path} in bucket {bucket}",
-                photoData.Path.Value,
+            _logger.LogError(
+                ex,
+                "Failed to upload file to MinIO with path {path} in bucket {bucket}",
+                photoData.Path,
                 BucketName);
 
-            return Error.Failure("file.upload",
+            return Error.Failure(
+                "file.upload",
                 "An error occurred while uploading the file to Minio");
         }
         finally
@@ -157,7 +162,7 @@ public class MinioProvider : IFileProvider
         CancellationToken cancellationToken = default)
     {
         await semaphoreSlim.WaitAsync(cancellationToken);
-        
+
         var removeObjectArgs = new RemoveObjectArgs()
             .WithBucket(BucketName)
             .WithObject(objectName);
@@ -165,16 +170,19 @@ public class MinioProvider : IFileProvider
         try
         {
             await _minioClient.RemoveObjectAsync(removeObjectArgs, cancellationToken);
-            
+
             return objectName;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to remove file from MinIO with path {path} in bucket {bucket}",
+            _logger.LogError(
+                ex,
+                "Failed to remove file from MinIO with path {path} in bucket {bucket}",
                 objectName,
                 BucketName);
 
-            return Error.Failure("file.remove",
+            return Error.Failure(
+                "file.remove",
                 "An error occurred while removing the file from Minio");
         }
         finally

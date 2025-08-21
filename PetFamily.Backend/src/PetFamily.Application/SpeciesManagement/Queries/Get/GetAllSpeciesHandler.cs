@@ -15,15 +15,17 @@ public class GetAllSpeciesHandler : IQueryHandler<IReadOnlyList<SpeciesDto>, Get
     {
         _sqlConnectionFactory = sqlConnectionFactory;
     }
-    
-    public async Task<Result<IReadOnlyList<SpeciesDto>, ErrorList>> HandleAsync(GetAllSpeciesQuery query, CancellationToken cancellationToken = default)
+
+    public async Task<Result<IReadOnlyList<SpeciesDto>, ErrorList>> HandleAsync(
+        GetAllSpeciesQuery query,
+        CancellationToken cancellationToken = default)
     {
         var connection = _sqlConnectionFactory.Create();
-        
+
         var sqlQuery = "SELECT id, name, species_breeds FROM species";
-        
+
         var species = await connection.QueryAsync<SpeciesDto>(sqlQuery);
-        
+
         return species.ToList();
     }
 }

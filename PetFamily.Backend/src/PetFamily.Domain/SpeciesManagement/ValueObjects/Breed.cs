@@ -7,6 +7,7 @@ namespace PetFamily.Domain.SpeciesManagement.ValueObjects;
 public class Breed : ComparableValueObject
 {
     public BreedId Id { get; private set; }
+
     public string Name { get; private set; }
 
     private Breed(string name)
@@ -14,12 +15,12 @@ public class Breed : ComparableValueObject
         Id = BreedId.CreateNew();
         Name = name;
     }
-    
+
     public static Result<Breed, Error> Create(string name)
     {
-        if(string.IsNullOrWhiteSpace(name))
+        if (string.IsNullOrWhiteSpace(name))
             return Errors.General.ValueIsRequired(nameof(name));
-        
+
         return new Breed(name);
     }
 

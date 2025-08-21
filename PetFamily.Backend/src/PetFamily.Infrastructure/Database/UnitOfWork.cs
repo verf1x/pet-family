@@ -13,11 +13,11 @@ public class UnitOfWork : IUnitOfWork
     {
         _writeDbContext = writeDbContext;
     }
-    
+
     public async Task<IDbTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default)
     {
         var transaction = await _writeDbContext.Database.BeginTransactionAsync(cancellationToken);
-        
+
         return transaction.GetDbTransaction();
     }
 

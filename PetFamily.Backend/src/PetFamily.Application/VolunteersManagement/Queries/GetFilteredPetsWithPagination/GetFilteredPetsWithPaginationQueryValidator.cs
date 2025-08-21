@@ -23,17 +23,17 @@ public class GetFilteredPetsWithPaginationQueryValidator
             .WithError(Errors.General.ValueIsInvalid(nameof(GetFilteredPetsWithPaginationQuery.PositionTo)));
 
         RuleFor(fp => fp)
-            .Must(pf => !pf.PositionFrom.HasValue || !pf.PositionTo.HasValue || 
+            .Must(pf => !pf.PositionFrom.HasValue || !pf.PositionTo.HasValue ||
                         pf.PositionFrom <= pf.PositionTo)
             .WithError(Error.Validation(
                 "invalid.position.range",
                 "PositionFrom must be less than or equal to PositionTo.",
                 "Position range"));
-        
+
         RuleFor(fp => fp.PageSize)
             .GreaterThan(0)
             .WithError(Errors.General.ValueIsInvalid(nameof(GetFilteredPetsWithPaginationQuery.PageSize)));
-        
+
         RuleFor(fp => fp.PageNumber)
             .GreaterThan(0)
             .WithError(Errors.General.ValueIsInvalid(nameof(GetFilteredPetsWithPaginationQuery.PageNumber)));

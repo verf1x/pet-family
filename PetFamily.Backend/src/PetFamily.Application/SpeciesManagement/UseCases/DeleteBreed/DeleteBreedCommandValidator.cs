@@ -11,7 +11,7 @@ public class DeleteBreedCommandValidator : AbstractValidator<DeleteBreedCommand>
         RuleFor(db => db.SpeciesId)
             .NotEqual(Guid.Empty)
             .WithError(Errors.General.ValueIsInvalid(nameof(DeleteBreedCommand.SpeciesId)));
-        
+
         RuleFor(db => db.BreedId)
             .NotEqual(Guid.Empty)
             .WithError(Errors.General.ValueIsInvalid(nameof(DeleteBreedCommand.BreedId)));

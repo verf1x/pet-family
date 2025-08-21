@@ -23,7 +23,7 @@ public static class Inject
             .AsSelfWithInterfaces()
             .WithScopedLifetime());
     }
-    
+
     private static IServiceCollection AddQueries(this IServiceCollection services)
     {
         return services.Scan(scan => scan.FromAssemblies(typeof(Inject).Assembly)

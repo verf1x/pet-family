@@ -7,15 +7,16 @@ namespace PetFamily.Infrastructure.Extensions;
 
 public static class EfCoreFluentApiExtensions
 {
-    public static PropertyBuilder<IReadOnlyList<TValueObject>> HasValueObjectCollectionJsonConversion<TValueObject, TDto>(
+    public static PropertyBuilder<IReadOnlyList<TValueObject>> HasValueObjectCollectionJsonConversion<TValueObject,
+        TDto>(
         this PropertyBuilder<IReadOnlyList<TValueObject>> builder,
         Func<TValueObject, TDto> toDtoSelector,
         Func<TDto, TValueObject> toValueObjectSelector)
     {
         return builder.HasConversion(
-            valueObjects => SerializeValueObjectsCollection(valueObjects, toDtoSelector),
-            json => DeserializeDtoCollection(json, toValueObjectSelector),
-            CreateCollectionValueComparer<TValueObject>())
+                valueObjects => SerializeValueObjectsCollection(valueObjects, toDtoSelector),
+                json => DeserializeDtoCollection(json, toValueObjectSelector),
+                CreateCollectionValueComparer<TValueObject>())
             .HasColumnType("jsonb");
     }
 
@@ -27,7 +28,7 @@ public static class EfCoreFluentApiExtensions
 
         return JsonSerializer.Serialize(dtos);
     }
-    
+
     private static List<TValueObject> DeserializeDtoCollection<TValueObject, TDto>(
         string json,
         Func<TDto, TValueObject> selector)
@@ -38,9 +39,9 @@ public static class EfCoreFluentApiExtensions
         return dtos.Select(selector).ToList();
     }
 
-    private static ValueComparer<IReadOnlyList<T>> CreateCollectionValueComparer<T>() 
+    private static ValueComparer<IReadOnlyList<T>> CreateCollectionValueComparer<T>()
         => new(
             (c1, c2) => c1!.SequenceEqual(c2!),
             c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v!.GetHashCode())),
             c => c.ToList());
-} 
+}

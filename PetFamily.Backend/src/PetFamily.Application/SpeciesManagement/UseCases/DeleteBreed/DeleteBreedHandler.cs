@@ -19,7 +19,7 @@ public class DeleteBreedHandler : ICommandHandler<Guid, DeleteBreedCommand>
     public DeleteBreedHandler(
         IValidator<DeleteBreedCommand> validator,
         ISpeciesRepository speciesRepository,
-        ISqlConnectionFactory sqlConnectionFactory, 
+        ISqlConnectionFactory sqlConnectionFactory,
         IUnitOfWork unitOfWork)
     {
         _validator = validator;
@@ -28,33 +28,36 @@ public class DeleteBreedHandler : ICommandHandler<Guid, DeleteBreedCommand>
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<Result<Guid, ErrorList>> HandleAsync(DeleteBreedCommand command,
+    public async Task<Result<Guid, ErrorList>> HandleAsync(
+        DeleteBreedCommand command,
         CancellationToken cancellationToken = default)
     {
         var validationResult = await _validator.ValidateAsync(command, cancellationToken);
         if (!validationResult.IsValid)
             return validationResult.ToErrorList();
-        
+
         var breedId = BreedId.Create(command.BreedId);
 
         var hasPetsWithBreed = await IsAnyPetsWithBreedAsync(breedId);
         if (hasPetsWithBreed)
+        {
             return Error.Validation(
                     "breed.is.used.by.pets",
                     $"Cannot delete breed with id {breedId.Value}, as it is used by one or more pets.",
                     nameof(command.BreedId))
                 .ToErrorList();
-        
+        }
+
         var speciesId = SpeciesId.Create(command.SpeciesId);
 
         var speciesResult = await _speciesRepository.GetByIdAsync(speciesId, cancellationToken);
         if (speciesResult.IsFailure)
             return speciesResult.Error.ToErrorList();
-        
+
         speciesResult.Value.RemoveBreeds([breedId]);
-        
+
         await _unitOfWork.SaveChangesAsync(cancellationToken);
-        
+
         return breedId.Value;
     }
 
@@ -75,7 +78,7 @@ public class DeleteBreedHandler : ICommandHandler<Guid, DeleteBreedCommand>
                 END
             AS BIT)
             """;
-        
+
         var parameters = new DynamicParameters();
         parameters.Add("breedId", breedId.Value);
 

@@ -29,7 +29,7 @@ public class UpdateMainInfoHandler : ICommandHandler<Guid, UpdateMainInfoCommand
         _validator = validator;
         _logger = logger;
     }
-    
+
     public async Task<Result<Guid, ErrorList>> HandleAsync(
         UpdateMainInfoCommand command,
         CancellationToken cancellationToken = default)
@@ -37,34 +37,34 @@ public class UpdateMainInfoHandler : ICommandHandler<Guid, UpdateMainInfoCommand
         var validationResult = await _validator.ValidateAsync(command, cancellationToken);
         if (validationResult.IsValid == false)
             return validationResult.ToErrorList();
-        
+
         var volunteerId = VolunteerId.Create(command.VolunteerId);
-        
+
         var volunteerResult = await _volunteersRepository.GetByIdAsync(volunteerId, cancellationToken);
         if (volunteerResult.IsFailure)
             return volunteerResult.Error.ToErrorList();
-        
+
         var fullName = FullName.Create(
             command.FullName.FirstName,
             command.FullName.LastName,
             command.FullName.MiddleName).Value;
-        
+
         var email = Email.Create(command.Email).Value;
         var description = Description.Create(command.Description).Value;
         var experienceYears = Experience.Create(command.ExperienceYears).Value;
         var phoneNumber = PhoneNumber.Create(command.PhoneNumber).Value;
-        
+
         volunteerResult.Value.UpdateMainInfo(
             fullName,
             email,
             description,
             experienceYears,
             phoneNumber);
-        
+
         await _unitOfWork.SaveChangesAsync(cancellationToken);
-        
-        _logger.LogInformation("Updated volunteer with ID: {VolunteerId}", command.VolunteerId); 
-        
+
+        _logger.LogInformation("Updated volunteer with ID: {VolunteerId}", command.VolunteerId);
+
         return volunteerId.Value;
     }
 }

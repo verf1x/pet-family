@@ -1,5 +1,3 @@
-using CSharpFunctionalExtensions;
-
 namespace PetFamily.Domain.Shared;
 
 public static class Errors
@@ -11,13 +9,13 @@ public static class Errors
             var label = name ?? "value";
             return Error.Validation("value.is.invalid", $"{label} is invalid", label);
         }
-        
+
         public static Error NotFound(Guid? id = null)
         {
-            var forId = id is null ? "" : $" for id '{id}'";
+            var forId = id is null ? string.Empty : $" for id '{id}'";
             return Error.NotFound("record.not.found", $"record not found{forId}");
         }
-        
+
         public static Error ValueIsRequired(string? name = null)
         {
             var label = name is null ? " " : " " + name + " ";
@@ -26,7 +24,7 @@ public static class Errors
 
         public static Error Conflict(Guid? id = null)
         {
-            var forId = id is null ? "" : $" for id '{id}'";
+            var forId = id is null ? string.Empty : $" for id '{id}'";
             return Error.NotFound("value.already.exists", $"value already exists{forId}");
         }
     }

@@ -19,7 +19,7 @@ public class FilesCleanerService : IFilesCleanerService
         _logger = logger;
         _messageQueue = messageQueue;
     }
-    
+
     public async Task ProcessAsync(CancellationToken cancellationToken)
     {
         var filesPaths = await _messageQueue.ReadAsync(cancellationToken);

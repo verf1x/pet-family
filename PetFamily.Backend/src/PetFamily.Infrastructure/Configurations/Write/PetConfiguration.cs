@@ -8,7 +8,6 @@ using PetFamily.Domain.VolunteersManagement.Entities;
 using PetFamily.Domain.VolunteersManagement.Enums;
 using PetFamily.Domain.VolunteersManagement.ValueObjects;
 using PetFamily.Infrastructure.Extensions;
-using File = PetFamily.Domain.VolunteersManagement.ValueObjects.File;
 
 namespace PetFamily.Infrastructure.Configurations.Write;
 
@@ -25,7 +24,8 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
                 p => p.Value,
                 value => PetId.Create(value));
 
-        builder.ComplexProperty(p => p.Nickname,
+        builder.ComplexProperty(
+            p => p.Nickname,
             nb =>
             {
                 nb.Property(n => n.Value)
@@ -34,7 +34,8 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
                     .HasColumnName("nickname");
             });
 
-        builder.ComplexProperty(p => p.Description,
+        builder.ComplexProperty(
+            p => p.Description,
             db =>
             {
                 db.Property(d => d.Value)
@@ -43,7 +44,8 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
                     .HasColumnName("description");
             });
 
-        builder.ComplexProperty(p => p.Position,
+        builder.ComplexProperty(
+            p => p.Position,
             snb =>
             {
                 snb.Property(sn => sn.Value)
@@ -51,7 +53,8 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
                     .HasColumnName("position");
             });
 
-        builder.ComplexProperty(p => p.SpeciesBreed,
+        builder.ComplexProperty(
+            p => p.SpeciesBreed,
             bsb =>
             {
                 bsb.Property(p => p.BreedId)
@@ -65,7 +68,8 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
                     .HasConversion(id => id.Value, value => SpeciesId.Create(value));
             });
 
-        builder.ComplexProperty(p => p.Color,
+        builder.ComplexProperty(
+            p => p.Color,
             cb =>
             {
                 cb.Property(c => c.Value)
@@ -74,7 +78,8 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
                     .HasColumnName("color");
             });
 
-        builder.ComplexProperty(p => p.HealthInfo,
+        builder.ComplexProperty(
+            p => p.HealthInfo,
             hb =>
             {
                 hb.Property(h => h.HealthStatus)
@@ -91,7 +96,8 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
                     .HasColumnName("is_vaccinated");
             });
 
-        builder.ComplexProperty(p => p.Address,
+        builder.ComplexProperty(
+            p => p.Address,
             pab =>
             {
                 pab.Property(p => p.Locality)
@@ -123,7 +129,8 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
                     .HasColumnName("address_lines");
             });
 
-        builder.ComplexProperty(p => p.Measurements,
+        builder.ComplexProperty(
+            p => p.Measurements,
             mb =>
             {
                 mb.Property(m => m.Height)
@@ -137,7 +144,8 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
                     .HasDefaultValue(0.0f);
             });
 
-        builder.ComplexProperty(p => p.OwnerPhoneNumber,
+        builder.ComplexProperty(
+            p => p.OwnerPhoneNumber,
             opn =>
             {
                 opn.Property(p => p.Value)
@@ -153,7 +161,8 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
             .IsRequired()
             .HasDefaultValue(HelpStatus.NeedsHelp);
 
-        builder.OwnsMany(p => p.HelpRequisites,
+        builder.OwnsMany(
+            p => p.HelpRequisites,
             hdb =>
             {
                 hdb.ToJson("help_requisites");
@@ -170,13 +179,21 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
 
         builder.Property(p => p.Photos)
             .HasValueObjectCollectionJsonConversion(
-                file => new PetFileDto { FilePath = file.FilePath.Value},
-                dto => new File(FilePath.Create(dto.FilePath).Value))
+                file => new PetFileDto { FilePath = file.Path },
+                dto => new Photo(dto.FilePath))
             .HasColumnName("photos");
+
+        builder.OwnsOne(p => p.MainPhoto, vo =>
+        {
+            vo.Property(v => v.Path)
+                .HasColumnName("main_photo_path")
+                .IsRequired(false)
+                .HasMaxLength(Domain.Shared.Constants.MaxLongTextLength);
+        });
 
         builder.Property(p => p.CreatedAt)
             .IsRequired();
- 
+
         builder.Property<bool>("IsDeleted")
             .HasColumnName("is_deleted");
 

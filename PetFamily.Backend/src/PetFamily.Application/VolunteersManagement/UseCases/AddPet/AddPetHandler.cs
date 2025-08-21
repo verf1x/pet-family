@@ -8,6 +8,7 @@ using PetFamily.Domain.Shared;
 using PetFamily.Domain.Shared.EntityIds;
 using PetFamily.Domain.Shared.ValueObjects;
 using PetFamily.Domain.VolunteersManagement.Entities;
+using PetFamily.Domain.VolunteersManagement.Enums;
 using PetFamily.Domain.VolunteersManagement.ValueObjects;
 
 namespace PetFamily.Application.VolunteersManagement.UseCases.AddPet;
@@ -19,7 +20,8 @@ public class AddPetHandler : ICommandHandler<Guid, AddPetCommand>
     private readonly IUnitOfWork _unitOfWork;
     private readonly ISqlConnectionFactory _sqlConnectionFactory;
 
-    public AddPetHandler(IVolunteersRepository volunteersRepository,
+    public AddPetHandler(
+        IVolunteersRepository volunteersRepository,
         IValidator<AddPetCommand> validator,
         IUnitOfWork unitOfWork,
         ISqlConnectionFactory sqlConnectionFactory)
@@ -49,7 +51,7 @@ public class AddPetHandler : ICommandHandler<Guid, AddPetCommand>
             return petResult.Error;
 
         var pet = petResult.Value;
-        
+
         volunteerResult.Value.AddPet(pet);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -64,15 +66,11 @@ public class AddPetHandler : ICommandHandler<Guid, AddPetCommand>
         var description = Description.Create(command.Description).Value;
 
         var speciesId = SpeciesId.Create(command.SpeciesBreedDto.SpeciesId);
-        var speciesExists = await IsSpeciesExistsAsync(speciesId);
-        
-        if(!speciesExists)
+        if (!(await speciesId.IsSpeciesExistsAsync(_sqlConnectionFactory)))
             return Errors.General.ValueIsInvalid(nameof(command.SpeciesBreedDto.SpeciesId)).ToErrorList();
-        
+
         var breedId = BreedId.Create(command.SpeciesBreedDto.BreedId);
-        var breedExists = await IsBreedExistsAsync(breedId);
-        
-        if(!breedExists)
+        if (!(await breedId.IsBreedExistsAsync(_sqlConnectionFactory)))
             return Errors.General.ValueIsInvalid(nameof(command.SpeciesBreedDto.BreedId)).ToErrorList();
 
         var speciesBreed = SpeciesBreed.Create(speciesId, breedId).Value;
@@ -96,7 +94,7 @@ public class AddPetHandler : ICommandHandler<Guid, AddPetCommand>
 
         var ownerPhoneNumber = PhoneNumber.Create(command.OwnerPhoneNumber).Value;
         var dateOfBirth = command.DateOfBirth;
-        var helpStatus = command.HelpStatus;
+        var helpStatus = (HelpStatus)command.HelpStatus;
 
         var helpRequisites = command.HelpRequisites
             .Select(r => HelpRequisite.Create(r.Name, r.Description).Value)
@@ -117,49 +115,5 @@ public class AddPetHandler : ICommandHandler<Guid, AddPetCommand>
             helpRequisites);
 
         return pet;
-    }
-
-    private async Task<bool> IsSpeciesExistsAsync(SpeciesId speciesId)
-    {
-        using var connection = _sqlConnectionFactory.Create();
-
-        const string sql =
-            """
-
-                    SELECT EXISTS (
-                        SELECT 1 
-                        FROM species 
-                        WHERE id = @id
-                    )
-            """;
-
-        var parameters = new DynamicParameters();
-        parameters.Add("id", speciesId.Value);
-
-        var speciesExists = await connection.ExecuteScalarAsync<bool>(sql, parameters);
-
-        return speciesExists;
-    }
-
-    private async Task<bool> IsBreedExistsAsync(BreedId breedId)
-    {
-        using var connection = _sqlConnectionFactory.Create();
-        
-        const string sql =
-            """
-
-                    SELECT EXISTS (
-                        SELECT 1
-                        FROM species, jsonb_array_elements(species_breeds) as breed
-                        WHERE (breed ->> 'Id')::uuid = @breedId
-                    )
-            """;
-        
-        var parameters = new DynamicParameters();
-        parameters.Add("breedId", breedId.Value);
-        
-        var breedExists = await connection.ExecuteScalarAsync<bool>(sql, parameters);
-
-        return breedExists;
     }
 }

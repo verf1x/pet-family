@@ -7,24 +7,27 @@ public abstract class SoftDeletableEntity<TId> : Entity<TId>, ISoftDeletableEnti
 {
     public bool IsDeleted { get; private set; }
 
-    public DateTime? DeletionDate { get; private set; } 
+    public DateTime? DeletionDate { get; private set; }
 
-    protected SoftDeletableEntity(TId id) : base(id) { }
-    
+    protected SoftDeletableEntity(TId id)
+        : base(id)
+    {
+    }
+
     public void SoftDelete()
     {
         if (IsDeleted)
             return;
-        
+
         IsDeleted = true;
         DeletionDate = DateTime.UtcNow;
     }
-    
+
     public void Restore()
     {
         if (IsDeleted is false)
             return;
-        
+
         IsDeleted = false;
         DeletionDate = null;
     }

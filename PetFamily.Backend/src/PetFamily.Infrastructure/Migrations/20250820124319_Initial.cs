@@ -54,6 +54,7 @@ namespace PetFamily.Infrastructure.Migrations
                     date_of_birth = table.Column<DateOnly>(type: "date", nullable: false),
                     help_status = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
                     photos = table.Column<string>(type: "jsonb", nullable: false),
+                    main_photo_path = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     volunteer_id = table.Column<Guid>(type: "uuid", nullable: false),
                     address_lines = table.Column<string>(type: "jsonb", nullable: false),

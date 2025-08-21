@@ -13,18 +13,18 @@ public static class QueriesExtensions
         CancellationToken cancellationToken = default)
     {
         var petsCount = await source.CountAsync(cancellationToken);
-        
+
         var items = await source
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);
-        
+
         return new PagedList<T>
         {
             Items = items,
             PageSize = pageSize,
             PageNumber = pageNumber,
-            TotalCount = petsCount
+            TotalCount = petsCount,
         };
     }
 
@@ -34,5 +34,5 @@ public static class QueriesExtensions
         Expression<Func<T, bool>> predicate)
     {
         return condition ? source.Where(predicate) : source;
-    } 
+    }
 }

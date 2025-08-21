@@ -20,7 +20,7 @@ public static class CustomValidators
             context.AddFailure(result.Error.Serialize());
         });
     }
-    
+
     public static IRuleBuilder<T, TProperty> WithError<T, TProperty>(
         this IRuleBuilderOptions<T, TProperty> rule, Error error)
     {

@@ -1,6 +1,5 @@
 using PetFamily.Contracts.Dtos;
 using PetFamily.Contracts.Dtos.Pet;
-using PetFamily.Domain.VolunteersManagement.Enums; //TODO: придумать как убрать зависимость от Domain
 
 namespace PetFamily.Contracts.Requests.Volunteers;
 
@@ -14,5 +13,5 @@ public record AddPetRequest(
     MeasurementsDto MeasurementsDto,
     string OwnerPhoneNumber,
     DateOnly DateOfBirth,
-    HelpStatus HelpStatus,
+    int HelpStatus,
     IEnumerable<HelpRequisiteDto> HelpRequisites);

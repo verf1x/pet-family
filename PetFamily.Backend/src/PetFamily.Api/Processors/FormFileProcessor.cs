@@ -14,7 +14,7 @@ public class FormFileProcessor : IAsyncDisposable
             var fileDto = new UploadFileDto(stream, file.FileName);
             _fileDtos.Add(fileDto);
         }
-        
+
         return _fileDtos;
     }
 

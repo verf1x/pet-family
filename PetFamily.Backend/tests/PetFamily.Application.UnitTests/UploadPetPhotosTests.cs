@@ -38,36 +38,35 @@ public class UploadPetPhotosTests
         volunteer.AddPet(pet);
 
         var stream = new MemoryStream();
-        const string fileName = "test.jpg"; 
+        const string fileName = "test.jpg";
 
         var uploadFileDto = new UploadFileDto(stream, fileName);
         List<UploadFileDto> files = [uploadFileDto, uploadFileDto];
 
-        List<FilePath> photoPaths =
+        List<string> photoPaths =
         [
-            FilePath.Create("test.jpg").Value,
-            FilePath.Create("test.jpg").Value
+            "test.jpg",
+            "test.jpg"
         ];
 
         var command = new UploadPetPhotosCommand(volunteer.Id, pet.Id, files);
         var cancellationToken = new CancellationTokenSource().Token;
-        
+
         _fileProviderMock
             .Setup(f => f.UploadPhotosAsync(It.IsAny<List<PhotoData>>(), cancellationToken))
-            .ReturnsAsync(Result.Success<List<FilePath>, Error>(photoPaths));
-        
-        _volunteersRepositoryMock.
-            Setup(v => v.GetByIdAsync(volunteer.Id, cancellationToken))
+            .ReturnsAsync(Result.Success<List<string>, Error>(photoPaths));
+
+        _volunteersRepositoryMock.Setup(v => v.GetByIdAsync(volunteer.Id, cancellationToken))
             .ReturnsAsync(volunteer);
 
         _unitOfWorkMock
             .Setup(u => u.BeginTransactionAsync(cancellationToken))
             .ReturnsAsync(Mock.Of<IDbTransaction>());
-        
+
         _unitOfWorkMock
             .Setup(u => u.SaveChangesAsync(cancellationToken))
             .Returns(Task.CompletedTask);
-        
+
         _validatorMock
             .Setup(v => v.ValidateAsync(command, cancellationToken))
             .ReturnsAsync(new ValidationResult());
@@ -76,11 +75,11 @@ public class UploadPetPhotosTests
             .Setup(m => m.WriteAsync(
                 It.IsAny<IEnumerable<string>>(), cancellationToken))
             .Returns(Task.CompletedTask);
-        
+
         _messageQueueMock
             .Setup(m => m.ReadAsync(cancellationToken))
             .ReturnsAsync(It.IsAny<IEnumerable<string>>());
-        
+
         var handler = new UploadPetPhotosHandler(
             _fileProviderMock.Object,
             _unitOfWorkMock.Object,
@@ -88,13 +87,13 @@ public class UploadPetPhotosTests
             _validatorMock.Object,
             _messageQueueMock.Object,
             _loggerMock.Object);
-        
+
         // Act
         var result = await handler.HandleAsync(command, cancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        result.Value.Should().BeEquivalentTo(photoPaths.Select(p => p.Value));
+        result.Value.Should().BeEquivalentTo(photoPaths);
         volunteer.Pets.First(i => i.Id == pet.Id).Photos.Should().HaveCount(2);
     }
 
@@ -129,7 +128,7 @@ public class UploadPetPhotosTests
             HelpRequisite.Create("string", "string").Value,
             HelpRequisite.Create("string", "string").Value
         ]);
-        var photos = new List<Domain.VolunteersManagement.ValueObjects.File>();
+        var photos = new List<Domain.VolunteersManagement.ValueObjects.Photo>();
 
         return new Pet(
             PetId.CreateNew(),

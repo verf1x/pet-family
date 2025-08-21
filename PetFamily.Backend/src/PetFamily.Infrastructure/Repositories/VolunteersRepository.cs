@@ -21,21 +21,21 @@ public class VolunteersRepository : IVolunteersRepository
     public async Task<Guid> AddAsync(Volunteer volunteer, CancellationToken cancellationToken = default)
     {
         await _writeDbContext.Volunteers.AddAsync(volunteer, cancellationToken);
-        
+
         await _writeDbContext.SaveChangesAsync(cancellationToken);
-        
+
         return volunteer.Id;
     }
-    
+
     public async Task<Guid> RemoveAsync(Volunteer volunteer, CancellationToken cancellationToken = default)
     {
         _writeDbContext.Volunteers.Remove(volunteer);
-        
+
         await _writeDbContext.SaveChangesAsync(cancellationToken);
-        
+
         return volunteer.Id;
     }
-    
+
     public async Task<Result<Volunteer, Error>> GetByIdAsync(
         VolunteerId volunteerId,
         CancellationToken cancellationToken = default)
@@ -54,7 +54,7 @@ public class VolunteersRepository : IVolunteersRepository
     {
         var volunteer = await _writeDbContext.Volunteers
             .FirstOrDefaultAsync(v => v.Email == email, cancellationToken);
-        
+
         return volunteer ?? Result.Failure<Volunteer>("Email not found");
     }
 
@@ -64,7 +64,7 @@ public class VolunteersRepository : IVolunteersRepository
     {
         var volunteer = await _writeDbContext.Volunteers
             .FirstOrDefaultAsync(v => v.PhoneNumber == phoneNumber, cancellationToken);
-        
+
         return volunteer ?? Result.Failure<Volunteer>("Phone number not found");
     }
-} 
+}

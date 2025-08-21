@@ -7,7 +7,7 @@ public class Description : ComparableValueObject
     public string Value { get; }
 
     private Description(string value) => Value = value;
-    
+
     public static Result<Description, Error> Create(string value)
     {
         if (string.IsNullOrWhiteSpace(value))

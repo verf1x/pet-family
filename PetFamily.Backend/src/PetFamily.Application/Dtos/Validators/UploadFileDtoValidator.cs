@@ -5,7 +5,7 @@ using PetFamily.Domain.Shared;
 
 namespace PetFamily.Application.Dtos.Validators;
 
-public class UploadFileDtoValidator :  AbstractValidator<UploadFileDto>
+public class UploadFileDtoValidator : AbstractValidator<UploadFileDto>
 {
     public UploadFileDtoValidator()
     {
@@ -15,7 +15,8 @@ public class UploadFileDtoValidator :  AbstractValidator<UploadFileDto>
 
         RuleFor(v => v.Content)
             .Must(c => c.Length is > 0 and < 10485760)
-            .WithError(Error.Validation("validation.fileSize",
+            .WithError(Error.Validation(
+                "validation.fileSize",
                 "File size must be between 1 byte and 10 MB",
                 nameof(UploadFileDto.Content.Length)));
     }

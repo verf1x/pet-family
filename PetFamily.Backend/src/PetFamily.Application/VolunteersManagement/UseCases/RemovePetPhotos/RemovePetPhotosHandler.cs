@@ -32,62 +32,61 @@ public class RemovePetPhotosHandler : ICommandHandler<List<string>, RemovePetPho
         _validator = validator;
         _logger = logger;
     }
-    
+
     public async Task<Result<List<string>, ErrorList>> HandleAsync(
         RemovePetPhotosCommand command,
         CancellationToken cancellationToken = default)
     {
         var validationResult = await _validator.ValidateAsync(command, cancellationToken);
-        if (validationResult.IsValid == false)
+        if (!validationResult.IsValid)
             return validationResult.ToErrorList();
-        
+
         var volunteerId = VolunteerId.Create(command.VolunteerId);
         var volunteerResult = await _volunteersRepository.GetByIdAsync(volunteerId, cancellationToken);
         if (volunteerResult.IsFailure)
             return volunteerResult.Error.ToErrorList();
-        
+
         var petId = PetId.Create(command.PetId);
         var petResult = volunteerResult.Value.GetPetById(petId);
         if (petResult.IsFailure)
             return petResult.Error.ToErrorList();
 
-        var petPhotos = new List<Domain.VolunteersManagement.ValueObjects.File>();
-        foreach (var photoName in command.PhotoNames)
+        var petPhotos = new List<Photo>();
+        foreach (var path in command.PhotoPaths)
         {
-            var photoPathResult = FilePath.Create(photoName);
-            if (photoPathResult.IsFailure)
-                return photoPathResult.Error.ToErrorList();
-            var photo = new Domain.VolunteersManagement.ValueObjects.File(photoPathResult.Value);
-            
+            var photo = new Photo(path);
+
             petPhotos.Add(photo);
         }
-        
+
         var transaction = await _unitOfWork.BeginTransactionAsync(cancellationToken);
-        
+
         try
         {
             petResult.Value.RemovePhotos(petPhotos);
-            
+
             await _unitOfWork.SaveChangesAsync(cancellationToken);
-            
-            var removeResult = await _fileProvider.RemovePhotosAsync(command.PhotoNames, cancellationToken);
+
+            var removeResult = await _fileProvider.RemoveFilesAsync(command.PhotoPaths, cancellationToken);
             if (removeResult.IsFailure)
                 return removeResult.Error.ToErrorList();
-            
+
             transaction.Commit();
 
             return removeResult.Value;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, 
-                "Error occurred while adding pet photos for pet with id {PetId} of volunteer {VolunteerId}", 
+            _logger.LogError(
+                ex,
+                "Error occurred while adding pet photos for pet with id {PetId} of volunteer {VolunteerId}",
                 petId,
                 volunteerId);
-            
+
             transaction.Rollback();
 
-            return Error.Failure("volunteer.pet.remove_photos.failure",
+            return Error.Failure(
+                "volunteer.pet.remove_photos.failure",
                 "An error occurred while removing photos for pet with id" + petId).ToErrorList();
         }
     }

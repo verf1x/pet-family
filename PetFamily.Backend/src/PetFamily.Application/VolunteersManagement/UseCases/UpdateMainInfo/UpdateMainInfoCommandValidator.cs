@@ -11,10 +11,10 @@ public class UpdateMainInfoCommandValidator : AbstractValidator<UpdateMainInfoCo
     {
         RuleFor(d => d.FullName)
             .MustBeValueObject(fn => FullName.Create(fn.FirstName, fn.LastName, fn.MiddleName));
-        
+
         RuleFor(d => d.Email)
             .MustBeValueObject(Email.Create);
-        
+
         RuleFor(d => d.Description)
             .MustBeValueObject(Description.Create);
 
