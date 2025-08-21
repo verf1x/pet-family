@@ -30,7 +30,25 @@ public class GetFilteredPetsWithPaginationHandlerDapper
         var parameters = new DynamicParameters();
 
         var sqlQuery = new StringBuilder(
-            "SELECT id, nickname, description, position, color, photos FROM pets");
+            """
+            SELECT
+                id,
+                nickname,
+                description,
+                position,
+                color,
+                (
+                    SELECT jsonb_agg(photo ORDER BY
+                            CASE
+                                WHEN main_photo_path IS NOT NULL AND photo."FilePath" = main_photo_path 
+                                THEN 0
+                                ELSE 1
+                            END)
+                    FROM jsonb_to_recordset(photos) AS photo("FilePath" TEXT))
+                    AS photos,
+                    main_photo_path
+            FROM pets 
+            """);
 
         var countQuery = new StringBuilder(
             "SELECT COUNT(*) FROM pets");
@@ -66,10 +84,7 @@ public class GetFilteredPetsWithPaginationHandlerDapper
 
         return new PagedList<PetDto>
         {
-            Items = pets.ToList(),
-            TotalCount = totalCount,
-            PageSize = query.PageSize,
-            PageNumber = query.PageNumber,
+            Items = pets.ToList(), TotalCount = totalCount, PageSize = query.PageSize, PageNumber = query.PageNumber,
         };
     }
 }
