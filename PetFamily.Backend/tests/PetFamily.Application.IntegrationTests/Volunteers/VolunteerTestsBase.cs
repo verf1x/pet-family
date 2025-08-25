@@ -1,0 +1,38 @@
+﻿using AutoFixture;
+using Microsoft.Extensions.DependencyInjection;
+using PetFamily.Application.Database;
+using PetFamily.Application.SpeciesManagement;
+using PetFamily.Application.VolunteersManagement;
+using PetFamily.Infrastructure.DbContexts;
+
+namespace PetFamily.Application.IntegrationTests.Volunteers;
+
+public class VolunteerTestsBase : IClassFixture<IntegrationTestsWebFactory>, IAsyncLifetime
+{
+    protected readonly IntegrationTestsWebFactory Factory;
+    protected readonly Fixture Fixture;
+    protected readonly IServiceScope Scope;
+    protected readonly IReadDbContext ReadDbContext;
+    protected readonly WriteDbContext WriteDbContext;
+    protected readonly ISpeciesRepository SpecieRepository;
+    protected readonly IVolunteersRepository VolunteerRepository;
+
+    protected VolunteerTestsBase(IntegrationTestsWebFactory factory)
+    {
+        Factory = factory;
+        Fixture = new Fixture();
+        Scope = factory.Services.CreateScope();
+        ReadDbContext = Scope.ServiceProvider.GetRequiredService<IReadDbContext>();
+        WriteDbContext = Scope.ServiceProvider.GetRequiredService<WriteDbContext>();
+        SpecieRepository = Scope.ServiceProvider.GetRequiredService<ISpeciesRepository>();
+        VolunteerRepository = Scope.ServiceProvider.GetRequiredService<IVolunteersRepository>();
+    }
+
+    public Task InitializeAsync() => Task.CompletedTask;
+
+    public async Task DisposeAsync()
+    {
+        Scope.Dispose();
+        await Factory.ResetDatabaseAsync();
+    }
+}
