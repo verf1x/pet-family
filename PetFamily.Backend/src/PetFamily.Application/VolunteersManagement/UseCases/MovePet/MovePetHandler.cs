@@ -30,7 +30,7 @@ public class MovePetHandler : ICommandHandler<int, MovePetCommand>
         CancellationToken cancellationToken = default)
     {
         var validationResult = await _validator.ValidateAsync(command, cancellationToken);
-        if (validationResult.IsValid == false)
+        if (!validationResult.IsValid)
             return validationResult.ToErrorList();
 
         var volunteerId = VolunteerId.Create(command.VolunteerId);
