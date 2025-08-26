@@ -14,19 +14,11 @@ public static class SpeciesSeeder
         var faker = new Faker();
 
         var speciesId = SpeciesId.CreateNew();
-        var name = faker.Lorem.Word();
-
-        var breeds = new List<Breed>
-        {
-            Breed.Create(faker.Lorem.Word()).Value,
-            Breed.Create(faker.Lorem.Word()).Value,
-        };
+        string name = faker.Lorem.Word();
 
         var species = new Species(
             speciesId,
             Name.Create(name).Value);
-
-        species.AddBreeds(breeds);
 
         await repository.AddAsync(species);
         await dbContext.SaveChangesAsync();

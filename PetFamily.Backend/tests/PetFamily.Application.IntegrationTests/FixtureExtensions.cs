@@ -1,5 +1,6 @@
 ﻿using AutoFixture;
 using Bogus;
+using PetFamily.Application.SpeciesManagement.UseCases.Create;
 using PetFamily.Application.VolunteersManagement.UseCases.AddPet;
 using PetFamily.Application.VolunteersManagement.UseCases.Create;
 using PetFamily.Application.VolunteersManagement.UseCases.UpdateMainInfo;
@@ -194,10 +195,7 @@ public static class FixtureExtensions
         height ??= faker.Random.Float(.05F, 80.0F);
         weight ??= faker.Random.Float(.1F, 70.0F);
         ownerPhoneNumber ??= faker.Phone.PhoneNumber("############");
-        helpRequisites ??= new List<HelpRequisiteDto>
-        {
-            new(faker.Lorem.Word(), faker.Finance.CreditCardNumber()),
-        };
+        helpRequisites ??= new List<HelpRequisiteDto> { new(faker.Lorem.Word(), faker.Finance.CreditCardNumber()), };
 
         return fixture.Build<UpdateMainPetInfoCommand>()
             .With(um => um.VolunteerId, volunteerId)
@@ -211,6 +209,18 @@ public static class FixtureExtensions
             .With(um => um.Measurements, new MeasurementsDto(height.Value, weight.Value))
             .With(um => um.OwnerPhoneNumber, ownerPhoneNumber)
             .With(um => um.HelpRequisites, helpRequisites)
+            .Create();
+    }
+
+    public static CreateSpeciesCommand BuildCreateSpeciesCommand(
+        this IFixture fixture,
+        string? name = null)
+    {
+        var faker = new Faker();
+
+        name ??= faker.Lorem.Word();
+        return fixture.Build<CreateSpeciesCommand>()
+            .With(cs => cs.Name, name)
             .Create();
     }
 
