@@ -27,7 +27,7 @@ public static class Inject
             .AddDbContexts(configuration)
             .AddMinio(configuration)
             .AddRepositories()
-            .AddDatabase()
+            .AddDatabase(configuration)
             .AddHostedServices()
             .AddMessageQueues()
             .AddServices();
@@ -56,10 +56,13 @@ public static class Inject
         return services;
     }
 
-    private static IServiceCollection AddDatabase(this IServiceCollection services)
+    private static IServiceCollection AddDatabase(
+        this IServiceCollection services,
+        IConfiguration configuration)
     {
         services.AddScoped<IUnitOfWork, UnitOfWork>();
-        services.AddSingleton<ISqlConnectionFactory, SqlConnectionFactory>();
+        services.AddSingleton<ISqlConnectionFactory, SqlConnectionFactory>(_ =>
+            new SqlConnectionFactory(configuration.GetConnectionString(Constants.Database)!));
 
         Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
 

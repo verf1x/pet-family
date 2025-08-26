@@ -7,24 +7,24 @@ using PetFamily.Infrastructure.DbContexts;
 
 namespace PetFamily.Application.IntegrationTests.Volunteers;
 
-public class VolunteerTestsBase : IClassFixture<IntegrationTestsWebFactory>, IAsyncLifetime
+public class VolunteerTestBase : IClassFixture<IntegrationTestsWebFactory>, IAsyncLifetime
 {
     protected readonly IntegrationTestsWebFactory Factory;
     protected readonly Fixture Fixture;
     protected readonly IServiceScope Scope;
     protected readonly IReadDbContext ReadDbContext;
     protected readonly WriteDbContext WriteDbContext;
-    protected readonly ISpeciesRepository SpecieRepository;
+    protected readonly ISpeciesRepository SpeciesRepository;
     protected readonly IVolunteersRepository VolunteerRepository;
 
-    protected VolunteerTestsBase(IntegrationTestsWebFactory factory)
+    protected VolunteerTestBase(IntegrationTestsWebFactory factory)
     {
         Factory = factory;
         Fixture = new Fixture();
         Scope = factory.Services.CreateScope();
         ReadDbContext = Scope.ServiceProvider.GetRequiredService<IReadDbContext>();
         WriteDbContext = Scope.ServiceProvider.GetRequiredService<WriteDbContext>();
-        SpecieRepository = Scope.ServiceProvider.GetRequiredService<ISpeciesRepository>();
+        SpeciesRepository = Scope.ServiceProvider.GetRequiredService<ISpeciesRepository>();
         VolunteerRepository = Scope.ServiceProvider.GetRequiredService<IVolunteersRepository>();
     }
 

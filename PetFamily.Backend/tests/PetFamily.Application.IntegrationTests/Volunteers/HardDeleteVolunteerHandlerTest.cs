@@ -7,12 +7,12 @@ using PetFamily.Application.VolunteersManagement.UseCases.Delete.Hard;
 
 namespace PetFamily.Application.IntegrationTests.Volunteers;
 
-public class HardDeleteVolunteerHandlerTests : VolunteerTestsBase
+public class HardDeleteVolunteerHandlerTest : VolunteerTestBase
 {
     private readonly ICommandHandler<Guid, CreateVolunteerCommand> _createVolunteerSut;
     private readonly ICommandHandler<Guid, HardDeleteVolunteerCommand> _hardDeleteSut;
 
-    public HardDeleteVolunteerHandlerTests(IntegrationTestsWebFactory factory)
+    public HardDeleteVolunteerHandlerTest(IntegrationTestsWebFactory factory)
         : base(factory)
     {
         _createVolunteerSut = Scope.ServiceProvider.GetRequiredService<ICommandHandler<Guid, CreateVolunteerCommand>>();

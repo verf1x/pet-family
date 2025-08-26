@@ -8,11 +8,11 @@ using PetFamily.Contracts.Dtos.Volunteer;
 
 namespace PetFamily.Application.IntegrationTests.Volunteers;
 
-public class AddVolunteerHandlerTests : VolunteerTestsBase
+public class CreateVolunteerHandlerTest : VolunteerTestBase
 {
     private readonly ICommandHandler<Guid, CreateVolunteerCommand> _sut;
 
-    public AddVolunteerHandlerTests(IntegrationTestsWebFactory factory)
+    public CreateVolunteerHandlerTest(IntegrationTestsWebFactory factory)
         : base(factory)
     {
         _sut = Scope.ServiceProvider.GetRequiredService<ICommandHandler<Guid, CreateVolunteerCommand>>();

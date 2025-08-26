@@ -5,9 +5,9 @@ namespace PetFamily.Domain.VolunteersManagement.ValueObjects;
 
 public class Experience : ComparableValueObject
 {
-    public int TotalYears { get; }
+    public int Value { get; }
 
-    private Experience(int totalYears) => TotalYears = totalYears;
+    private Experience(int value) => Value = value;
 
     public static Result<Experience, Error> Create(int totalYears)
     {
@@ -19,6 +19,6 @@ public class Experience : ComparableValueObject
 
     protected override IEnumerable<IComparable> GetComparableEqualityComponents()
     {
-        yield return TotalYears;
+        yield return Value;
     }
 }

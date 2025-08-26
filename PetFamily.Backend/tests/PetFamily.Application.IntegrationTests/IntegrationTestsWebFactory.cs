@@ -1,9 +1,16 @@
 ﻿using System.Data.Common;
+using CSharpFunctionalExtensions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Npgsql;
+using NSubstitute;
+using PetFamily.Application.Database;
+using PetFamily.Application.Files;
+using PetFamily.Domain.Shared;
+using PetFamily.Infrastructure;
 using PetFamily.Infrastructure.DbContexts;
 using Respawn;
 using Testcontainers.PostgreSql;
@@ -19,8 +26,14 @@ public class IntegrationTestsWebFactory : WebApplicationFactory<Program>, IAsync
         .WithPassword("postgres")
         .Build();
 
-    private Respawner _respawner = default!;
-    private DbConnection _dbConnection = default!;
+    private Respawner _respawner = null!;
+    private DbConnection _dbConnection = null!;
+    private readonly IFileProvider _fileProviderMock;
+
+    public IntegrationTestsWebFactory()
+    {
+        _fileProviderMock = Substitute.For<IFileProvider>();
+    }
 
     public async Task InitializeAsync()
     {
@@ -46,6 +59,21 @@ public class IntegrationTestsWebFactory : WebApplicationFactory<Program>, IAsync
         await _respawner.ResetAsync(_dbConnection);
     }
 
+    public void SetupFileProviderSuccessUploadMock()
+    {
+        _fileProviderMock
+            .UploadPhotosAsync(Arg.Any<IEnumerable<PhotoData>>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Success<List<string>, Error>(["fake1.jpg", "fake2.jpg"]));
+    }
+
+    public void SetupFileProviderFailedUploadMock()
+    {
+        _fileProviderMock
+            .UploadPhotosAsync(Arg.Any<IEnumerable<PhotoData>>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Failure<List<string>, Error>(
+                Error.Failure("fake.upload.error", "Failed to upload files")));
+    }
+
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.ConfigureTestServices(ConfigureDefaultServices);
@@ -53,21 +81,21 @@ public class IntegrationTestsWebFactory : WebApplicationFactory<Program>, IAsync
 
     protected virtual void ConfigureDefaultServices(IServiceCollection services)
     {
-        var writeContext = services.SingleOrDefault(s => s.ServiceType == typeof(WriteDbContext));
+        services.RemoveAll<IFileProvider>();
+        services.AddScoped(_ => _fileProviderMock);
 
-        var readContext = services.SingleOrDefault(s => s.ServiceType == typeof(ReadDbContext));
-
-        if (writeContext is not null)
-            services.Remove(writeContext);
-
-        if (readContext is not null)
-            services.Remove(readContext);
+        services.RemoveAll<WriteDbContext>();
+        services.RemoveAll<IReadDbContext>();
+        services.RemoveAll<ISqlConnectionFactory>();
 
         services.AddScoped<WriteDbContext>(_ =>
             new WriteDbContext(_dbContainer.GetConnectionString()));
 
-        services.AddScoped<ReadDbContext>(_ =>
+        services.AddScoped<IReadDbContext>(_ =>
             new ReadDbContext(_dbContainer.GetConnectionString()));
+
+        services.AddSingleton<ISqlConnectionFactory>(_ =>
+            new SqlConnectionFactory(_dbContainer.GetConnectionString()));
     }
 
     private async Task InitializeRespawnerAsync()
