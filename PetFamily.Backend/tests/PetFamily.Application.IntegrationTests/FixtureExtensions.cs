@@ -3,6 +3,7 @@ using Bogus;
 using PetFamily.Application.VolunteersManagement.UseCases.AddPet;
 using PetFamily.Application.VolunteersManagement.UseCases.Create;
 using PetFamily.Application.VolunteersManagement.UseCases.UpdateMainInfo;
+using PetFamily.Application.VolunteersManagement.UseCases.UpdateMainPetInfo;
 using PetFamily.Application.VolunteersManagement.UseCases.UploadPetPhotos;
 using PetFamily.Contracts.Dtos;
 using PetFamily.Contracts.Dtos.Pet;
@@ -161,6 +162,55 @@ public static class FixtureExtensions
             .With(up => up.VolunteerId, volunteerId)
             .With(up => up.PetId, petId)
             .With(up => up.Photos, photos)
+            .Create();
+    }
+
+    public static UpdateMainPetInfoCommand BuildUpdateMainPetInfoCommand(
+        this IFixture fixture,
+        Guid volunteerId,
+        Guid petId,
+        SpeciesBreedDto speciesBreed,
+        string? nickname = null,
+        string? description = null,
+        string? color = null,
+        string? healthStatus = null,
+        IEnumerable<string>? addressLines = null,
+        string? locality = null,
+        string? countryCode = null,
+        float? height = null,
+        float? weight = null,
+        string? ownerPhoneNumber = null,
+        IEnumerable<HelpRequisiteDto>? helpRequisites = null)
+    {
+        var faker = new Faker();
+
+        nickname ??= faker.Name.FirstName();
+        description ??= faker.Lorem.Paragraph();
+        color ??= faker.Commerce.Color();
+        healthStatus ??= faker.Lorem.Sentence();
+        addressLines ??= new List<string> { faker.Address.StreetAddress(), faker.Address.SecondaryAddress() };
+        locality ??= faker.Address.City();
+        countryCode ??= faker.Address.CountryCode();
+        height ??= faker.Random.Float(.05F, 80.0F);
+        weight ??= faker.Random.Float(.1F, 70.0F);
+        ownerPhoneNumber ??= faker.Phone.PhoneNumber("############");
+        helpRequisites ??= new List<HelpRequisiteDto>
+        {
+            new(faker.Lorem.Word(), faker.Finance.CreditCardNumber()),
+        };
+
+        return fixture.Build<UpdateMainPetInfoCommand>()
+            .With(um => um.VolunteerId, volunteerId)
+            .With(um => um.PetId, petId)
+            .With(um => um.Nickname, nickname)
+            .With(um => um.Description, description)
+            .With(um => um.SpeciesBreed, speciesBreed)
+            .With(um => um.Color, color)
+            .With(um => um.HealthInfo, new HealthInfoDto(healthStatus, true, true))
+            .With(um => um.Address, new AddressDto(addressLines, locality, null, null, countryCode))
+            .With(um => um.Measurements, new MeasurementsDto(height.Value, weight.Value))
+            .With(um => um.OwnerPhoneNumber, ownerPhoneNumber)
+            .With(um => um.HelpRequisites, helpRequisites)
             .Create();
     }
 

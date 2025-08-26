@@ -23,10 +23,10 @@ public class MovePetHandlerTest : VolunteerTestBase
         // Arrange
         var volunteer = await VolunteerSeeder.SeedVolunteerAsync(VolunteersRepository, WriteDbContext);
         var species = await SpeciesSeeder.SeedSpeciesAsync(SpeciesRepository, WriteDbContext);
-        var pet1 = await VolunteerSeeder.SeedPetAsync(WriteDbContext, volunteer, species.Id, species.Breeds[0].Id);
-        var pet2 = await VolunteerSeeder.SeedPetAsync(WriteDbContext, volunteer, species.Id, species.Breeds[1].Id);
+        var petToMove = await VolunteerSeeder.SeedPetAsync(WriteDbContext, volunteer, species.Id, species.Breeds[0].Id);
+        await VolunteerSeeder.SeedPetAsync(WriteDbContext, volunteer, species.Id, species.Breeds[1].Id);
 
-        var command = new MovePetCommand(volunteer.Id, pet1.Id.Value, 2);
+        var command = new MovePetCommand(volunteer.Id, petToMove.Id.Value, 2);
 
         // Act
         var result = await _sut.HandleAsync(command, CancellationToken.None);
