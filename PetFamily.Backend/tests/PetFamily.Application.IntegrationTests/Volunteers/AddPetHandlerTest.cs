@@ -23,7 +23,7 @@ public class AddPetHandlerTest : VolunteerTestBase
     {
         // Arrange
         var species = await SpeciesSeeder.SeedSpeciesAsync(SpeciesRepository, WriteDbContext);
-        var volunteer = await VolunteerSeeder.SeedVolunteerAsync(VolunteerRepository, WriteDbContext);
+        var volunteer = await VolunteerSeeder.SeedVolunteerAsync(VolunteersRepository, WriteDbContext);
         var command =
             Fixture.BuildAddPetCommand(volunteer.Id, new SpeciesBreedDto(species.Id, species.Breeds[0].Id.Value));
 

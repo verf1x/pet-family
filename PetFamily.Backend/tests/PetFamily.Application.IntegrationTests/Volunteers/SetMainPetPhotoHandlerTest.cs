@@ -24,7 +24,7 @@ public class SetMainPetPhotoHandlerTest : VolunteerTestBase
     public async Task HandleAsync_ShouldSetMainPetPhoto_WhenCommandIsValid()
     {
         // Arrange
-        var volunteer = await VolunteerSeeder.SeedVolunteerAsync(VolunteerRepository, WriteDbContext);
+        var volunteer = await VolunteerSeeder.SeedVolunteerAsync(VolunteersRepository, WriteDbContext);
         var species = await SpeciesSeeder.SeedSpeciesAsync(SpeciesRepository, WriteDbContext);
         var pet = await VolunteerSeeder.SeedPetAsync(WriteDbContext, volunteer, species.Id, species.Breeds[0].Id);
 

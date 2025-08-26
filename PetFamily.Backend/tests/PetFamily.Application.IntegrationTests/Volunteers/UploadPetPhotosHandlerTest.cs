@@ -22,7 +22,7 @@ public class UploadPetPhotosHandlerTest : VolunteerTestBase
     {
         // Arrange
         var species = await SpeciesSeeder.SeedSpeciesAsync(SpeciesRepository, WriteDbContext);
-        var volunteer = await VolunteerSeeder.SeedVolunteerAsync(VolunteerRepository, WriteDbContext);
+        var volunteer = await VolunteerSeeder.SeedVolunteerAsync(VolunteersRepository, WriteDbContext);
         var pet = await VolunteerSeeder.SeedPetAsync(WriteDbContext, volunteer, species.Id, species.Breeds[0].Id);
 
         var command = Fixture.BuildUploadPetPhotosCommand(volunteer.Id, pet.Id.Value);
@@ -45,7 +45,7 @@ public class UploadPetPhotosHandlerTest : VolunteerTestBase
     {
         // Arrange
         var species = await SpeciesSeeder.SeedSpeciesAsync(SpeciesRepository, WriteDbContext);
-        var volunteer = await VolunteerSeeder.SeedVolunteerAsync(VolunteerRepository, WriteDbContext);
+        var volunteer = await VolunteerSeeder.SeedVolunteerAsync(VolunteersRepository, WriteDbContext);
         var pet = await VolunteerSeeder.SeedPetAsync(WriteDbContext, volunteer, species.Id, species.Breeds[0].Id);
 
         var command = Fixture.BuildUploadPetPhotosCommand(volunteer.Id, pet.Id);

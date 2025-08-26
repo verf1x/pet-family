@@ -15,7 +15,7 @@ public class VolunteerTestBase : IClassFixture<IntegrationTestsWebFactory>, IAsy
     protected readonly IReadDbContext ReadDbContext;
     protected readonly WriteDbContext WriteDbContext;
     protected readonly ISpeciesRepository SpeciesRepository;
-    protected readonly IVolunteersRepository VolunteerRepository;
+    protected readonly IVolunteersRepository VolunteersRepository;
 
     protected VolunteerTestBase(IntegrationTestsWebFactory factory)
     {
@@ -25,7 +25,7 @@ public class VolunteerTestBase : IClassFixture<IntegrationTestsWebFactory>, IAsy
         ReadDbContext = Scope.ServiceProvider.GetRequiredService<IReadDbContext>();
         WriteDbContext = Scope.ServiceProvider.GetRequiredService<WriteDbContext>();
         SpeciesRepository = Scope.ServiceProvider.GetRequiredService<ISpeciesRepository>();
-        VolunteerRepository = Scope.ServiceProvider.GetRequiredService<IVolunteersRepository>();
+        VolunteersRepository = Scope.ServiceProvider.GetRequiredService<IVolunteersRepository>();
     }
 
     public Task InitializeAsync() => Task.CompletedTask;
