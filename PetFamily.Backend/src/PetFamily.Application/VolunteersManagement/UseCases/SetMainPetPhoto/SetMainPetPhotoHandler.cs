@@ -9,13 +9,13 @@ using PetFamily.Domain.VolunteersManagement.ValueObjects;
 
 namespace PetFamily.Application.VolunteersManagement.UseCases.SetMainPetPhoto;
 
-public class UpdateMainPetPhotoHandler : ICommandHandler<string, SetMainPetPhotoCommand>
+public class SetMainPetPhotoHandler : ICommandHandler<string, SetMainPetPhotoCommand>
 {
     private readonly IValidator<SetMainPetPhotoCommand> _validator;
     private readonly IVolunteersRepository _volunteersRepository;
     private readonly IUnitOfWork _unitOfWork;
 
-    public UpdateMainPetPhotoHandler(
+    public SetMainPetPhotoHandler(
         IValidator<SetMainPetPhotoCommand> validator,
         IVolunteersRepository volunteersRepository,
         IUnitOfWork unitOfWork)
