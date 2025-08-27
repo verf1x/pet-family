@@ -31,7 +31,7 @@ namespace PetFamily.Infrastructure.Migrations
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     description = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: false),
                     email = table.Column<string>(type: "character varying(254)", maxLength: 254, nullable: false),
-                    total_years = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
+                    experience = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
                     first_name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     last_name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     middle_name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),

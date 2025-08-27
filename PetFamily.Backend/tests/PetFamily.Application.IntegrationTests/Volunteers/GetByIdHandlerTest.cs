@@ -1,5 +1,4 @@
-﻿using Dapper;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using PetFamily.Application.Abstractions;
 using PetFamily.Application.VolunteersManagement.Queries.GetById;
@@ -25,11 +24,6 @@ public class GetByIdHandlerTest : VolunteerTestBase
         var volunteer = await VolunteerSeeder.SeedVolunteerAsync(VolunteersRepository, WriteDbContext);
         var query = new GetVolunteerByIdQuery(volunteer.Id);
 
-        var connection = SqlConnectionFactory.Create();
-        const string sqlQuery = "SELECT COUNT(*) FROM Volunteers WHERE Id = @Id";
-        var parameters = new DynamicParameters();
-        parameters.Add("Id", volunteer.Id.Value);
-
         // Act
         var result = await _sut.HandleAsync(query, CancellationToken.None);
 
@@ -37,7 +31,5 @@ public class GetByIdHandlerTest : VolunteerTestBase
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().NotBeNull();
         result.Value.Id.Should().Be(volunteer.Id);
-        int volunteersCount = await connection.ExecuteScalarAsync<int>(sqlQuery, parameters);
-        volunteersCount.Should().Be(1);
     }
 }

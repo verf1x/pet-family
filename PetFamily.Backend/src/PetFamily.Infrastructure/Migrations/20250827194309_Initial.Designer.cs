@@ -13,7 +13,7 @@ using PetFamily.Infrastructure.DbContexts;
 namespace PetFamily.Infrastructure.Migrations
 {
     [DbContext(typeof(WriteDbContext))]
-    [Migration("20250820124319_Initial")]
+    [Migration("20250827194309_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -270,11 +270,11 @@ namespace PetFamily.Infrastructure.Migrations
                         {
                             b1.IsRequired();
 
-                            b1.Property<int>("TotalYears")
+                            b1.Property<int>("Value")
                                 .ValueGeneratedOnAdd()
                                 .HasColumnType("integer")
                                 .HasDefaultValue(0)
-                                .HasColumnName("total_years");
+                                .HasColumnName("experience");
                         });
 
                     b.ComplexProperty<Dictionary<string, object>>("FullName", "PetFamily.Domain.VolunteersManagement.Entities.Volunteer.FullName#FullName", b1 =>

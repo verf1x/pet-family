@@ -24,6 +24,7 @@ public class IntegrationTestsWebFactory : WebApplicationFactory<Program>, IAsync
         .WithDatabase("pet_family_tests")
         .WithUsername("postgres")
         .WithPassword("postgres")
+        .WithPortBinding(53850, 5432)
         .Build();
 
     private Respawner _respawner = null!;
