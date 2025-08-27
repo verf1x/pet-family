@@ -337,7 +337,7 @@ namespace PetFamily.Infrastructure.Migrations
 
                             b1.ToTable("species");
 
-                            b1.ToJson("species_breeds");
+                            b1.ToJson("breeds");
 
                             b1.WithOwner()
                                 .HasForeignKey("SpeciesId")

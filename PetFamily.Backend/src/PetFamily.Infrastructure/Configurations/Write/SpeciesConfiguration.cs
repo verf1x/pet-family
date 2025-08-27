@@ -30,7 +30,7 @@ public class SpeciesConfiguration : IEntityTypeConfiguration<Species>
             s => s.Breeds,
             bb =>
             {
-                bb.ToJson("species_breeds");
+                bb.ToJson("breeds");
 
                 bb.Property(bp => bp.Name)
                     .IsRequired()

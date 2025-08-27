@@ -49,4 +49,6 @@ public class GetFilteredPetsWithPaginationHandlerTest : VolunteerTestBase
         result.Value.Items[1].Photos.Should().HaveCount(pet2.Photos.Count);
         result.Value.Items[1].Position.Should().Be(pet2.Position.Value);
     }
+
+    // TODO: Добавить тесты на фильтрацию по разным параметрам
 }
