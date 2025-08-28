@@ -6,17 +6,17 @@ using PetFamily.Application.Extensions;
 using PetFamily.Domain.Shared;
 using PetFamily.Domain.Shared.EntityIds;
 
-namespace PetFamily.Application.VolunteersManagement.UseCases.Delete;
+namespace PetFamily.Application.VolunteersManagement.UseCases.Delete.Hard;
 
-public class HardDeleteVolunteerHandler : ICommandHandler<Guid, DeleteVolunteerCommand>
+public class HardDeleteVolunteerHandler : ICommandHandler<Guid, HardDeleteVolunteerCommand>
 {
     private readonly IVolunteersRepository _volunteersRepository;
-    private readonly IValidator<DeleteVolunteerCommand> _validator;
+    private readonly IValidator<HardDeleteVolunteerCommand> _validator;
     private readonly ILogger<HardDeleteVolunteerHandler> _logger;
 
     public HardDeleteVolunteerHandler(
         IVolunteersRepository volunteersRepository,
-        IValidator<DeleteVolunteerCommand> validator,
+        IValidator<HardDeleteVolunteerCommand> validator,
         ILogger<HardDeleteVolunteerHandler> logger)
     {
         _volunteersRepository = volunteersRepository;
@@ -25,7 +25,7 @@ public class HardDeleteVolunteerHandler : ICommandHandler<Guid, DeleteVolunteerC
     }
 
     public async Task<Result<Guid, ErrorList>> HandleAsync(
-        DeleteVolunteerCommand command,
+        HardDeleteVolunteerCommand command,
         CancellationToken cancellationToken = default)
     {
         var validationResult = await _validator.ValidateAsync(command, cancellationToken);

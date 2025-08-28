@@ -267,11 +267,11 @@ namespace PetFamily.Infrastructure.Migrations
                         {
                             b1.IsRequired();
 
-                            b1.Property<int>("TotalYears")
+                            b1.Property<int>("Value")
                                 .ValueGeneratedOnAdd()
                                 .HasColumnType("integer")
                                 .HasDefaultValue(0)
-                                .HasColumnName("total_years");
+                                .HasColumnName("experience");
                         });
 
                     b.ComplexProperty<Dictionary<string, object>>("FullName", "PetFamily.Domain.VolunteersManagement.Entities.Volunteer.FullName#FullName", b1 =>
@@ -337,7 +337,7 @@ namespace PetFamily.Infrastructure.Migrations
 
                             b1.ToTable("species");
 
-                            b1.ToJson("species_breeds");
+                            b1.ToJson("breeds");
 
                             b1.WithOwner()
                                 .HasForeignKey("SpeciesId")

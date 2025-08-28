@@ -1,3 +1,4 @@
+using System.Text.Json;
 using CSharpFunctionalExtensions;
 using Dapper;
 using PetFamily.Application.Abstractions;
@@ -22,9 +23,19 @@ public class GetAllSpeciesHandler : IQueryHandler<IReadOnlyList<SpeciesDto>, Get
     {
         var connection = _sqlConnectionFactory.Create();
 
-        var sqlQuery = "SELECT id, name, species_breeds FROM species";
+        var sqlQuery = "SELECT id, name, breeds FROM species";
 
-        var species = await connection.QueryAsync<SpeciesDto>(sqlQuery);
+        var species = await connection.QueryAsync<SpeciesDto, string, SpeciesDto>(
+            sqlQuery,
+            (speciesDto, breedsJson) =>
+            {
+                speciesDto.Breeds = !string.IsNullOrWhiteSpace(breedsJson)
+                    ? JsonSerializer.Deserialize<BreedDto[]>(breedsJson)!
+                    : [];
+
+                return speciesDto;
+            },
+            splitOn: "breeds");
 
         return species.ToList();
     }

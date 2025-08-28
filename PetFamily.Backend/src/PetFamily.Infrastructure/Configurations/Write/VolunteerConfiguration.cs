@@ -58,9 +58,9 @@ public class VolunteerConfiguration : IEntityTypeConfiguration<Volunteer>
             v => v.Experience,
             veb =>
             {
-                veb.Property(e => e.TotalYears)
+                veb.Property(e => e.Value)
                     .IsRequired()
-                    .HasColumnName("total_years")
+                    .HasColumnName("experience")
                     .HasDefaultValue(0);
             });
 

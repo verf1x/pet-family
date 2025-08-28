@@ -7,6 +7,7 @@ using PetFamily.Application.Extensions;
 using PetFamily.Application.Files;
 using PetFamily.Application.Messaging;
 using PetFamily.Application.VolunteersManagement.UseCases.Delete;
+using PetFamily.Application.VolunteersManagement.UseCases.Delete.Hard;
 using PetFamily.Domain.Shared;
 using PetFamily.Domain.Shared.EntityIds;
 

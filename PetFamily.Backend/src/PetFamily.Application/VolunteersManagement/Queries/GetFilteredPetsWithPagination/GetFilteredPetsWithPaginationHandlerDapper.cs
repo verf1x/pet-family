@@ -73,9 +73,9 @@ public class GetFilteredPetsWithPaginationHandlerDapper
             sqlQuery.ToString(),
             (pet, jsonFiles) =>
             {
-                var files = JsonSerializer.Deserialize<PetFileDto[]>(jsonFiles) ?? [];
-
-                pet.Photos = files;
+                pet.Photos = !string.IsNullOrWhiteSpace(jsonFiles)
+                    ? JsonSerializer.Deserialize<PetFileDto[]>(jsonFiles)!
+                    : [];
 
                 return pet;
             },

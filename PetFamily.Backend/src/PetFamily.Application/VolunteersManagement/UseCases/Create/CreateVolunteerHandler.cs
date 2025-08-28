@@ -32,7 +32,7 @@ public class CreateVolunteerHandler : ICommandHandler<Guid, CreateVolunteerComma
         CancellationToken cancellationToken = default)
     {
         var validationResult = await _validator.ValidateAsync(command, cancellationToken);
-        if (validationResult.IsValid == false)
+        if (!validationResult.IsValid)
             return validationResult.ToErrorList();
 
         var email = Email.Create(command.Email).Value;

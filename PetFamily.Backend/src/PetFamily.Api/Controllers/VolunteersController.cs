@@ -7,7 +7,8 @@ using PetFamily.Application.VolunteersManagement.Queries.GetById;
 using PetFamily.Application.VolunteersManagement.Queries.GetWithPagination;
 using PetFamily.Application.VolunteersManagement.UseCases.AddPet;
 using PetFamily.Application.VolunteersManagement.UseCases.Create;
-using PetFamily.Application.VolunteersManagement.UseCases.Delete;
+using PetFamily.Application.VolunteersManagement.UseCases.Delete.Hard;
+using PetFamily.Application.VolunteersManagement.UseCases.Delete.Soft;
 using PetFamily.Application.VolunteersManagement.UseCases.HardDeletePet;
 using PetFamily.Application.VolunteersManagement.UseCases.MovePet;
 using PetFamily.Application.VolunteersManagement.UseCases.RemovePetPhotos;
@@ -71,10 +72,10 @@ public class VolunteersController : ApplicationController
     [HttpDelete("{id:guid}/soft")]
     public async Task<IActionResult> DeleteAsync(
         [FromRoute] Guid id,
-        [FromServices] SoftDeleteVolunteerHandler handler,
+        [FromServices] ICommandHandler<Guid, SoftDeleteVolunteerCommand> handler,
         CancellationToken cancellationToken = default)
     {
-        var command = new DeleteVolunteerCommand(id);
+        var command = new SoftDeleteVolunteerCommand(id);
         var result = await handler.HandleAsync(command, cancellationToken);
         if (result.IsFailure)
             return result.Error.ToResponse();
@@ -85,10 +86,10 @@ public class VolunteersController : ApplicationController
     [HttpDelete("{id:guid}/hard")]
     public async Task<IActionResult> DeleteAsync(
         [FromRoute] Guid id,
-        [FromServices] HardDeleteVolunteerHandler handler,
+        [FromServices] ICommandHandler<Guid, HardDeleteVolunteerCommand> handler,
         CancellationToken cancellationToken = default)
     {
-        var command = new DeleteVolunteerCommand(id);
+        var command = new HardDeleteVolunteerCommand(id);
         var result = await handler.HandleAsync(command, cancellationToken);
         if (result.IsFailure)
             return result.Error.ToResponse();

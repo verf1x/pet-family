@@ -26,7 +26,7 @@ public class GetBreedsBySpeciesIdHandler : IQueryHandler<IReadOnlyList<BreedDto>
 
         var speciesId = SpeciesId.Create(query.SpeciesId);
 
-        const string sqlQuery = "SELECT species_breeds FROM species WHERE id = @speciesId";
+        const string sqlQuery = "SELECT breeds FROM species WHERE id = @speciesId";
 
         var parameters = new DynamicParameters();
         parameters.Add("speciesId", speciesId.Value);

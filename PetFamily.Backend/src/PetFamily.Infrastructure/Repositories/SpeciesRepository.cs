@@ -17,13 +17,13 @@ public class SpeciesRepository : ISpeciesRepository
     {
         _writeDbContext = writeDbContext;
     }
-    
+
     public async Task<Guid> AddAsync(Species species, CancellationToken cancellationToken = default)
     {
         await _writeDbContext.Species.AddAsync(species, cancellationToken);
-        
+
         await _writeDbContext.SaveChangesAsync(cancellationToken);
-        
+
         return species.Id;
     }
 
@@ -44,16 +44,16 @@ public class SpeciesRepository : ISpeciesRepository
 
         if (species is null)
             return Errors.General.NotFound(speciesId);
-        
+
         return species;
     }
 
     public async Task<Guid> RemoveAsync(Species species, CancellationToken cancellationToken = default)
     {
         _writeDbContext.Species.Remove(species);
-        
+
         await _writeDbContext.SaveChangesAsync(cancellationToken);
-        
+
         return species.Id;
     }
 }

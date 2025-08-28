@@ -32,7 +32,7 @@ public class GetVolunteersWithPaginationHandlerDapper
             "SELECT COUNT(*) FROM volunteers");
 
         var sqlQuery = new StringBuilder(
-            "SELECT id, description, total_years, phone_number FROM volunteers");
+            "SELECT id, description, experience, phone_number FROM volunteers");
 
         sqlQuery.ApplyPagination(parameters, query.PageNumber, query.PageSize);
 
