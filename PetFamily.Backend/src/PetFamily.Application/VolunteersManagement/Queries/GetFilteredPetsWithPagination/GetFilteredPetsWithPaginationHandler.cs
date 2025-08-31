@@ -5,6 +5,7 @@ using Dapper;
 using PetFamily.Application.Abstractions;
 using PetFamily.Application.Database;
 using PetFamily.Application.Extensions;
+using PetFamily.Application.Mappers;
 using PetFamily.Application.Models;
 using PetFamily.Contracts.Dtos.Pet;
 using PetFamily.Domain.Shared;
@@ -81,7 +82,7 @@ public class GetFilteredPetsWithPaginationHandler
 
         var pets = await connection.QueryAsync(
             sqlQuery.ToString(),
-            MapFlatDtoToPetDtoWithPhotos(),
+            PetDtoMapper.MapFlatDtoToPetDtoWithPhotos(),
             splitOn: "photos",
             param: parameters);
 
@@ -175,28 +176,4 @@ public class GetFilteredPetsWithPaginationHandler
 
         return whereClauses;
     }
-
-    private Func<PetDtoFlat, string, PetDto> MapFlatDtoToPetDtoWithPhotos() =>
-        (petFlat, jsonFiles) => new PetDto
-        {
-            Id = petFlat.Id,
-            VolunteerId = petFlat.VolunteerId,
-            Nickname = petFlat.Nickname,
-            BirthDate = DateOnly.FromDateTime(petFlat.BirthDate),
-            Description = petFlat.Description,
-            Position = petFlat.Position,
-            Color = petFlat.Color,
-            HelpStatus = petFlat.HelpStatus,
-            SpeciesBreed = new SpeciesBreedDto(petFlat.SpeciesId, petFlat.BreedId),
-            Measurements = new MeasurementsDto(petFlat.Height, petFlat.Weight),
-            Address = new AddressDto(
-                JsonSerializer.Deserialize<IEnumerable<string>>(petFlat.AddressLines) ?? [],
-                petFlat.Locality,
-                petFlat.Region,
-                petFlat.PostalCode,
-                petFlat.CountryCode),
-            Photos = !string.IsNullOrWhiteSpace(jsonFiles)
-                ? JsonSerializer.Deserialize<PetFileDto[]>(jsonFiles)!
-                : [],
-        };
 }
