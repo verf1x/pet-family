@@ -17,7 +17,7 @@ public static class BreedIdExtensions
 
                     SELECT EXISTS (
                         SELECT 1
-                        FROM species, jsonb_array_elements(species_breeds) as breed
+                        FROM species, jsonb_array_elements(breeds) as breed
                         WHERE (breed ->> 'Id')::uuid = @breedId
                     )
             """;

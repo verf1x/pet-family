@@ -10,11 +10,21 @@ public class PetsController : ApplicationController
     [HttpGet]
     public async Task<IActionResult> GetAsync(
         [FromQuery] GetFilteredPetsWithPaginationRequest request,
-        [FromServices] GetFilteredPetsWithPaginationHandlerDapper handler,
+        [FromServices] GetFilteredPetsWithPaginationHandler handler,
         CancellationToken cancellationToken = default)
     {
         var query = new GetFilteredPetsWithPaginationQuery(
+            request.VolunteerIds,
             request.Nickname,
+            request.Age,
+            request.SpeciesId,
+            request.BreedId,
+            request.Color,
+            request.CountryCode,
+            request.Locality,
+            request.Height,
+            request.Weight,
+            request.HelpStatus,
             request.PositionFrom,
             request.PositionTo,
             request.SortBy,
