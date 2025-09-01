@@ -8,6 +8,16 @@ public class PetDto
 
     public string Nickname { get; init; } = null!;
 
+    public DateOnly BirthDate { get; init; }
+
+    public SpeciesBreedDto SpeciesBreed { get; init; } = null!;
+
+    public AddressDto Address { get; init; } = null!;
+
+    public MeasurementsDto Measurements { get; init; } = null!;
+
+    public int HelpStatus { get; init; }
+
     public string Description { get; init; } = null!;
 
     public int Position { get; init; }

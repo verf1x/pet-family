@@ -14,6 +14,13 @@ public class BreedId : ComparableValueObject
 
     public static BreedId Create(Guid id) => new(id);
 
+    public static implicit operator Guid(BreedId id)
+    {
+        ArgumentNullException.ThrowIfNull(id);
+
+        return id.Value;
+    }
+
     protected override IEnumerable<IComparable> GetComparableEqualityComponents()
     {
         yield return Value;
