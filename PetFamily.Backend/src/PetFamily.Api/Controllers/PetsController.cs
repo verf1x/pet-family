@@ -46,7 +46,7 @@ public class PetsController : ApplicationController
     [HttpGet("{petId:guid}")]
     public async Task<IActionResult> GetByIdAsync(
         Guid petId,
-        [FromServices] GetPetByIdHandler handler,
+        [FromServices] IQueryHandler<PetDto, GetPetByIdQuery> handler,
         CancellationToken cancellationToken = default)
     {
         var query = new GetPetByIdQuery(petId);
