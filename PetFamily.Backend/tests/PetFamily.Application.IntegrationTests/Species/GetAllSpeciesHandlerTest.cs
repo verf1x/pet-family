@@ -1,9 +1,9 @@
 ﻿using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
-using PetFamily.Application.Abstractions;
-using PetFamily.Application.SpeciesManagement.Queries.Get;
-using PetFamily.Contracts.Dtos.Species;
+using PetFamily.Framework.Abstractions;
 using PetFamily.TestUtils;
+using Species.Application.SpeciesManagement.Queries.Get;
+using Species.Contracts.Dtos.Species;
 
 namespace PetFamily.Application.IntegrationTests.Species;
 

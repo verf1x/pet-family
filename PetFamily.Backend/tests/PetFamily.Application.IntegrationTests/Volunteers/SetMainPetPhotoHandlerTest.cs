@@ -1,9 +1,9 @@
 ﻿using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
-using PetFamily.Application.Abstractions;
-using PetFamily.Application.VolunteersManagement.UseCases.SetMainPetPhoto;
-using PetFamily.Application.VolunteersManagement.UseCases.UploadPetPhotos;
+using PetFamily.Framework.Abstractions;
 using PetFamily.TestUtils;
+using Volunteers.Application.VolunteersManagement.UseCases.SetMainPetPhoto;
+using Volunteers.Application.VolunteersManagement.UseCases.UploadPetPhotos;
 
 namespace PetFamily.Application.IntegrationTests.Volunteers;
 
@@ -24,9 +24,9 @@ public class SetMainPetPhotoHandlerTest : VolunteerTestBase
     public async Task HandleAsync_ShouldSetMainPetPhoto_WhenCommandIsValid()
     {
         // Arrange
-        var volunteer = await VolunteerSeeder.SeedVolunteerAsync(VolunteersRepository, WriteDbContext);
-        var species = await SpeciesSeeder.SeedSpeciesAsync(SpeciesRepository, WriteDbContext);
-        var pet = await VolunteerSeeder.SeedPetAsync(WriteDbContext, volunteer, species.Id, species.Breeds[0].Id);
+        var volunteer = await VolunteerSeeder.SeedVolunteerAsync(VolunteersRepository, VolunteersWriteDbContext);
+        var species = await SpeciesSeeder.SeedSpeciesWithBreedsAsync(SpeciesRepository, SpeciesWriteDbContext);
+        var pet = await VolunteerSeeder.SeedPetAsync(VolunteersWriteDbContext, volunteer, species.Id, species.Breeds[0].Id);
 
         var uploadCommand = Fixture.BuildUploadPetPhotosCommand(volunteer.Id, pet.Id);
 

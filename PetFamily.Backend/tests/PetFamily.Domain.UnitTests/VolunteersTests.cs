@@ -1,9 +1,9 @@
 ﻿using FluentAssertions;
-using PetFamily.Domain.Shared.EntityIds;
-using PetFamily.Domain.Shared.ValueObjects;
-using PetFamily.Domain.VolunteersManagement.Entities;
-using PetFamily.Domain.VolunteersManagement.Enums;
-using PetFamily.Domain.VolunteersManagement.ValueObjects;
+using PetFamily.Framework.EntityIds;
+using PetFamily.Framework.ValueObjects;
+using PetFamily.Volunteers.Domain.VolunteersManagement.Entities;
+using PetFamily.Volunteers.Domain.VolunteersManagement.Enums;
+using PetFamily.Volunteers.Domain.VolunteersManagement.ValueObjects;
 
 namespace PetFamily.Domain.UnitTests;
 

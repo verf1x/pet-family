@@ -1,5 +1,6 @@
 ﻿using System.Data.Common;
 using CSharpFunctionalExtensions;
+using Infrastructure.Postgres;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
@@ -7,13 +8,15 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Npgsql;
 using NSubstitute;
-using PetFamily.Api;
-using PetFamily.Application.Database;
-using PetFamily.Application.Files;
-using PetFamily.Domain.Shared;
-using PetFamily.Infrastructure.DbContexts;
+using PetFamily.Framework;
+using PetFamily.Framework.Database;
+using PetFamily.Framework.Files;
 using Respawn;
+using Species.Application.Database;
+using Species.Infrastructure.Postgres.DbContexts;
 using Testcontainers.PostgreSql;
+using Volunteers.Application.Database;
+using Volunteers.Infrastructure.Postgres.DbContexts;
 
 namespace PetFamily.Application.IntegrationTests;
 
@@ -41,8 +44,11 @@ public class IntegrationTestsWebFactory : WebApplicationFactory<Program>, IAsync
         await _dbContainer.StartAsync();
 
         using var scope = Services.CreateScope();
-        var dbContext = scope.ServiceProvider.GetRequiredService<WriteDbContext>();
-        await dbContext.Database.EnsureCreatedAsync();
+        var volunteersWriteDbContext = scope.ServiceProvider.GetRequiredService<VolunteersWriteDbContext>();
+        await volunteersWriteDbContext.Database.EnsureCreatedAsync();
+
+        var speciesWriteDbContext = scope.ServiceProvider.GetRequiredService<SpeciesWriteDbContext>();
+        await speciesWriteDbContext.Database.EnsureCreatedAsync();
 
         _dbConnection = new NpgsqlConnection(_dbContainer.GetConnectionString());
         await InitializeRespawnerAsync();
@@ -85,15 +91,23 @@ public class IntegrationTestsWebFactory : WebApplicationFactory<Program>, IAsync
         services.RemoveAll<IFileProvider>();
         services.AddScoped(_ => _fileProviderMock);
 
-        services.RemoveAll<WriteDbContext>();
-        services.RemoveAll<IReadDbContext>();
+        services.RemoveAll<VolunteersWriteDbContext>();
+        services.RemoveAll<SpeciesWriteDbContext>();
+        services.RemoveAll<IVolunteersReadDbContext>();
+        services.RemoveAll<ISpeciesReadDbContext>();
         services.RemoveAll<ISqlConnectionFactory>();
 
-        services.AddScoped<WriteDbContext>(_ =>
-            new WriteDbContext(_dbContainer.GetConnectionString()));
+        services.AddScoped<VolunteersWriteDbContext>(_ =>
+            new VolunteersWriteDbContext(_dbContainer.GetConnectionString()));
 
-        services.AddScoped<IReadDbContext>(_ =>
-            new ReadDbContext(_dbContainer.GetConnectionString()));
+        services.AddScoped<SpeciesWriteDbContext>(_ =>
+            new SpeciesWriteDbContext(_dbContainer.GetConnectionString()));
+
+        services.AddScoped<IVolunteersReadDbContext>(_ =>
+            new VolunteersReadDbContext(_dbContainer.GetConnectionString()));
+
+        services.AddScoped<ISpeciesReadDbContext>(_ =>
+            new SpeciesReadDbContext(_dbContainer.GetConnectionString()));
 
         services.AddSingleton<ISqlConnectionFactory>(_ =>
             new SqlConnectionFactory(_dbContainer.GetConnectionString()));

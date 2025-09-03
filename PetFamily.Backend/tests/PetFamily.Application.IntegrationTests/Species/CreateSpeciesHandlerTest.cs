@@ -1,7 +1,7 @@
 ﻿using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
-using PetFamily.Application.Abstractions;
-using PetFamily.Application.SpeciesManagement.UseCases.Create;
+using PetFamily.Framework.Abstractions;
+using Species.Application.SpeciesManagement.UseCases.Create;
 
 namespace PetFamily.Application.IntegrationTests.Species;
 

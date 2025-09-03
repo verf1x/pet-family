@@ -1,9 +1,9 @@
 ﻿using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
-using PetFamily.Application.Abstractions;
-using PetFamily.Application.VolunteersManagement.Queries.GetPetById;
-using PetFamily.Contracts.Dtos.Pet;
+using PetFamily.Framework.Abstractions;
 using PetFamily.TestUtils;
+using Volunteers.Application.VolunteersManagement.Queries.GetPetById;
+using Volunteers.Contracts.Dtos.Pet;
 
 namespace PetFamily.Application.IntegrationTests.Volunteers;
 
@@ -21,10 +21,10 @@ public class GetPetByIdHandlerTest : VolunteerTestBase
     public async Task HandleAsync_ShouldReturnPet_WhenQueryIsValid()
     {
         // Arrange
-        var volunteer = await VolunteerSeeder.SeedVolunteerAsync(VolunteersRepository, WriteDbContext);
-        var species = await SpeciesSeeder.SeedSpeciesWithBreedsAsync(SpeciesRepository, WriteDbContext);
-        var pet1 = await VolunteerSeeder.SeedPetAsync(WriteDbContext, volunteer, species.Id, species.Breeds[0].Id);
-        var pet2 = await VolunteerSeeder.SeedPetAsync(WriteDbContext, volunteer, species.Id, species.Breeds[1].Id);
+        var volunteer = await VolunteerSeeder.SeedVolunteerAsync(VolunteersRepository, VolunteersWriteDbContext);
+        var species = await SpeciesSeeder.SeedSpeciesWithBreedsAsync(SpeciesRepository, SpeciesWriteDbContext);
+        var pet1 = await VolunteerSeeder.SeedPetAsync(VolunteersWriteDbContext, volunteer, species.Id, species.Breeds[0].Id);
+        var pet2 = await VolunteerSeeder.SeedPetAsync(VolunteersWriteDbContext, volunteer, species.Id, species.Breeds[1].Id);
 
         var query = new GetPetByIdQuery(pet2.Id);
 

@@ -128,7 +128,7 @@ public class UploadPetPhotosTests
             HelpRequisite.Create("string", "string").Value,
             HelpRequisite.Create("string", "string").Value
         ]);
-        var photos = new List<Domain.VolunteersManagement.ValueObjects.Photo>();
+        var photos = new List<Photo>();
 
         return new Pet(
             PetId.CreateNew(),
@@ -160,7 +160,7 @@ public class UploadPetPhotosTests
         return PhoneNumber.Create(phoneNumber).Value;
     }
 
-    private Errors.Volunteer GetUniqueVolunteer()
+    private Volunteer GetUniqueVolunteer()
     {
         var fullName = FullName.Create("John", "Doe").Value;
         var email = GetRandomEmail();

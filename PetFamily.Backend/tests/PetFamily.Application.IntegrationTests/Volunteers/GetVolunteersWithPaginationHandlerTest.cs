@@ -1,10 +1,10 @@
 ﻿using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
-using PetFamily.Application.Abstractions;
-using PetFamily.Application.Models;
-using PetFamily.Application.VolunteersManagement.Queries.GetWithPagination;
-using PetFamily.Contracts.Dtos.Volunteer;
+using PetFamily.Framework.Abstractions;
+using PetFamily.Framework.Models;
 using PetFamily.TestUtils;
+using Volunteers.Application.VolunteersManagement.Queries.GetWithPagination;
+using Volunteers.Contracts.Dtos.Volunteer;
 
 namespace PetFamily.Application.IntegrationTests.Volunteers;
 
@@ -23,8 +23,8 @@ public class GetVolunteersWithPaginationHandlerTest : VolunteerTestBase
     public async Task HandleAsync_ShouldReturnPagedListOfVolunteers_WhenQueryIsValid()
     {
         // Arrange
-        var volunteer1 = await VolunteerSeeder.SeedVolunteerAsync(VolunteersRepository, WriteDbContext);
-        var volunteer2 = await VolunteerSeeder.SeedVolunteerAsync(VolunteersRepository, WriteDbContext);
+        var volunteer1 = await VolunteerSeeder.SeedVolunteerAsync(VolunteersRepository, VolunteersWriteDbContext);
+        var volunteer2 = await VolunteerSeeder.SeedVolunteerAsync(VolunteersRepository, VolunteersWriteDbContext);
 
         var query = new GetVolunteersWithPaginationQuery(1, 2);
 

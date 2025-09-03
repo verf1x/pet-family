@@ -1,9 +1,9 @@
 ﻿using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using PetFamily.Application.Abstractions;
-using PetFamily.Application.SpeciesManagement.UseCases.Delete;
+using PetFamily.Framework.Abstractions;
 using PetFamily.TestUtils;
+using Species.Application.SpeciesManagement.UseCases.Delete;
 
 namespace PetFamily.Application.IntegrationTests.Species;
 

@@ -12,4 +12,12 @@
       </Reference>
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\..\src\Species\Species.Application\Species.Application.csproj" />
+      <ProjectReference Include="..\..\src\Species\Species.Domain\Species.Domain.csproj" />
+      <ProjectReference Include="..\..\src\Species\Species.Infrastructure.Postgres\Species.Infrastructure.Postgres.csproj" />
+      <ProjectReference Include="..\..\src\Volunteers\Volunteers.Domain\Volunteers.Domain.csproj" />
+      <ProjectReference Include="..\..\src\Volunteers\Volunteers.Infrastructure.Postgres\Volunteers.Infrastructure.Postgres.csproj" />
+    </ItemGroup>
+
 </Project>

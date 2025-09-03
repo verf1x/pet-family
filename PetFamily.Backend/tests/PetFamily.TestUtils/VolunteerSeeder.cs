@@ -1,17 +1,17 @@
 ﻿using Bogus;
-using PetFamily.Application.VolunteersManagement;
-using PetFamily.Domain.Shared.EntityIds;
-using PetFamily.Domain.Shared.ValueObjects;
-using PetFamily.Domain.VolunteersManagement.Entities;
-using PetFamily.Domain.VolunteersManagement.Enums;
-using PetFamily.Domain.VolunteersManagement.ValueObjects;
-using PetFamily.Infrastructure.DbContexts;
+using PetFamily.Framework.EntityIds;
+using PetFamily.Framework.ValueObjects;
+using PetFamily.Volunteers.Domain.VolunteersManagement.Entities;
+using PetFamily.Volunteers.Domain.VolunteersManagement.Enums;
+using PetFamily.Volunteers.Domain.VolunteersManagement.ValueObjects;
+using Volunteers.Application.VolunteersManagement;
+using Volunteers.Infrastructure.Postgres.DbContexts;
 
 namespace PetFamily.TestUtils;
 
 public static class VolunteerSeeder
 {
-    public static async Task<Volunteer> SeedVolunteerAsync(IVolunteersRepository repository, WriteDbContext dbContext)
+    public static async Task<Volunteer> SeedVolunteerAsync(IVolunteersRepository repository, VolunteersWriteDbContext dbContext)
     {
         var faker = new Faker();
 
@@ -56,7 +56,7 @@ public static class VolunteerSeeder
     }
 
     public static async Task<Pet> SeedPetAsync(
-        WriteDbContext writeDbContext,
+        VolunteersWriteDbContext writeDbContext,
         Volunteer volunteer,
         SpeciesId speciesId,
         BreedId breedId)

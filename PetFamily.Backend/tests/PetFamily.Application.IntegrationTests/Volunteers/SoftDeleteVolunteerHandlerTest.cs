@@ -1,9 +1,9 @@
 ﻿using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using PetFamily.Application.Abstractions;
-using PetFamily.Application.VolunteersManagement.UseCases.Create;
-using PetFamily.Application.VolunteersManagement.UseCases.Delete.Soft;
+using PetFamily.Framework.Abstractions;
+using Volunteers.Application.VolunteersManagement.UseCases.Create;
+using Volunteers.Application.VolunteersManagement.UseCases.Delete.Soft;
 
 namespace PetFamily.Application.IntegrationTests.Volunteers;
 
@@ -36,7 +36,7 @@ public class SoftDeleteVolunteerHandlerTest : VolunteerTestBase
         softDeleteResult.IsSuccess.Should().BeTrue();
 
         var volunteer =
-            await WriteDbContext.Volunteers.FirstOrDefaultAsync(); // TODO: Обновить ReadDbContext, либо внедрить Dapper
+            await VolunteersWriteDbContext.Volunteers.FirstOrDefaultAsync(); // TODO: Обновить ReadDbContext, либо внедрить Dapper
         volunteer.Should().NotBeNull();
         volunteer.IsDeleted.Should().BeTrue();
     }

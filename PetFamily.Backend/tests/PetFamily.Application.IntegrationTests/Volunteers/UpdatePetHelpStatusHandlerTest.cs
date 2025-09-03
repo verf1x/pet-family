@@ -1,10 +1,10 @@
 ﻿using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using PetFamily.Application.Abstractions;
-using PetFamily.Application.VolunteersManagement.UseCases.UpdatePetHelpStatus;
-using PetFamily.Domain.VolunteersManagement.Enums;
+using PetFamily.Framework.Abstractions;
 using PetFamily.TestUtils;
+using PetFamily.Volunteers.Domain.VolunteersManagement.Enums;
+using Volunteers.Application.VolunteersManagement.UseCases.UpdatePetHelpStatus;
 
 namespace PetFamily.Application.IntegrationTests.Volunteers;
 
@@ -22,9 +22,9 @@ public class UpdatePetHelpStatusHandlerTest : VolunteerTestBase
     public async Task HandleAsync_ShouldUpdatePetHelpStatus_WhenCommandIsValid()
     {
         // Arrange
-        var volunteer = await VolunteerSeeder.SeedVolunteerAsync(VolunteersRepository, WriteDbContext);
-        var species = await SpeciesSeeder.SeedSpeciesAsync(SpeciesRepository, WriteDbContext);
-        var pet = await VolunteerSeeder.SeedPetAsync(WriteDbContext, volunteer, species.Id, species.Breeds[0].Id);
+        var volunteer = await VolunteerSeeder.SeedVolunteerAsync(VolunteersRepository, VolunteersWriteDbContext);
+        var species = await SpeciesSeeder.SeedSpeciesWithBreedsAsync(SpeciesRepository, SpeciesWriteDbContext);
+        var pet = await VolunteerSeeder.SeedPetAsync(VolunteersWriteDbContext, volunteer, species.Id, species.Breeds[0].Id);
 
         const int newHelpStatus = 2;
         var command = new UpdatePetHelpStatusCommand(volunteer.Id, pet.Id.Value, newHelpStatus);
@@ -35,7 +35,7 @@ public class UpdatePetHelpStatusHandlerTest : VolunteerTestBase
         // Assert
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().Be(newHelpStatus);
-        var updatedVolunteer = await WriteDbContext.Volunteers.FirstOrDefaultAsync();
+        var updatedVolunteer = await VolunteersWriteDbContext.Volunteers.FirstOrDefaultAsync();
         updatedVolunteer!.Pets.Should().HaveCount(1);
         updatedVolunteer.Pets[0].HelpStatus.Should().Be((HelpStatus)newHelpStatus);
     }
@@ -44,9 +44,9 @@ public class UpdatePetHelpStatusHandlerTest : VolunteerTestBase
     public async Task HandleAsync_ShouldUpdatePetHelpStatus_WhenCommandIsInvalid()
     {
         // Arrange
-        var volunteer = await VolunteerSeeder.SeedVolunteerAsync(VolunteersRepository, WriteDbContext);
-        var species = await SpeciesSeeder.SeedSpeciesAsync(SpeciesRepository, WriteDbContext);
-        var pet = await VolunteerSeeder.SeedPetAsync(WriteDbContext, volunteer, species.Id, species.Breeds[0].Id);
+        var volunteer = await VolunteerSeeder.SeedVolunteerAsync(VolunteersRepository, VolunteersWriteDbContext);
+        var species = await SpeciesSeeder.SeedSpeciesWithBreedsAsync(SpeciesRepository, SpeciesWriteDbContext);
+        var pet = await VolunteerSeeder.SeedPetAsync(VolunteersWriteDbContext, volunteer, species.Id, species.Breeds[0].Id);
 
         const int newHelpStatus = -1; // Invalid status
         var command = new UpdatePetHelpStatusCommand(volunteer.Id, pet.Id.Value, newHelpStatus);
@@ -57,7 +57,7 @@ public class UpdatePetHelpStatusHandlerTest : VolunteerTestBase
         // Assert
         result.IsFailure.Should().BeTrue();
         result.Error.Should().NotBeNull();
-        var updatedVolunteer = await WriteDbContext.Volunteers.FirstOrDefaultAsync();
+        var updatedVolunteer = await VolunteersWriteDbContext.Volunteers.FirstOrDefaultAsync();
         updatedVolunteer!.Pets.Should().HaveCount(1);
         updatedVolunteer.Pets[0].HelpStatus.Should().NotBe((HelpStatus)newHelpStatus);
     }

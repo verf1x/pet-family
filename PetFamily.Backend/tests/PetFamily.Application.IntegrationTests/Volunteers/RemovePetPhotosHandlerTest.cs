@@ -1,9 +1,9 @@
 ﻿using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
-using PetFamily.Application.Abstractions;
-using PetFamily.Application.VolunteersManagement.UseCases.RemovePetPhotos;
-using PetFamily.Application.VolunteersManagement.UseCases.UploadPetPhotos;
+using PetFamily.Framework.Abstractions;
 using PetFamily.TestUtils;
+using Volunteers.Application.VolunteersManagement.UseCases.RemovePetPhotos;
+using Volunteers.Application.VolunteersManagement.UseCases.UploadPetPhotos;
 
 namespace PetFamily.Application.IntegrationTests.Volunteers;
 
@@ -25,9 +25,9 @@ public class RemovePetPhotosHandlerTest : VolunteerTestBase
     public async Task HandleAsync_ShouldRemovePetPhotos_WhenCommandIsValid()
     {
         // Arrange
-        var volunteer = await VolunteerSeeder.SeedVolunteerAsync(VolunteersRepository, WriteDbContext);
-        var species = await SpeciesSeeder.SeedSpeciesAsync(SpeciesRepository, WriteDbContext);
-        var pet = await VolunteerSeeder.SeedPetAsync(WriteDbContext, volunteer, species.Id, species.Breeds[0].Id);
+        var volunteer = await VolunteerSeeder.SeedVolunteerAsync(VolunteersRepository, VolunteersWriteDbContext);
+        var species = await SpeciesSeeder.SeedSpeciesWithBreedsAsync(SpeciesRepository, SpeciesWriteDbContext);
+        var pet = await VolunteerSeeder.SeedPetAsync(VolunteersWriteDbContext, volunteer, species.Id, species.Breeds[0].Id);
 
         var uploadCommand = Fixture.BuildUploadPetPhotosCommand(volunteer.Id, pet.Id.Value);
         var uploadResult = await _uploadSut.HandleAsync(uploadCommand, CancellationToken.None);
@@ -39,7 +39,7 @@ public class RemovePetPhotosHandlerTest : VolunteerTestBase
 
         // Assert
         removeResult.IsSuccess.Should().BeTrue();
-        var updatedVolunteer = await WriteDbContext.Volunteers.FindAsync(volunteer.Id);
+        var updatedVolunteer = await VolunteersWriteDbContext.Volunteers.FindAsync(volunteer.Id);
         updatedVolunteer!.Pets.Should().HaveCount(1);
         updatedVolunteer.Pets[0].Photos.Should().BeEmpty();
 

@@ -24,7 +24,7 @@ public class GetVolunteerByIdHandlerDapper : IQueryHandler<VolunteerDto, GetVolu
 
         const string sqlQuery =
             """
-            SELECT id, description, total_years, phone_number from volunteers
+            SELECT id, description, experience, phone_number from volunteers
             WHERE id = @VolunteerId AND is_deleted = false
             """;
 

@@ -1,10 +1,10 @@
 ﻿using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
-using PetFamily.Application.Abstractions;
-using PetFamily.Application.Models;
-using PetFamily.Application.VolunteersManagement.Queries.GetFilteredPetsWithPagination;
-using PetFamily.Contracts.Dtos.Pet;
+using PetFamily.Framework.Abstractions;
+using PetFamily.Framework.Models;
 using PetFamily.TestUtils;
+using Volunteers.Application.VolunteersManagement.Queries.GetFilteredPetsWithPagination;
+using Volunteers.Contracts.Dtos.Pet;
 
 namespace PetFamily.Application.IntegrationTests.Volunteers;
 
@@ -23,10 +23,10 @@ public class GetFilteredPetsWithPaginationHandlerTest : VolunteerTestBase
     public async Task HandleAsync_ShouldReturnPagedListOfPets_WhenQueryIsValidWithNoFiltering()
     {
         // Arrange
-        var volunteer = await VolunteerSeeder.SeedVolunteerAsync(VolunteersRepository, WriteDbContext);
-        var species = await SpeciesSeeder.SeedSpeciesWithBreedsAsync(SpeciesRepository, WriteDbContext);
-        var pet1 = await VolunteerSeeder.SeedPetAsync(WriteDbContext, volunteer, species.Id, species.Breeds[0].Id);
-        var pet2 = await VolunteerSeeder.SeedPetAsync(WriteDbContext, volunteer, species.Id, species.Breeds[1].Id);
+        var volunteer = await VolunteerSeeder.SeedVolunteerAsync(VolunteersRepository, VolunteersWriteDbContext);
+        var species = await SpeciesSeeder.SeedSpeciesWithBreedsAsync(SpeciesRepository, SpeciesWriteDbContext);
+        var pet1 = await VolunteerSeeder.SeedPetAsync(VolunteersWriteDbContext, volunteer, species.Id, species.Breeds[0].Id);
+        var pet2 = await VolunteerSeeder.SeedPetAsync(VolunteersWriteDbContext, volunteer, species.Id, species.Breeds[1].Id);
 
         var query = new GetFilteredPetsWithPaginationQuery(null, null, null, null, null, null, null, null, null, null,
             null, null, null, null, null, 1, 10);
@@ -55,10 +55,10 @@ public class GetFilteredPetsWithPaginationHandlerTest : VolunteerTestBase
     public async Task HandleAsync_ShouldReturnFilteredPets_WhenQueryIsValidWithFiltering()
     {
         // Arrange
-        var volunteer = await VolunteerSeeder.SeedVolunteerAsync(VolunteersRepository, WriteDbContext);
-        var species = await SpeciesSeeder.SeedSpeciesWithBreedsAsync(SpeciesRepository, WriteDbContext);
-        var pet1 = await VolunteerSeeder.SeedPetAsync(WriteDbContext, volunteer, species.Id, species.Breeds[0].Id);
-        var pet2 = await VolunteerSeeder.SeedPetAsync(WriteDbContext, volunteer, species.Id, species.Breeds[1].Id);
+        var volunteer = await VolunteerSeeder.SeedVolunteerAsync(VolunteersRepository, VolunteersWriteDbContext);
+        var species = await SpeciesSeeder.SeedSpeciesWithBreedsAsync(SpeciesRepository, SpeciesWriteDbContext);
+        var pet1 = await VolunteerSeeder.SeedPetAsync(VolunteersWriteDbContext, volunteer, species.Id, species.Breeds[0].Id);
+        var pet2 = await VolunteerSeeder.SeedPetAsync(VolunteersWriteDbContext, volunteer, species.Id, species.Breeds[1].Id);
 
         var query = new GetFilteredPetsWithPaginationQuery(
             [volunteer.Id.Value],

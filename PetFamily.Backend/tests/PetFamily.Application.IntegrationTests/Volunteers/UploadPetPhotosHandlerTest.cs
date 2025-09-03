@@ -1,9 +1,9 @@
 ﻿using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using PetFamily.Application.Abstractions;
-using PetFamily.Application.VolunteersManagement.UseCases.UploadPetPhotos;
+using PetFamily.Framework.Abstractions;
 using PetFamily.TestUtils;
+using Volunteers.Application.VolunteersManagement.UseCases.UploadPetPhotos;
 
 namespace PetFamily.Application.IntegrationTests.Volunteers;
 
@@ -21,9 +21,9 @@ public class UploadPetPhotosHandlerTest : VolunteerTestBase
     public async Task HandleAsync_ShouldUploadPetPhotos_WhenCommandIsValid()
     {
         // Arrange
-        var species = await SpeciesSeeder.SeedSpeciesAsync(SpeciesRepository, WriteDbContext);
-        var volunteer = await VolunteerSeeder.SeedVolunteerAsync(VolunteersRepository, WriteDbContext);
-        var pet = await VolunteerSeeder.SeedPetAsync(WriteDbContext, volunteer, species.Id, species.Breeds[0].Id);
+        var species = await SpeciesSeeder.SeedSpeciesWithBreedsAsync(SpeciesRepository, SpeciesWriteDbContext);
+        var volunteer = await VolunteerSeeder.SeedVolunteerAsync(VolunteersRepository, VolunteersWriteDbContext);
+        var pet = await VolunteerSeeder.SeedPetAsync(VolunteersWriteDbContext, volunteer, species.Id, species.Breeds[0].Id);
 
         var command = Fixture.BuildUploadPetPhotosCommand(volunteer.Id, pet.Id.Value);
 
@@ -35,7 +35,7 @@ public class UploadPetPhotosHandlerTest : VolunteerTestBase
         // Assert
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().NotBeEmpty();
-        var updatedVolunteer = await WriteDbContext.Volunteers.FirstOrDefaultAsync();
+        var updatedVolunteer = await VolunteersWriteDbContext.Volunteers.FirstOrDefaultAsync();
         updatedVolunteer!.Pets.Should().NotBeEmpty();
         updatedVolunteer.Pets[0].Photos.Should().NotBeEmpty();
     }
@@ -44,9 +44,9 @@ public class UploadPetPhotosHandlerTest : VolunteerTestBase
     public async Task HandleAsync_ShouldReturnError_WhenUploadFailed()
     {
         // Arrange
-        var species = await SpeciesSeeder.SeedSpeciesAsync(SpeciesRepository, WriteDbContext);
-        var volunteer = await VolunteerSeeder.SeedVolunteerAsync(VolunteersRepository, WriteDbContext);
-        var pet = await VolunteerSeeder.SeedPetAsync(WriteDbContext, volunteer, species.Id, species.Breeds[0].Id);
+        var species = await SpeciesSeeder.SeedSpeciesWithBreedsAsync(SpeciesRepository, SpeciesWriteDbContext);
+        var volunteer = await VolunteerSeeder.SeedVolunteerAsync(VolunteersRepository, VolunteersWriteDbContext);
+        var pet = await VolunteerSeeder.SeedPetAsync(VolunteersWriteDbContext, volunteer, species.Id, species.Breeds[0].Id);
 
         var command = Fixture.BuildUploadPetPhotosCommand(volunteer.Id, pet.Id);
 

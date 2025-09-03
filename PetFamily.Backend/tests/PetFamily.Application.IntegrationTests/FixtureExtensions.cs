@@ -1,14 +1,14 @@
 ﻿using AutoFixture;
 using Bogus;
-using PetFamily.Application.SpeciesManagement.UseCases.Create;
-using PetFamily.Application.VolunteersManagement.UseCases.AddPet;
-using PetFamily.Application.VolunteersManagement.UseCases.Create;
-using PetFamily.Application.VolunteersManagement.UseCases.UpdateMainInfo;
-using PetFamily.Application.VolunteersManagement.UseCases.UpdateMainPetInfo;
-using PetFamily.Application.VolunteersManagement.UseCases.UploadPetPhotos;
-using PetFamily.Contracts.Dtos;
-using PetFamily.Contracts.Dtos.Pet;
-using PetFamily.Contracts.Dtos.Volunteer;
+using Species.Application.SpeciesManagement.UseCases.Create;
+using Volunteers.Application.VolunteersManagement.UseCases.AddPet;
+using Volunteers.Application.VolunteersManagement.UseCases.Create;
+using Volunteers.Application.VolunteersManagement.UseCases.UpdateMainInfo;
+using Volunteers.Application.VolunteersManagement.UseCases.UpdateMainPetInfo;
+using Volunteers.Application.VolunteersManagement.UseCases.UploadPetPhotos;
+using Volunteers.Contracts.Dtos;
+using Volunteers.Contracts.Dtos.Pet;
+using Volunteers.Contracts.Dtos.Volunteer;
 
 namespace PetFamily.Application.IntegrationTests;
 

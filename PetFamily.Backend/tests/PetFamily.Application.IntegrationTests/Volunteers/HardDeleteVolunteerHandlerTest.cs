@@ -1,9 +1,9 @@
 ﻿using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using PetFamily.Application.Abstractions;
-using PetFamily.Application.VolunteersManagement.UseCases.Create;
-using PetFamily.Application.VolunteersManagement.UseCases.Delete.Hard;
+using PetFamily.Framework.Abstractions;
+using Volunteers.Application.VolunteersManagement.UseCases.Create;
+using Volunteers.Application.VolunteersManagement.UseCases.Delete.Hard;
 
 namespace PetFamily.Application.IntegrationTests.Volunteers;
 
@@ -35,7 +35,7 @@ public class HardDeleteVolunteerHandlerTest : VolunteerTestBase
         // Assert
         hardDeleteResult.IsSuccess.Should().BeTrue();
 
-        var volunteer = await WriteDbContext.Volunteers.FirstOrDefaultAsync();
+        var volunteer = await VolunteersWriteDbContext.Volunteers.FirstOrDefaultAsync();
         volunteer.Should().BeNull();
     }
 }

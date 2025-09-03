@@ -1,10 +1,10 @@
 ﻿using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using PetFamily.Application.Abstractions;
-using PetFamily.Application.VolunteersManagement.UseCases.Create;
-using PetFamily.Contracts.Dtos;
-using PetFamily.Contracts.Dtos.Volunteer;
+using PetFamily.Framework.Abstractions;
+using Volunteers.Application.VolunteersManagement.UseCases.Create;
+using Volunteers.Contracts.Dtos;
+using Volunteers.Contracts.Dtos.Volunteer;
 
 namespace PetFamily.Application.IntegrationTests.Volunteers;
 
@@ -31,7 +31,7 @@ public class CreateVolunteerHandlerTest : VolunteerTestBase
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().NotBeEmpty();
 
-        var volunteer = await WriteDbContext.Volunteers.FirstOrDefaultAsync();
+        var volunteer = await VolunteersWriteDbContext.Volunteers.FirstOrDefaultAsync();
         volunteer.Should().NotBeNull();
     }
 

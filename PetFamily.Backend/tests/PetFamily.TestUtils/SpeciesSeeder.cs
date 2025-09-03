@@ -1,22 +1,21 @@
 ﻿using Bogus;
-using PetFamily.Application.SpeciesManagement;
-using PetFamily.Domain.Shared.EntityIds;
-using PetFamily.Domain.SpeciesManagement;
-using PetFamily.Domain.SpeciesManagement.ValueObjects;
-using PetFamily.Infrastructure.DbContexts;
+using PetFamily.Framework.EntityIds;
+using Species.Application.SpeciesManagement;
+using Species.Domain.SpeciesManagement.ValueObjects;
+using Species.Infrastructure.Postgres.DbContexts;
 
 namespace PetFamily.TestUtils;
 
 public static class SpeciesSeeder
 {
-    public static async Task<Species> SeedSpeciesAsync(ISpeciesRepository repository, WriteDbContext dbContext)
+    public static async Task<Species.Domain.SpeciesManagement.Species> SeedSpeciesAsync(ISpeciesRepository repository, SpeciesWriteDbContext dbContext)
     {
         var faker = new Faker();
 
         var speciesId = SpeciesId.CreateNew();
         string name = faker.Lorem.Word();
 
-        var species = new Species(
+        var species = new Species.Domain.SpeciesManagement.Species(
             speciesId,
             Name.Create(name).Value);
 
@@ -26,16 +25,16 @@ public static class SpeciesSeeder
         return species;
     }
 
-    public static async Task<Species> SeedSpeciesWithBreedsAsync(
+    public static async Task<Species.Domain.SpeciesManagement.Species> SeedSpeciesWithBreedsAsync(
         ISpeciesRepository repository,
-        WriteDbContext dbContext)
+        SpeciesWriteDbContext dbContext)
     {
         var faker = new Faker();
 
         var speciesId = SpeciesId.CreateNew();
         string name = faker.Lorem.Word();
 
-        var species = new Species(
+        var species = new Species.Domain.SpeciesManagement.Species(
             speciesId,
             Name.Create(name).Value);
 

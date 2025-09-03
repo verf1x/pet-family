@@ -1,9 +1,9 @@
 ﻿using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
-using PetFamily.Application.Abstractions;
-using PetFamily.Application.VolunteersManagement.Queries.GetById;
-using PetFamily.Contracts.Dtos.Volunteer;
+using PetFamily.Framework.Abstractions;
 using PetFamily.TestUtils;
+using Volunteers.Application.VolunteersManagement.Queries.GetById;
+using Volunteers.Contracts.Dtos.Volunteer;
 
 namespace PetFamily.Application.IntegrationTests.Volunteers;
 
@@ -21,7 +21,7 @@ public class GetByIdHandlerTest : VolunteerTestBase
     public async Task HandleAsync_ShouldReturnVolunteer_WhenIdIsValid()
     {
         // Arrange
-        var volunteer = await VolunteerSeeder.SeedVolunteerAsync(VolunteersRepository, WriteDbContext);
+        var volunteer = await VolunteerSeeder.SeedVolunteerAsync(VolunteersRepository, VolunteersWriteDbContext);
         var query = new GetVolunteerByIdQuery(volunteer.Id);
 
         // Act

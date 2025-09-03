@@ -1,9 +1,9 @@
 ﻿using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using PetFamily.Application.Abstractions;
-using PetFamily.Application.VolunteersManagement.UseCases.Create;
-using PetFamily.Application.VolunteersManagement.UseCases.UpdateMainInfo;
+using PetFamily.Framework.Abstractions;
+using Volunteers.Application.VolunteersManagement.UseCases.Create;
+using Volunteers.Application.VolunteersManagement.UseCases.UpdateMainInfo;
 
 namespace PetFamily.Application.IntegrationTests.Volunteers;
 
@@ -35,7 +35,7 @@ public class UpdateVolunteerMainInfoHandlerTest : VolunteerTestBase
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().Be(volunteerId.Value);
 
-        var volunteer = await WriteDbContext.Volunteers.FirstOrDefaultAsync();
+        var volunteer = await VolunteersWriteDbContext.Volunteers.FirstOrDefaultAsync();
         volunteer.Should().NotBeNull();
 
         volunteer.FullName.FirstName.Should().Be(updateCommand.FullName.FirstName);
