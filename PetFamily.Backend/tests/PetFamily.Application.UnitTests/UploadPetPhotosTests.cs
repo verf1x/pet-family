@@ -5,18 +5,18 @@ using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.Extensions.Logging;
 using Moq;
-using PetFamily.Application.Database;
-using PetFamily.Application.Files;
-using PetFamily.Application.Messaging;
-using PetFamily.Application.VolunteersManagement;
-using PetFamily.Application.VolunteersManagement.UseCases.UploadPetPhotos;
-using PetFamily.Contracts.Dtos;
-using PetFamily.Domain.Shared;
-using PetFamily.Domain.Shared.EntityIds;
-using PetFamily.Domain.Shared.ValueObjects;
-using PetFamily.Domain.VolunteersManagement.Entities;
-using PetFamily.Domain.VolunteersManagement.Enums;
-using PetFamily.Domain.VolunteersManagement.ValueObjects;
+using PetFamily.Framework;
+using PetFamily.Framework.Database;
+using PetFamily.Framework.EntityIds;
+using PetFamily.Framework.Files;
+using PetFamily.Framework.Messaging;
+using PetFamily.Framework.ValueObjects;
+using PetFamily.Volunteers.Domain.VolunteersManagement.Entities;
+using PetFamily.Volunteers.Domain.VolunteersManagement.Enums;
+using PetFamily.Volunteers.Domain.VolunteersManagement.ValueObjects;
+using Volunteers.Application.VolunteersManagement;
+using Volunteers.Application.VolunteersManagement.UseCases.UploadPetPhotos;
+using Volunteers.Contracts.Dtos;
 
 namespace PetFamily.Application.UnitTests;
 
@@ -160,7 +160,7 @@ public class UploadPetPhotosTests
         return PhoneNumber.Create(phoneNumber).Value;
     }
 
-    private Volunteer GetUniqueVolunteer()
+    private Errors.Volunteer GetUniqueVolunteer()
     {
         var fullName = FullName.Create("John", "Doe").Value;
         var email = GetRandomEmail();

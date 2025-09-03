@@ -22,8 +22,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\src\PetFamily.Application\PetFamily.Application.csproj" />
-      <ProjectReference Include="..\..\src\PetFamily.Infrastructure\PetFamily.Infrastructure.csproj" />
+      <ProjectReference Include="..\..\src\Core\Shared\Shared.csproj" />
+      <ProjectReference Include="..\..\src\Volunteers\Volunteers.Application\Volunteers.Application.csproj" />
     </ItemGroup>
 
 </Project>
