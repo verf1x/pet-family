@@ -1,6 +1,6 @@
 using FluentValidation;
-using PetFamily.Framework;
-using PetFamily.Framework.Validation;
+using PetFamily.Core.Validation;
+using PetFamily.SharedKernel;
 
 namespace Volunteers.Application.VolunteersManagement.UseCases.UploadPetPhotos;
 

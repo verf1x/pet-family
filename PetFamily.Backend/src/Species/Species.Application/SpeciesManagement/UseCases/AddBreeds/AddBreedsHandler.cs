@@ -1,19 +1,21 @@
 using CSharpFunctionalExtensions;
 using FluentValidation;
-using PetFamily.Framework;
-using PetFamily.Framework.Abstractions;
-using PetFamily.Framework.Database;
-using PetFamily.Framework.EntityIds;
-using PetFamily.Framework.Extensions;
+using FluentValidation.Results;
+using PetFamily.Core.Abstractions;
+using PetFamily.Core.Database;
+using PetFamily.SharedKernel;
+using PetFamily.SharedKernel.EntityIds;
+using PetFamily.SharedKernel.Extensions;
 using Species.Application.Extensions;
+using Species.Domain.SpeciesManagement.ValueObjects;
 
 namespace Species.Application.SpeciesManagement.UseCases.AddBreeds;
 
 public class AddBreedsHandler : ICommandHandler<List<Guid>, AddBreedsCommand>
 {
-    private readonly IValidator<AddBreedsCommand> _validator;
     private readonly ISpeciesRepository _speciesRepository;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IValidator<AddBreedsCommand> _validator;
 
     public AddBreedsHandler(
         IValidator<AddBreedsCommand> validator,
@@ -29,17 +31,22 @@ public class AddBreedsHandler : ICommandHandler<List<Guid>, AddBreedsCommand>
         AddBreedsCommand command,
         CancellationToken cancellationToken = default)
     {
-        var validationResult = await _validator.ValidateAsync(command, cancellationToken);
+        ValidationResult? validationResult = await _validator.ValidateAsync(command, cancellationToken);
         if (!validationResult.IsValid)
+        {
             return validationResult.ToErrorList();
+        }
 
-        var speciesId = SpeciesId.Create(command.SpeciesId);
+        SpeciesId speciesId = SpeciesId.Create(command.SpeciesId);
 
-        var speciesResult = await _speciesRepository.GetByIdAsync(speciesId, cancellationToken);
+        Result<Domain.SpeciesManagement.Species, Error> speciesResult =
+            await _speciesRepository.GetByIdAsync(speciesId, cancellationToken);
         if (speciesResult.IsFailure)
+        {
             return speciesResult.Error.ToErrorList();
+        }
 
-        var breeds = command.BreedsNames.ToBreedsCollection();
+        List<Breed> breeds = command.BreedsNames.ToBreedsCollection();
 
         speciesResult.Value.AddBreeds(breeds);
 

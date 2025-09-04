@@ -1,23 +1,26 @@
-﻿using CSharpFunctionalExtensions;
+﻿using System.Data;
+using CSharpFunctionalExtensions;
 using FluentValidation;
+using FluentValidation.Results;
 using Microsoft.Extensions.Logging;
-using PetFamily.Framework;
-using PetFamily.Framework.Abstractions;
-using PetFamily.Framework.Database;
-using PetFamily.Framework.EntityIds;
-using PetFamily.Framework.Extensions;
-using PetFamily.Framework.Files;
+using PetFamily.Core.Abstractions;
+using PetFamily.Core.Database;
+using PetFamily.Core.Files;
+using PetFamily.SharedKernel;
+using PetFamily.SharedKernel.EntityIds;
+using PetFamily.SharedKernel.Extensions;
+using PetFamily.Volunteers.Domain.VolunteersManagement.Entities;
 using Volunteers.Application.VolunteersManagement.UseCases.Delete.Hard;
 
 namespace Volunteers.Application.VolunteersManagement.UseCases.HardDeletePet;
 
 public class HardDeletePetHandler : ICommandHandler<Guid, HardDeletePetCommand>
 {
-    private readonly IValidator<HardDeletePetCommand> _validator;
-    private readonly IVolunteersRepository _volunteersRepository;
+    private readonly IFileProvider _fileProvider;
     private readonly ILogger<HardDeleteVolunteerHandler> _logger;
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IFileProvider _fileProvider;
+    private readonly IValidator<HardDeletePetCommand> _validator;
+    private readonly IVolunteersRepository _volunteersRepository;
 
     public HardDeletePetHandler(
         IValidator<HardDeletePetCommand> validator,
@@ -37,27 +40,34 @@ public class HardDeletePetHandler : ICommandHandler<Guid, HardDeletePetCommand>
         HardDeletePetCommand command,
         CancellationToken cancellationToken = default)
     {
-        var validationResult = await _validator.ValidateAsync(command, cancellationToken);
+        ValidationResult? validationResult = await _validator.ValidateAsync(command, cancellationToken);
         if (!validationResult.IsValid)
+        {
             return validationResult.ToErrorList();
+        }
 
-        var volunteerId = VolunteerId.Create(command.VolunteerId);
+        VolunteerId volunteerId = VolunteerId.Create(command.VolunteerId);
 
-        var volunteerResult = await _volunteersRepository.GetByIdAsync(volunteerId, cancellationToken);
+        Result<Volunteer, Error> volunteerResult =
+            await _volunteersRepository.GetByIdAsync(volunteerId, cancellationToken);
         if (volunteerResult.IsFailure)
+        {
             return volunteerResult.Error.ToErrorList();
+        }
 
-        var petId = PetId.Create(command.PetId);
+        PetId petId = PetId.Create(command.PetId);
 
-        var petResult = volunteerResult.Value.GetPetById(petId);
+        Result<Pet, Error> petResult = volunteerResult.Value.GetPetById(petId);
         if (petResult.IsFailure)
+        {
             return petResult.Error.ToErrorList();
+        }
 
-        var pet = petResult.Value;
+        Pet? pet = petResult.Value;
 
-        var photosPaths = pet.Photos.Select(file => file.Path);
+        IEnumerable<string> photosPaths = pet.Photos.Select(file => file.Path);
 
-        var transaction = await _unitOfWork.BeginTransactionAsync(cancellationToken);
+        IDbTransaction transaction = await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
         try
         {
@@ -65,11 +75,13 @@ public class HardDeletePetHandler : ICommandHandler<Guid, HardDeletePetCommand>
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            var removeFilesResult =
+            Result<List<string>, Error> removeFilesResult =
                 await _fileProvider.RemoveFilesAsync(photosPaths, cancellationToken);
 
             if (removeFilesResult.IsFailure)
+            {
                 return removeFilesResult.Error.ToErrorList();
+            }
 
             transaction.Commit();
 

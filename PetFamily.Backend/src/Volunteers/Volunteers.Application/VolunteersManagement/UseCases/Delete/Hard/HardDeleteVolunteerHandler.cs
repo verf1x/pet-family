@@ -1,18 +1,20 @@
 using CSharpFunctionalExtensions;
 using FluentValidation;
+using FluentValidation.Results;
 using Microsoft.Extensions.Logging;
-using PetFamily.Framework;
-using PetFamily.Framework.Abstractions;
-using PetFamily.Framework.EntityIds;
-using PetFamily.Framework.Extensions;
+using PetFamily.Core.Abstractions;
+using PetFamily.SharedKernel;
+using PetFamily.SharedKernel.EntityIds;
+using PetFamily.SharedKernel.Extensions;
+using PetFamily.Volunteers.Domain.VolunteersManagement.Entities;
 
 namespace Volunteers.Application.VolunteersManagement.UseCases.Delete.Hard;
 
 public class HardDeleteVolunteerHandler : ICommandHandler<Guid, HardDeleteVolunteerCommand>
 {
-    private readonly IVolunteersRepository _volunteersRepository;
-    private readonly IValidator<HardDeleteVolunteerCommand> _validator;
     private readonly ILogger<HardDeleteVolunteerHandler> _logger;
+    private readonly IValidator<HardDeleteVolunteerCommand> _validator;
+    private readonly IVolunteersRepository _volunteersRepository;
 
     public HardDeleteVolunteerHandler(
         IVolunteersRepository volunteersRepository,
@@ -28,16 +30,21 @@ public class HardDeleteVolunteerHandler : ICommandHandler<Guid, HardDeleteVolunt
         HardDeleteVolunteerCommand command,
         CancellationToken cancellationToken = default)
     {
-        var validationResult = await _validator.ValidateAsync(command, cancellationToken);
+        ValidationResult? validationResult = await _validator.ValidateAsync(command, cancellationToken);
         if (!validationResult.IsValid)
+        {
             return validationResult.ToErrorList();
+        }
 
-        var volunteerId = VolunteerId.Create(command.VolunteerId);
-        var volunteerResult = await _volunteersRepository.GetByIdAsync(volunteerId, cancellationToken);
+        VolunteerId volunteerId = VolunteerId.Create(command.VolunteerId);
+        Result<Volunteer, Error> volunteerResult =
+            await _volunteersRepository.GetByIdAsync(volunteerId, cancellationToken);
         if (volunteerResult.IsFailure)
+        {
             return volunteerResult.Error.ToErrorList();
+        }
 
-        var result = await _volunteersRepository.RemoveAsync(volunteerResult.Value, cancellationToken);
+        Guid result = await _volunteersRepository.RemoveAsync(volunteerResult.Value, cancellationToken);
 
         _logger.LogInformation("Hard deleted volunteer with ID: {VolunteerId}", command.VolunteerId);
 

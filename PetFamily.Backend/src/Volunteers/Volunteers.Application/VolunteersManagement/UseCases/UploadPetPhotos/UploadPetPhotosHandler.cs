@@ -1,13 +1,17 @@
+using System.Data;
 using CSharpFunctionalExtensions;
 using FluentValidation;
+using FluentValidation.Results;
 using Microsoft.Extensions.Logging;
-using PetFamily.Framework;
-using PetFamily.Framework.Abstractions;
-using PetFamily.Framework.Database;
-using PetFamily.Framework.EntityIds;
-using PetFamily.Framework.Extensions;
-using PetFamily.Framework.Files;
-using PetFamily.Framework.Messaging;
+using PetFamily.Core.Abstractions;
+using PetFamily.Core.Database;
+using PetFamily.Core.Files;
+using PetFamily.Core.Messaging;
+using PetFamily.SharedKernel;
+using PetFamily.SharedKernel.EntityIds;
+using PetFamily.SharedKernel.Extensions;
+using PetFamily.Volunteers.Domain.VolunteersManagement.Entities;
+using PetFamily.Volunteers.Domain.VolunteersManagement.ValueObjects;
 using Volunteers.Application.Extensions;
 
 namespace Volunteers.Application.VolunteersManagement.UseCases.UploadPetPhotos;
@@ -15,11 +19,11 @@ namespace Volunteers.Application.VolunteersManagement.UseCases.UploadPetPhotos;
 public class UploadPetPhotosHandler : ICommandHandler<List<string>, UploadPetPhotosCommand>
 {
     private readonly IFileProvider _fileProvider;
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly IVolunteersRepository _volunteersRepository;
-    private readonly IValidator<UploadPetPhotosCommand> _validator;
-    private readonly IMessageQueue<IEnumerable<string>> _messageQueue;
     private readonly ILogger<UploadPetPhotosHandler> _logger;
+    private readonly IMessageQueue<IEnumerable<string>> _messageQueue;
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly IValidator<UploadPetPhotosCommand> _validator;
+    private readonly IVolunteersRepository _volunteersRepository;
 
     public UploadPetPhotosHandler(
         IFileProvider fileProvider,
@@ -41,27 +45,36 @@ public class UploadPetPhotosHandler : ICommandHandler<List<string>, UploadPetPho
         UploadPetPhotosCommand command,
         CancellationToken cancellationToken = default)
     {
-        var validationResult = await _validator.ValidateAsync(command, cancellationToken);
+        ValidationResult? validationResult = await _validator.ValidateAsync(command, cancellationToken);
         if (!validationResult.IsValid)
+        {
             return validationResult.ToErrorList();
+        }
 
-        var volunteerId = VolunteerId.Create(command.VolunteerId);
-        var volunteerResult = await _volunteersRepository.GetByIdAsync(volunteerId, cancellationToken);
+        VolunteerId volunteerId = VolunteerId.Create(command.VolunteerId);
+        Result<Volunteer, Error> volunteerResult =
+            await _volunteersRepository.GetByIdAsync(volunteerId, cancellationToken);
         if (volunteerResult.IsFailure)
+        {
             return volunteerResult.Error.ToErrorList();
+        }
 
-        var petId = PetId.Create(command.PetId);
-        var petResult = volunteerResult.Value.GetPetById(petId);
+        PetId petId = PetId.Create(command.PetId);
+        Result<Pet, Error> petResult = volunteerResult.Value.GetPetById(petId);
         if (petResult.IsFailure)
+        {
             return petResult.Error.ToErrorList();
+        }
 
-        var filesData = command.Photos.ToDataCollection();
+        Result<List<PhotoData>, Error> filesData = command.Photos.ToDataCollection();
         if (filesData.IsFailure)
+        {
             return filesData.Error.ToErrorList();
+        }
 
-        var petPhotos = filesData.Value.ToFilesCollection();
+        List<Photo> petPhotos = filesData.Value.ToFilesCollection();
 
-        var transaction = await _unitOfWork.BeginTransactionAsync(cancellationToken);
+        IDbTransaction transaction = await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
         try
         {
@@ -69,7 +82,8 @@ public class UploadPetPhotosHandler : ICommandHandler<List<string>, UploadPetPho
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            var uploadResult = await _fileProvider.UploadPhotosAsync(filesData.Value, cancellationToken);
+            Result<List<string>, Error> uploadResult =
+                await _fileProvider.UploadPhotosAsync(filesData.Value, cancellationToken);
             if (uploadResult.IsFailure)
             {
                 await _messageQueue.WriteAsync(
@@ -81,7 +95,7 @@ public class UploadPetPhotosHandler : ICommandHandler<List<string>, UploadPetPho
 
             transaction.Commit();
 
-            var photoPaths = uploadResult.Value
+            List<string> photoPaths = uploadResult.Value
                 .Select(file => file)
                 .ToList();
 

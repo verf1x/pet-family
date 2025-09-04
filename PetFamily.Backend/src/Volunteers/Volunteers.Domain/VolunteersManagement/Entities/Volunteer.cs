@@ -1,7 +1,7 @@
 using CSharpFunctionalExtensions;
-using PetFamily.Framework;
-using PetFamily.Framework.EntityIds;
-using PetFamily.Framework.ValueObjects;
+using PetFamily.SharedKernel;
+using PetFamily.SharedKernel.EntityIds;
+using PetFamily.SharedKernel.ValueObjects;
 using PetFamily.Volunteers.Domain.VolunteersManagement.Enums;
 using PetFamily.Volunteers.Domain.VolunteersManagement.ValueObjects;
 
@@ -10,22 +10,6 @@ namespace PetFamily.Volunteers.Domain.VolunteersManagement.Entities;
 public class Volunteer : SoftDeletableEntity<VolunteerId>
 {
     private readonly List<Pet> _pets = [];
-
-    public FullName FullName { get; private set; } = null!;
-
-    public Email Email { get; private set; } = null!;
-
-    public Description Description { get; private set; } = null!;
-
-    public Experience Experience { get; private set; } = null!;
-
-    public PhoneNumber PhoneNumber { get; private set; } = null!;
-
-    public IReadOnlyList<SocialNetwork> SocialNetworks { get; private set; } = null!;
-
-    public IReadOnlyList<HelpRequisite> HelpRequisites { get; private set; } = null!;
-
-    public IReadOnlyList<Pet> Pets => _pets;
 
     public Volunteer(
         VolunteerId id,
@@ -53,11 +37,29 @@ public class Volunteer : SoftDeletableEntity<VolunteerId>
     {
     }
 
+    public FullName FullName { get; private set; } = null!;
+
+    public Email Email { get; private set; } = null!;
+
+    public Description Description { get; private set; } = null!;
+
+    public Experience Experience { get; private set; } = null!;
+
+    public PhoneNumber PhoneNumber { get; private set; } = null!;
+
+    public IReadOnlyList<SocialNetwork> SocialNetworks { get; private set; } = null!;
+
+    public IReadOnlyList<HelpRequisite> HelpRequisites { get; private set; } = null!;
+
+    public IReadOnlyList<Pet> Pets => _pets;
+
     public Result<Pet, Error> GetPetById(PetId petId)
     {
-        var pet = _pets.FirstOrDefault(p => p.Id == petId);
+        Pet? pet = _pets.FirstOrDefault(p => p.Id == petId);
         if (pet is null)
+        {
             return Errors.General.NotFound(petId.Value);
+        }
 
         return pet;
     }
@@ -65,7 +67,9 @@ public class Volunteer : SoftDeletableEntity<VolunteerId>
     public Result<Guid, Error> RemovePet(Pet pet)
     {
         if (!_pets.Contains(pet))
+        {
             return Errors.General.NotFound(pet.Id.Value);
+        }
 
         _pets.Remove(pet);
 
@@ -77,11 +81,15 @@ public class Volunteer : SoftDeletableEntity<VolunteerId>
     public UnitResult<Error> AddPet(Pet pet)
     {
         if (_pets.Contains(pet))
+        {
             return Errors.General.Conflict(pet.Id.Value);
+        }
 
-        var serialNumberResult = Position.Create(_pets.Count + 1);
+        Result<Position, Error> serialNumberResult = Position.Create(_pets.Count + 1);
         if (serialNumberResult.IsFailure)
+        {
             return serialNumberResult.Error;
+        }
 
         pet.SetPosition(serialNumberResult.Value);
 
@@ -92,20 +100,26 @@ public class Volunteer : SoftDeletableEntity<VolunteerId>
 
     public UnitResult<Error> MovePet(Pet pet, Position newPosition)
     {
-        var currentPosition = pet.Position;
+        Position currentPosition = pet.Position;
 
         if (currentPosition == newPosition || _pets.Count == 1)
+        {
             return Result.Success<Error>();
+        }
 
-        var adjustedPositionResult = AdjustNewPositionIfOutOfRange(newPosition);
+        Result<Position, Error> adjustedPositionResult = AdjustNewPositionIfOutOfRange(newPosition);
         if (adjustedPositionResult.IsFailure)
+        {
             return adjustedPositionResult.Error;
+        }
 
         newPosition = adjustedPositionResult.Value;
 
-        var moveResult = MovePetsBetweenPositions(newPosition, currentPosition);
+        UnitResult<Error> moveResult = MovePetsBetweenPositions(newPosition, currentPosition);
         if (moveResult.IsFailure)
+        {
             return moveResult.Error;
+        }
 
         pet.Move(newPosition);
 
@@ -126,57 +140,57 @@ public class Volunteer : SoftDeletableEntity<VolunteerId>
         PhoneNumber = phoneNumber;
     }
 
-    public IReadOnlyList<Pet> GetPetsNeedsHelp()
-    {
-        return _pets
+    public IReadOnlyList<Pet> GetPetsNeedsHelp() =>
+        _pets
             .Where(p => p.HelpStatus is HelpStatus.NeedsHelp)
             .ToList();
-    }
 
-    public IReadOnlyList<Pet> GetPetsLookingForHome()
-    {
-        return _pets
+    public IReadOnlyList<Pet> GetPetsLookingForHome() =>
+        _pets
             .Where(p => p.HelpStatus is HelpStatus.LookingForHome)
             .ToList();
-    }
 
-    public IReadOnlyList<Pet> GetPetsFoundHome()
-    {
-        return _pets
+    public IReadOnlyList<Pet> GetPetsFoundHome() =>
+        _pets
             .Where(p => p.HelpStatus is HelpStatus.FoundHome)
             .ToList();
-    }
 
     private void AdjustPetsPositions()
     {
         for (int i = 0; i < _pets.Count; i++)
+        {
             _pets[i].SetPosition(Position.Create(i + 1).Value);
+        }
     }
 
     private UnitResult<Error> MovePetsBetweenPositions(Position newPosition, Position currentPosition)
     {
         if (newPosition < currentPosition)
         {
-            var petsToMove = _pets.Where(i => i.Position >= newPosition
-                                              && i.Position <= currentPosition);
+            IEnumerable<Pet> petsToMove = _pets.Where(i => i.Position >= newPosition
+                                                           && i.Position <= currentPosition);
 
-            foreach (var petToMove in petsToMove)
+            foreach (Pet petToMove in petsToMove)
             {
-                var result = petToMove.MoveForward();
+                UnitResult<Error> result = petToMove.MoveForward();
                 if (result.IsFailure)
+                {
                     return result.Error;
+                }
             }
         }
         else if (newPosition > currentPosition)
         {
-            var petsToMove = _pets.Where(i => i.Position > currentPosition
-                                              && i.Position <= newPosition);
+            IEnumerable<Pet> petsToMove = _pets.Where(i => i.Position > currentPosition
+                                                           && i.Position <= newPosition);
 
-            foreach (var petToMove in petsToMove)
+            foreach (Pet petToMove in petsToMove)
             {
-                var result = petToMove.MoveBackward();
+                UnitResult<Error> result = petToMove.MoveBackward();
                 if (result.IsFailure)
+                {
                     return result.Error;
+                }
             }
         }
 
@@ -186,11 +200,15 @@ public class Volunteer : SoftDeletableEntity<VolunteerId>
     private Result<Position, Error> AdjustNewPositionIfOutOfRange(Position newPosition)
     {
         if (newPosition <= _pets.Count)
+        {
             return newPosition;
+        }
 
-        var lastPositionResult = Position.Create(_pets.Count - 1);
+        Result<Position, Error> lastPositionResult = Position.Create(_pets.Count - 1);
         if (lastPositionResult.IsFailure)
+        {
             return lastPositionResult.Error;
+        }
 
         return lastPositionResult.Value;
     }

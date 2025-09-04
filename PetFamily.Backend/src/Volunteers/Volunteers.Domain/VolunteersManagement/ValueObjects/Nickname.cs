@@ -1,18 +1,19 @@
 using CSharpFunctionalExtensions;
-using PetFamily.Framework;
+using PetFamily.SharedKernel;
 
 namespace PetFamily.Volunteers.Domain.VolunteersManagement.ValueObjects;
 
 public class Nickname : ComparableValueObject
 {
-    public string Value { get; }
-
     private Nickname(string value) => Value = value;
+    public string Value { get; }
 
     public static Result<Nickname, Error> Create(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
+        {
             return Errors.General.ValueIsRequired(nameof(value));
+        }
 
         return new Nickname(value);
     }

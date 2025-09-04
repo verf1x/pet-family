@@ -1,22 +1,24 @@
 using CSharpFunctionalExtensions;
 using FluentValidation;
+using FluentValidation.Results;
 using Microsoft.Extensions.Logging;
-using PetFamily.Framework;
-using PetFamily.Framework.Abstractions;
-using PetFamily.Framework.Database;
-using PetFamily.Framework.EntityIds;
-using PetFamily.Framework.Extensions;
-using PetFamily.Framework.ValueObjects;
+using PetFamily.Core.Abstractions;
+using PetFamily.Core.Database;
+using PetFamily.SharedKernel;
+using PetFamily.SharedKernel.EntityIds;
+using PetFamily.SharedKernel.Extensions;
+using PetFamily.SharedKernel.ValueObjects;
+using PetFamily.Volunteers.Domain.VolunteersManagement.Entities;
 using PetFamily.Volunteers.Domain.VolunteersManagement.ValueObjects;
 
 namespace Volunteers.Application.VolunteersManagement.UseCases.UpdateMainInfo;
 
 public class UpdateMainInfoHandler : ICommandHandler<Guid, UpdateMainInfoCommand>
 {
-    private readonly IVolunteersRepository _volunteersRepository;
+    private readonly ILogger<UpdateMainInfoHandler> _logger;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IValidator<UpdateMainInfoCommand> _validator;
-    private readonly ILogger<UpdateMainInfoHandler> _logger;
+    private readonly IVolunteersRepository _volunteersRepository;
 
     public UpdateMainInfoHandler(
         IVolunteersRepository volunteersRepository,
@@ -34,25 +36,30 @@ public class UpdateMainInfoHandler : ICommandHandler<Guid, UpdateMainInfoCommand
         UpdateMainInfoCommand command,
         CancellationToken cancellationToken = default)
     {
-        var validationResult = await _validator.ValidateAsync(command, cancellationToken);
+        ValidationResult? validationResult = await _validator.ValidateAsync(command, cancellationToken);
         if (!validationResult.IsValid)
+        {
             return validationResult.ToErrorList();
+        }
 
-        var volunteerId = VolunteerId.Create(command.VolunteerId);
+        VolunteerId volunteerId = VolunteerId.Create(command.VolunteerId);
 
-        var volunteerResult = await _volunteersRepository.GetByIdAsync(volunteerId, cancellationToken);
+        Result<Volunteer, Error> volunteerResult =
+            await _volunteersRepository.GetByIdAsync(volunteerId, cancellationToken);
         if (volunteerResult.IsFailure)
+        {
             return volunteerResult.Error.ToErrorList();
+        }
 
-        var fullName = FullName.Create(
+        FullName? fullName = FullName.Create(
             command.FullName.FirstName,
             command.FullName.LastName,
             command.FullName.MiddleName).Value;
 
-        var email = Email.Create(command.Email).Value;
-        var description = Description.Create(command.Description).Value;
-        var experienceYears = Experience.Create(command.ExperienceYears).Value;
-        var phoneNumber = PhoneNumber.Create(command.PhoneNumber).Value;
+        Email? email = Email.Create(command.Email).Value;
+        Description? description = Description.Create(command.Description).Value;
+        Experience? experienceYears = Experience.Create(command.ExperienceYears).Value;
+        PhoneNumber? phoneNumber = PhoneNumber.Create(command.PhoneNumber).Value;
 
         volunteerResult.Value.UpdateMainInfo(
             fullName,

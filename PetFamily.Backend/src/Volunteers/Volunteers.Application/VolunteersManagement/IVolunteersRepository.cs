@@ -1,7 +1,7 @@
 using CSharpFunctionalExtensions;
-using PetFamily.Framework;
-using PetFamily.Framework.EntityIds;
-using PetFamily.Framework.ValueObjects;
+using PetFamily.SharedKernel;
+using PetFamily.SharedKernel.EntityIds;
+using PetFamily.SharedKernel.ValueObjects;
 using PetFamily.Volunteers.Domain.VolunteersManagement.Entities;
 
 namespace Volunteers.Application.VolunteersManagement;

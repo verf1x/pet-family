@@ -1,8 +1,10 @@
+using CSharpFunctionalExtensions;
 using Microsoft.AspNetCore.Mvc;
+using PetFamily.Core.Abstractions;
 using PetFamily.Framework;
-using PetFamily.Framework.Abstractions;
-using PetFamily.Framework.Models;
 using PetFamily.Framework.ResponseExtensions;
+using PetFamily.SharedKernel;
+using PetFamily.SharedKernel.Models;
 using Volunteers.Application.VolunteersManagement.Queries.GetFilteredPetsWithPagination;
 using Volunteers.Application.VolunteersManagement.Queries.GetPetById;
 using Volunteers.Contracts.Dtos.Pet;
@@ -18,7 +20,7 @@ public class PetsController : ApplicationController
         [FromServices] IQueryHandler<PagedList<PetDto>, GetFilteredPetsWithPaginationQuery> handler,
         CancellationToken cancellationToken = default)
     {
-        var query = new GetFilteredPetsWithPaginationQuery(
+        GetFilteredPetsWithPaginationQuery query = new(
             request.VolunteerIds,
             request.Nickname,
             request.Age,
@@ -37,9 +39,11 @@ public class PetsController : ApplicationController
             request.PageNumber,
             request.PageSize);
 
-        var result = await handler.HandleAsync(query, cancellationToken);
+        Result<PagedList<PetDto>, ErrorList> result = await handler.HandleAsync(query, cancellationToken);
         if (result.IsFailure)
+        {
             return result.Error.ToResponse();
+        }
 
         return Ok(result.Value);
     }
@@ -50,11 +54,13 @@ public class PetsController : ApplicationController
         [FromServices] IQueryHandler<PetDto, GetPetByIdQuery> handler,
         CancellationToken cancellationToken = default)
     {
-        var query = new GetPetByIdQuery(petId);
+        GetPetByIdQuery query = new(petId);
 
-        var result = await handler.HandleAsync(query, cancellationToken);
+        Result<PetDto, ErrorList> result = await handler.HandleAsync(query, cancellationToken);
         if (result.IsFailure)
+        {
             return result.Error.ToResponse();
+        }
 
         return Ok(result.Value);
     }

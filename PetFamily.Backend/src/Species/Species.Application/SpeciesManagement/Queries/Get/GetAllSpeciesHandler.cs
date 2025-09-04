@@ -1,9 +1,10 @@
+using System.Data;
 using System.Text.Json;
 using CSharpFunctionalExtensions;
 using Dapper;
-using PetFamily.Framework;
-using PetFamily.Framework.Abstractions;
-using PetFamily.Framework.Database;
+using PetFamily.Core.Abstractions;
+using PetFamily.Core.Database;
+using PetFamily.SharedKernel;
 using Species.Contracts.Dtos.Species;
 
 namespace Species.Application.SpeciesManagement.Queries.Get;
@@ -12,20 +13,18 @@ public class GetAllSpeciesHandler : IQueryHandler<IReadOnlyList<SpeciesDto>, Get
 {
     private readonly ISqlConnectionFactory _sqlConnectionFactory;
 
-    public GetAllSpeciesHandler(ISqlConnectionFactory sqlConnectionFactory)
-    {
+    public GetAllSpeciesHandler(ISqlConnectionFactory sqlConnectionFactory) =>
         _sqlConnectionFactory = sqlConnectionFactory;
-    }
 
     public async Task<Result<IReadOnlyList<SpeciesDto>, ErrorList>> HandleAsync(
         GetAllSpeciesQuery query,
         CancellationToken cancellationToken = default)
     {
-        var connection = _sqlConnectionFactory.Create();
+        IDbConnection connection = _sqlConnectionFactory.Create();
 
-        var sqlQuery = "SELECT id, name, breeds FROM species";
+        string sqlQuery = "SELECT id, name, breeds FROM species";
 
-        var species = await connection.QueryAsync<SpeciesDto, string, SpeciesDto>(
+        IEnumerable<SpeciesDto> species = await connection.QueryAsync<SpeciesDto, string, SpeciesDto>(
             sqlQuery,
             (speciesDto, breedsJson) =>
             {

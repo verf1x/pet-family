@@ -1,10 +1,12 @@
+using CSharpFunctionalExtensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using PetFamily.Core.Abstractions;
 using PetFamily.Framework;
-using PetFamily.Framework.Abstractions;
-using PetFamily.Framework.Models;
 using PetFamily.Framework.Processors;
 using PetFamily.Framework.ResponseExtensions;
+using PetFamily.SharedKernel;
+using PetFamily.SharedKernel.Models;
 using Volunteers.Application.VolunteersManagement.Queries.GetById;
 using Volunteers.Application.VolunteersManagement.Queries.GetWithPagination;
 using Volunteers.Application.VolunteersManagement.UseCases.AddPet;
@@ -20,6 +22,7 @@ using Volunteers.Application.VolunteersManagement.UseCases.UpdateMainInfo;
 using Volunteers.Application.VolunteersManagement.UseCases.UpdateMainPetInfo;
 using Volunteers.Application.VolunteersManagement.UseCases.UpdatePetHelpStatus;
 using Volunteers.Application.VolunteersManagement.UseCases.UploadPetPhotos;
+using Volunteers.Contracts.Dtos;
 using Volunteers.Contracts.Dtos.Volunteer;
 using Volunteers.Contracts.Requests.Volunteers;
 
@@ -33,7 +36,7 @@ public class VolunteersController : ApplicationController
         [FromBody] CreateVolunteerRequest request,
         CancellationToken cancellationToken = default)
     {
-        var command = new CreateVolunteerCommand(
+        CreateVolunteerCommand command = new(
             request.FullName,
             request.Email,
             request.Description,
@@ -42,9 +45,11 @@ public class VolunteersController : ApplicationController
             request.SocialNetworks,
             request.HelpRequisites);
 
-        var result = await handler.HandleAsync(command, cancellationToken);
+        Result<Guid, ErrorList> result = await handler.HandleAsync(command, cancellationToken);
         if (result.IsFailure)
+        {
             return result.Error.ToResponse();
+        }
 
         return Ok(result.Value);
     }
@@ -56,7 +61,7 @@ public class VolunteersController : ApplicationController
         [FromServices] ICommandHandler<Guid, UpdateMainInfoCommand> handler,
         CancellationToken cancellationToken = default)
     {
-        var command = new UpdateMainInfoCommand(
+        UpdateMainInfoCommand command = new(
             id,
             request.FullName,
             request.Email,
@@ -64,9 +69,11 @@ public class VolunteersController : ApplicationController
             request.ExperienceYears,
             request.PhoneNumber);
 
-        var result = await handler.HandleAsync(command, cancellationToken);
+        Result<Guid, ErrorList> result = await handler.HandleAsync(command, cancellationToken);
         if (result.IsFailure)
+        {
             return result.Error.ToResponse();
+        }
 
         return Ok(result.Value);
     }
@@ -77,10 +84,12 @@ public class VolunteersController : ApplicationController
         [FromServices] ICommandHandler<Guid, SoftDeleteVolunteerCommand> handler,
         CancellationToken cancellationToken = default)
     {
-        var command = new SoftDeleteVolunteerCommand(id);
-        var result = await handler.HandleAsync(command, cancellationToken);
+        SoftDeleteVolunteerCommand command = new(id);
+        Result<Guid, ErrorList> result = await handler.HandleAsync(command, cancellationToken);
         if (result.IsFailure)
+        {
             return result.Error.ToResponse();
+        }
 
         return Ok(result.Value);
     }
@@ -91,10 +100,12 @@ public class VolunteersController : ApplicationController
         [FromServices] ICommandHandler<Guid, HardDeleteVolunteerCommand> handler,
         CancellationToken cancellationToken = default)
     {
-        var command = new HardDeleteVolunteerCommand(id);
-        var result = await handler.HandleAsync(command, cancellationToken);
+        HardDeleteVolunteerCommand command = new(id);
+        Result<Guid, ErrorList> result = await handler.HandleAsync(command, cancellationToken);
         if (result.IsFailure)
+        {
             return result.Error.ToResponse();
+        }
 
         return Ok(result.Value);
     }
@@ -106,7 +117,7 @@ public class VolunteersController : ApplicationController
         [FromServices] ICommandHandler<Guid, AddPetCommand> handler,
         CancellationToken cancellationToken = default)
     {
-        var command = new AddPetCommand(
+        AddPetCommand command = new(
             id,
             request.Nickname,
             request.Description,
@@ -120,10 +131,12 @@ public class VolunteersController : ApplicationController
             request.HelpStatus,
             request.HelpRequisites);
 
-        var result = await handler.HandleAsync(command, cancellationToken);
+        Result<Guid, ErrorList> result = await handler.HandleAsync(command, cancellationToken);
 
         if (result.IsFailure)
+        {
             return result.Error.ToResponse();
+        }
 
         return Ok(result.Value);
     }
@@ -137,16 +150,18 @@ public class VolunteersController : ApplicationController
         [FromServices] ICommandHandler<List<string>, UploadPetPhotosCommand> handler,
         CancellationToken cancellationToken = default)
     {
-        await using var fileProcessor = new FormFileProcessor();
+        await using FormFileProcessor fileProcessor = new();
 
-        var fileDtos = fileProcessor.Process(photos);
+        List<UploadFileDto> fileDtos = fileProcessor.Process(photos);
 
-        var command = new UploadPetPhotosCommand(volunteerId, petId, fileDtos);
+        UploadPetPhotosCommand command = new(volunteerId, petId, fileDtos);
 
-        var result = await handler.HandleAsync(command, cancellationToken);
+        Result<List<string>, ErrorList> result = await handler.HandleAsync(command, cancellationToken);
 
         if (result.IsFailure)
+        {
             return result.Error.ToResponse();
+        }
 
         return Ok(result.Value);
     }
@@ -159,12 +174,14 @@ public class VolunteersController : ApplicationController
         [FromServices] ICommandHandler<List<string>, RemovePetPhotosCommand> handler,
         CancellationToken cancellationToken = default)
     {
-        var command = new RemovePetPhotosCommand(volunteerId, petId, photoPaths);
+        RemovePetPhotosCommand command = new(volunteerId, petId, photoPaths);
 
-        var result = await handler.HandleAsync(command, cancellationToken);
+        Result<List<string>, ErrorList> result = await handler.HandleAsync(command, cancellationToken);
 
         if (result.IsFailure)
+        {
             return result.Error.ToResponse();
+        }
 
         return Ok(result.Value);
     }
@@ -177,11 +194,13 @@ public class VolunteersController : ApplicationController
         [FromServices] ICommandHandler<int, MovePetCommand> handler,
         CancellationToken cancellationToken = default)
     {
-        var command = new MovePetCommand(volunteerId, petId, newPosition);
-        var result = await handler.HandleAsync(command, cancellationToken);
+        MovePetCommand command = new(volunteerId, petId, newPosition);
+        Result<int, ErrorList> result = await handler.HandleAsync(command, cancellationToken);
 
         if (result.IsFailure)
+        {
             return result.Error.ToResponse();
+        }
 
         return Ok(result.Value);
     }
@@ -192,14 +211,16 @@ public class VolunteersController : ApplicationController
         [FromServices] IQueryHandler<PagedList<VolunteerDto>, GetVolunteersWithPaginationQuery> handler,
         CancellationToken cancellationToken = default)
     {
-        var query = new GetVolunteersWithPaginationQuery(
+        GetVolunteersWithPaginationQuery query = new(
             request.PageNumber,
             request.PageSize);
 
-        var result = await handler.HandleAsync(query, cancellationToken);
+        Result<PagedList<VolunteerDto>, ErrorList> result = await handler.HandleAsync(query, cancellationToken);
 
         if (result.IsFailure)
+        {
             return result.Error.ToResponse();
+        }
 
         return Ok(result.Value);
     }
@@ -210,11 +231,13 @@ public class VolunteersController : ApplicationController
         [FromServices] IQueryHandler<VolunteerDto, GetVolunteerByIdQuery> handler,
         CancellationToken cancellationToken = default)
     {
-        var query = new GetVolunteerByIdQuery(id);
-        var result = await handler.HandleAsync(query, cancellationToken);
+        GetVolunteerByIdQuery query = new(id);
+        Result<VolunteerDto, ErrorList> result = await handler.HandleAsync(query, cancellationToken);
 
         if (result.IsFailure)
+        {
             return result.Error.ToResponse();
+        }
 
         return Ok(result.Value);
     }
@@ -227,7 +250,7 @@ public class VolunteersController : ApplicationController
         [FromServices] ICommandHandler<Guid, UpdateMainPetInfoCommand> handler,
         CancellationToken cancellationToken = default)
     {
-        var command = new UpdateMainPetInfoCommand(
+        UpdateMainPetInfoCommand command = new(
             volunteerId,
             petId,
             request.Nickname,
@@ -241,9 +264,11 @@ public class VolunteersController : ApplicationController
             request.DateOfBirth,
             request.HelpRequisites);
 
-        var result = await handler.HandleAsync(command, cancellationToken);
+        Result<Guid, ErrorList> result = await handler.HandleAsync(command, cancellationToken);
         if (result.IsFailure)
+        {
             return result.Error.ToResponse();
+        }
 
         return Ok(result.Value);
     }
@@ -256,11 +281,13 @@ public class VolunteersController : ApplicationController
         [FromServices] ICommandHandler<int, UpdatePetHelpStatusCommand> handler,
         CancellationToken cancellationToken = default)
     {
-        var command = new UpdatePetHelpStatusCommand(volunteerId, petId, helpStatus);
+        UpdatePetHelpStatusCommand command = new(volunteerId, petId, helpStatus);
 
-        var result = await handler.HandleAsync(command, cancellationToken);
+        Result<int, ErrorList> result = await handler.HandleAsync(command, cancellationToken);
         if (result.IsFailure)
+        {
             return result.Error.ToResponse();
+        }
 
         return Ok(result.Value);
     }
@@ -272,11 +299,13 @@ public class VolunteersController : ApplicationController
         [FromServices] ICommandHandler<Guid, SoftDeletePetCommand> handler,
         CancellationToken cancellationToken = default)
     {
-        var command = new SoftDeletePetCommand(volunteerId, petId);
+        SoftDeletePetCommand command = new(volunteerId, petId);
 
-        var result = await handler.HandleAsync(command, cancellationToken);
+        Result<Guid, ErrorList> result = await handler.HandleAsync(command, cancellationToken);
         if (result.IsFailure)
+        {
             return result.Error.ToResponse();
+        }
 
         return Ok(result.Value);
     }
@@ -288,11 +317,13 @@ public class VolunteersController : ApplicationController
         [FromServices] ICommandHandler<Guid, HardDeletePetCommand> handler,
         CancellationToken cancellationToken = default)
     {
-        var command = new HardDeletePetCommand(volunteerId, petId);
+        HardDeletePetCommand command = new(volunteerId, petId);
 
-        var result = await handler.HandleAsync(command, cancellationToken);
+        Result<Guid, ErrorList> result = await handler.HandleAsync(command, cancellationToken);
         if (result.IsFailure)
+        {
             return result.Error.ToResponse();
+        }
 
         return Ok(result.Value);
     }
@@ -305,12 +336,14 @@ public class VolunteersController : ApplicationController
         [FromServices] ICommandHandler<string, SetMainPetPhotoCommand> handler,
         CancellationToken cancellationToken = default)
     {
-        var command = new SetMainPetPhotoCommand(volunteerId, petId, photoPath);
+        SetMainPetPhotoCommand command = new(volunteerId, petId, photoPath);
 
-        var result = await handler.HandleAsync(command, cancellationToken);
+        Result<string, ErrorList> result = await handler.HandleAsync(command, cancellationToken);
 
         if (result.IsFailure)
+        {
             return result.Error.ToResponse();
+        }
 
         return Ok(result.Value);
     }

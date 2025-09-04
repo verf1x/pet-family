@@ -1,13 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using PetFamily.Framework;
-using PetFamily.Framework.EntityIds;
+using PetFamily.SharedKernel;
+using PetFamily.SharedKernel.EntityIds;
 
 namespace Species.Infrastructure.Postgres.Configurations.Write;
 
-public class SpeciesConfiguration : IEntityTypeConfiguration<Species.Domain.SpeciesManagement.Species>
+public class SpeciesConfiguration : IEntityTypeConfiguration<Domain.SpeciesManagement.Species>
 {
-    public void Configure(EntityTypeBuilder<Species.Domain.SpeciesManagement.Species> builder)
+    public void Configure(EntityTypeBuilder<Domain.SpeciesManagement.Species> builder)
     {
         builder.ToTable("species");
 

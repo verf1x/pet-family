@@ -1,19 +1,21 @@
 using CSharpFunctionalExtensions;
 using FluentValidation;
-using PetFamily.Framework;
-using PetFamily.Framework.Abstractions;
-using PetFamily.Framework.Database;
-using PetFamily.Framework.EntityIds;
-using PetFamily.Framework.Extensions;
+using FluentValidation.Results;
+using PetFamily.Core.Abstractions;
+using PetFamily.Core.Database;
+using PetFamily.SharedKernel;
+using PetFamily.SharedKernel.EntityIds;
+using PetFamily.SharedKernel.Extensions;
+using PetFamily.Volunteers.Domain.VolunteersManagement.Entities;
 using PetFamily.Volunteers.Domain.VolunteersManagement.ValueObjects;
 
 namespace Volunteers.Application.VolunteersManagement.UseCases.MovePet;
 
 public class MovePetHandler : ICommandHandler<int, MovePetCommand>
 {
-    private readonly IVolunteersRepository _volunteersRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IValidator<MovePetCommand> _validator;
+    private readonly IVolunteersRepository _volunteersRepository;
 
     public MovePetHandler(
         IVolunteersRepository volunteersRepository,
@@ -29,27 +31,38 @@ public class MovePetHandler : ICommandHandler<int, MovePetCommand>
         MovePetCommand command,
         CancellationToken cancellationToken = default)
     {
-        var validationResult = await _validator.ValidateAsync(command, cancellationToken);
+        ValidationResult? validationResult = await _validator.ValidateAsync(command, cancellationToken);
         if (!validationResult.IsValid)
+        {
             return validationResult.ToErrorList();
+        }
 
-        var volunteerId = VolunteerId.Create(command.VolunteerId);
-        var volunteerResult = await _volunteersRepository.GetByIdAsync(volunteerId, cancellationToken);
+        VolunteerId volunteerId = VolunteerId.Create(command.VolunteerId);
+        Result<Volunteer, Error> volunteerResult =
+            await _volunteersRepository.GetByIdAsync(volunteerId, cancellationToken);
         if (volunteerResult.IsFailure)
+        {
             return volunteerResult.Error.ToErrorList();
+        }
 
-        var petId = PetId.Create(command.PetId);
-        var petResult = volunteerResult.Value.GetPetById(petId);
+        PetId petId = PetId.Create(command.PetId);
+        Result<Pet, Error> petResult = volunteerResult.Value.GetPetById(petId);
         if (petResult.IsFailure)
+        {
             return petResult.Error.ToErrorList();
+        }
 
-        var newPositionResult = Position.Create(command.NewPosition);
+        Result<Position, Error> newPositionResult = Position.Create(command.NewPosition);
         if (newPositionResult.IsFailure)
+        {
             return newPositionResult.Error.ToErrorList();
+        }
 
-        var movePetResult = volunteerResult.Value.MovePet(petResult.Value, newPositionResult.Value);
+        UnitResult<Error> movePetResult = volunteerResult.Value.MovePet(petResult.Value, newPositionResult.Value);
         if (movePetResult.IsFailure)
+        {
             return movePetResult.Error.ToErrorList();
+        }
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 

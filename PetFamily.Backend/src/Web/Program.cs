@@ -1,11 +1,11 @@
 using Infrastructure.Postgres;
 using Infrastructure.S3;
+using PetFamily.Framework.Middlewares;
 using Serilog;
 using Web;
 using Web.Extensions;
-using Web.Middlewares;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 Log.Logger = LoggerConfigurationFactory.Create(builder.GetSeqConnectionString());
 
@@ -15,7 +15,7 @@ builder.Services.AddS3Infrastructure(builder.Configuration);
 builder.Services.AddPostgres(builder.Configuration);
 builder.Services.AddProgramDependencies(builder.Configuration);
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 app.UseExceptionMiddleware();
 
@@ -37,4 +37,7 @@ app.MapControllers();
 
 app.Run();
 
-public partial class Program;
+namespace Web
+{
+    public class Program;
+}

@@ -1,6 +1,6 @@
 using FluentValidation;
-using PetFamily.Framework;
-using PetFamily.Framework.Validation;
+using PetFamily.Core.Validation;
+using PetFamily.SharedKernel;
 using Species.Application.SpeciesManagement.UseCases.Delete;
 
 namespace Species.Application.SpeciesManagement.UseCases.AddBreeds;

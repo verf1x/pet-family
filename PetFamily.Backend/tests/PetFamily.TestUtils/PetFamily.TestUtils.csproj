@@ -1,23 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-    </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
 
-    <ItemGroup>
-      <Reference Include="Bogus">
-        <HintPath>..\..\..\..\..\.nuget\packages\bogus\35.6.3\lib\net6.0\Bogus.dll</HintPath>
-      </Reference>
-    </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Bogus">
+      <HintPath>..\..\..\..\..\.nuget\packages\bogus\35.6.3\lib\net6.0\Bogus.dll</HintPath>
+    </Reference>
+  </ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\..\src\Species\Species.Application\Species.Application.csproj" />
-      <ProjectReference Include="..\..\src\Species\Species.Domain\Species.Domain.csproj" />
-      <ProjectReference Include="..\..\src\Species\Species.Infrastructure.Postgres\Species.Infrastructure.Postgres.csproj" />
-      <ProjectReference Include="..\..\src\Volunteers\Volunteers.Domain\Volunteers.Domain.csproj" />
-      <ProjectReference Include="..\..\src\Volunteers\Volunteers.Infrastructure.Postgres\Volunteers.Infrastructure.Postgres.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Species\Species.Application\Species.Application.csproj"/>
+    <ProjectReference Include="..\..\src\Species\Species.Domain\Species.Domain.csproj"/>
+    <ProjectReference Include="..\..\src\Species\Species.Infrastructure.Postgres\Species.Infrastructure.Postgres.csproj"/>
+    <ProjectReference Include="..\..\src\Volunteers\Volunteers.Domain\Volunteers.Domain.csproj"/>
+    <ProjectReference Include="..\..\src\Volunteers\Volunteers.Infrastructure.Postgres\Volunteers.Infrastructure.Postgres.csproj"/>
+  </ItemGroup>
 
 </Project>

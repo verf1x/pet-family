@@ -1,7 +1,8 @@
 ﻿using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using PetFamily.Framework.Abstractions;
+using PetFamily.Core.Abstractions;
+using PetFamily.Volunteers.Domain.VolunteersManagement.Entities;
 using Volunteers.Application.VolunteersManagement.UseCases.Create;
 using Volunteers.Application.VolunteersManagement.UseCases.Delete.Soft;
 
@@ -23,20 +24,21 @@ public class SoftDeleteVolunteerHandlerTest : VolunteerTestBase
     public async Task HandleAsync_ShouldSoftDeleteVolunteer_WhenCommandIsValid()
     {
         // Arrange
-        var createCommand = Fixture.BuildCreateVolunteerCommand();
+        CreateVolunteerCommand createCommand = Fixture.BuildCreateVolunteerCommand();
 
         // Act
         var createResult = await _createVolunteerSut.HandleAsync(createCommand, CancellationToken.None);
         var volunteerId = createResult.Value;
 
-        var softDeleteCommand = new SoftDeleteVolunteerCommand(volunteerId);
+        SoftDeleteVolunteerCommand softDeleteCommand = new(volunteerId);
         var softDeleteResult = await _softDeleteSut.HandleAsync(softDeleteCommand, CancellationToken.None);
 
         // Assert
         softDeleteResult.IsSuccess.Should().BeTrue();
 
-        var volunteer =
-            await VolunteersWriteDbContext.Volunteers.FirstOrDefaultAsync(); // TODO: Обновить ReadDbContext, либо внедрить Dapper
+        Volunteer? volunteer =
+            await VolunteersWriteDbContext.Volunteers
+                .FirstOrDefaultAsync(); // TODO: Обновить ReadDbContext, либо внедрить Dapper
         volunteer.Should().NotBeNull();
         volunteer.IsDeleted.Should().BeTrue();
     }
@@ -45,7 +47,7 @@ public class SoftDeleteVolunteerHandlerTest : VolunteerTestBase
     public async Task HandleAsync_ShouldReturnError_WhenVolunteerDoesNotExist()
     {
         // Arrange
-        var softDeleteCommand = new SoftDeleteVolunteerCommand(Guid.NewGuid());
+        SoftDeleteVolunteerCommand softDeleteCommand = new(Guid.NewGuid());
 
         // Act
         var softDeleteResult = await _softDeleteSut.HandleAsync(softDeleteCommand, CancellationToken.None);

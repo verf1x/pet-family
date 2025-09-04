@@ -8,15 +8,16 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Npgsql;
 using NSubstitute;
-using PetFamily.Framework;
-using PetFamily.Framework.Database;
-using PetFamily.Framework.Files;
+using PetFamily.Core.Database;
+using PetFamily.Core.Files;
+using PetFamily.SharedKernel;
 using Respawn;
 using Species.Application.Database;
 using Species.Infrastructure.Postgres.DbContexts;
 using Testcontainers.PostgreSql;
 using Volunteers.Application.Database;
 using Volunteers.Infrastructure.Postgres.DbContexts;
+using Web;
 
 namespace PetFamily.Application.IntegrationTests;
 
@@ -30,24 +31,23 @@ public class IntegrationTestsWebFactory : WebApplicationFactory<Program>, IAsync
         .WithPortBinding(53850, 5432)
         .Build();
 
-    private Respawner _respawner = null!;
-    private DbConnection _dbConnection = null!;
     private readonly IFileProvider _fileProviderMock;
+    private DbConnection _dbConnection = null!;
 
-    public IntegrationTestsWebFactory()
-    {
-        _fileProviderMock = Substitute.For<IFileProvider>();
-    }
+    private Respawner _respawner = null!;
+
+    public IntegrationTestsWebFactory() => _fileProviderMock = Substitute.For<IFileProvider>();
 
     public async Task InitializeAsync()
     {
         await _dbContainer.StartAsync();
 
-        using var scope = Services.CreateScope();
-        var volunteersWriteDbContext = scope.ServiceProvider.GetRequiredService<VolunteersWriteDbContext>();
+        using IServiceScope scope = Services.CreateScope();
+        VolunteersWriteDbContext volunteersWriteDbContext =
+            scope.ServiceProvider.GetRequiredService<VolunteersWriteDbContext>();
         await volunteersWriteDbContext.Database.EnsureCreatedAsync();
 
-        var speciesWriteDbContext = scope.ServiceProvider.GetRequiredService<SpeciesWriteDbContext>();
+        SpeciesWriteDbContext speciesWriteDbContext = scope.ServiceProvider.GetRequiredService<SpeciesWriteDbContext>();
         await speciesWriteDbContext.Database.EnsureCreatedAsync();
 
         _dbConnection = new NpgsqlConnection(_dbContainer.GetConnectionString());
@@ -61,30 +61,21 @@ public class IntegrationTestsWebFactory : WebApplicationFactory<Program>, IAsync
         await _dbContainer.DisposeAsync();
     }
 
-    public async Task ResetDatabaseAsync()
-    {
-        await _respawner.ResetAsync(_dbConnection);
-    }
+    public async Task ResetDatabaseAsync() => await _respawner.ResetAsync(_dbConnection);
 
-    public void SetupFileProviderSuccessUploadMock()
-    {
+    public void SetupFileProviderSuccessUploadMock() =>
         _fileProviderMock
             .UploadPhotosAsync(Arg.Any<IEnumerable<PhotoData>>(), Arg.Any<CancellationToken>())
             .Returns(Result.Success<List<string>, Error>(["fake1.jpg", "fake2.jpg"]));
-    }
 
-    public void SetupFileProviderFailedUploadMock()
-    {
+    public void SetupFileProviderFailedUploadMock() =>
         _fileProviderMock
             .UploadPhotosAsync(Arg.Any<IEnumerable<PhotoData>>(), Arg.Any<CancellationToken>())
             .Returns(Result.Failure<List<string>, Error>(
                 Error.Failure("fake.upload.error", "Failed to upload files")));
-    }
 
-    protected override void ConfigureWebHost(IWebHostBuilder builder)
-    {
+    protected override void ConfigureWebHost(IWebHostBuilder builder) =>
         builder.ConfigureTestServices(ConfigureDefaultServices);
-    }
 
     protected virtual void ConfigureDefaultServices(IServiceCollection services)
     {
@@ -119,6 +110,6 @@ public class IntegrationTestsWebFactory : WebApplicationFactory<Program>, IAsync
 
         _respawner = await Respawner.CreateAsync(
             _dbConnection,
-            new RespawnerOptions { DbAdapter = DbAdapter.Postgres, SchemasToInclude = ["public"], });
+            new RespawnerOptions { DbAdapter = DbAdapter.Postgres, SchemasToInclude = ["public"] });
     }
 }

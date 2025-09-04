@@ -10,8 +10,8 @@ public class SpeciesTestBase : IClassFixture<IntegrationTestsWebFactory>, IAsync
     protected readonly IntegrationTestsWebFactory Factory;
     protected readonly Fixture Fixture;
     protected readonly IServiceScope Scope;
-    protected readonly SpeciesWriteDbContext WriteDbContext;
     protected readonly ISpeciesRepository SpeciesRepository;
+    protected readonly SpeciesWriteDbContext WriteDbContext;
 
     protected SpeciesTestBase(IntegrationTestsWebFactory factory)
     {

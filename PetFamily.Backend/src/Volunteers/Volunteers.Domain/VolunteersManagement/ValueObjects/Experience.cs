@@ -1,18 +1,19 @@
 using CSharpFunctionalExtensions;
-using PetFamily.Framework;
+using PetFamily.SharedKernel;
 
 namespace PetFamily.Volunteers.Domain.VolunteersManagement.ValueObjects;
 
 public class Experience : ComparableValueObject
 {
-    public int Value { get; }
-
     private Experience(int value) => Value = value;
+    public int Value { get; }
 
     public static Result<Experience, Error> Create(int totalYears)
     {
         if (totalYears is > 100 or < 0)
+        {
             return Errors.General.ValueIsInvalid(nameof(totalYears));
+        }
 
         return new Experience(totalYears);
     }

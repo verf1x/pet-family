@@ -1,8 +1,9 @@
 ﻿using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using PetFamily.Framework.Abstractions;
+using PetFamily.Core.Abstractions;
 using PetFamily.TestUtils;
+using PetFamily.Volunteers.Domain.VolunteersManagement.Entities;
 using Volunteers.Application.VolunteersManagement.UseCases.UpdateMainPetInfo;
 using Volunteers.Contracts.Dtos.Pet;
 
@@ -13,20 +14,20 @@ public class UpdateMainPetInfoHandlerTest : VolunteerTestBase
     private readonly ICommandHandler<Guid, UpdateMainPetInfoCommand> _sut;
 
     public UpdateMainPetInfoHandlerTest(IntegrationTestsWebFactory factory)
-        : base(factory)
-    {
+        : base(factory) =>
         _sut = Scope.ServiceProvider.GetRequiredService<ICommandHandler<Guid, UpdateMainPetInfoCommand>>();
-    }
 
     [Fact]
     public async Task HandleAsync_ShouldUpdateMainPetInfo_WhenCommandIsValid()
     {
         // Arrange
-        var volunteer = await VolunteerSeeder.SeedVolunteerAsync(VolunteersRepository, VolunteersWriteDbContext);
-        var species = await SpeciesSeeder.SeedSpeciesWithBreedsAsync(SpeciesRepository, SpeciesWriteDbContext);
-        var pet = await VolunteerSeeder.SeedPetAsync(VolunteersWriteDbContext, volunteer, species.Id, species.Breeds[0].Id);
+        Volunteer volunteer = await VolunteerSeeder.SeedVolunteerAsync(VolunteersRepository, VolunteersWriteDbContext);
+        global::Species.Domain.SpeciesManagement.Species species =
+            await SpeciesSeeder.SeedSpeciesWithBreedsAsync(SpeciesRepository, SpeciesWriteDbContext);
+        Pet pet = await VolunteerSeeder.SeedPetAsync(VolunteersWriteDbContext, volunteer, species.Id,
+            species.Breeds[0].Id);
 
-        var command = Fixture.BuildUpdateMainPetInfoCommand(
+        UpdateMainPetInfoCommand command = Fixture.BuildUpdateMainPetInfoCommand(
             volunteer.Id,
             pet.Id.Value,
             new SpeciesBreedDto(species.Id, species.Breeds[0].Id.Value));
@@ -37,9 +38,9 @@ public class UpdateMainPetInfoHandlerTest : VolunteerTestBase
         // Assert
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().Be(pet.Id.Value);
-        var updatedVolunteer = await VolunteersWriteDbContext.Volunteers.FirstOrDefaultAsync();
+        Volunteer? updatedVolunteer = await VolunteersWriteDbContext.Volunteers.FirstOrDefaultAsync();
         updatedVolunteer!.Pets.Should().HaveCount(1);
-        var updatedPet = updatedVolunteer.Pets[0];
+        Pet updatedPet = updatedVolunteer.Pets[0];
         updatedPet.Id.Value.Should().Be(pet.Id.Value);
         updatedPet.Nickname.Value.Should().Be(command.Nickname);
         updatedPet.Description.Value.Should().Be(command.Description);

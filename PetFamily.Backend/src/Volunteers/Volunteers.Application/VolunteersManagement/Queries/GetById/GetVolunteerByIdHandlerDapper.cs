@@ -1,8 +1,9 @@
+using System.Data;
 using CSharpFunctionalExtensions;
 using Dapper;
-using PetFamily.Framework;
-using PetFamily.Framework.Abstractions;
-using PetFamily.Framework.Database;
+using PetFamily.Core.Abstractions;
+using PetFamily.Core.Database;
+using PetFamily.SharedKernel;
 using Volunteers.Contracts.Dtos.Volunteer;
 
 namespace Volunteers.Application.VolunteersManagement.Queries.GetById;
@@ -11,16 +12,14 @@ public class GetVolunteerByIdHandlerDapper : IQueryHandler<VolunteerDto, GetVolu
 {
     private readonly ISqlConnectionFactory _sqlConnectionFactory;
 
-    public GetVolunteerByIdHandlerDapper(ISqlConnectionFactory sqlConnectionFactory)
-    {
+    public GetVolunteerByIdHandlerDapper(ISqlConnectionFactory sqlConnectionFactory) =>
         _sqlConnectionFactory = sqlConnectionFactory;
-    }
 
     public async Task<Result<VolunteerDto, ErrorList>> HandleAsync(
         GetVolunteerByIdQuery query,
         CancellationToken cancellationToken = default)
     {
-        var connection = _sqlConnectionFactory.Create();
+        IDbConnection connection = _sqlConnectionFactory.Create();
 
         const string sqlQuery =
             """
@@ -28,15 +27,17 @@ public class GetVolunteerByIdHandlerDapper : IQueryHandler<VolunteerDto, GetVolu
             WHERE id = @VolunteerId AND is_deleted = false
             """;
 
-        var parameters = new DynamicParameters();
+        DynamicParameters parameters = new();
         parameters.Add("VolunteerId", query.VolunteerId);
 
-        var volunteerDto = await connection.QuerySingleOrDefaultAsync<VolunteerDto>(
+        VolunteerDto? volunteerDto = await connection.QuerySingleOrDefaultAsync<VolunteerDto>(
             sqlQuery,
             parameters);
 
         if (volunteerDto is null)
+        {
             return Errors.General.NotFound(query.VolunteerId).ToErrorList();
+        }
 
         return volunteerDto;
     }

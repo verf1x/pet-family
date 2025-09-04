@@ -1,8 +1,8 @@
 using CSharpFunctionalExtensions;
 using Microsoft.EntityFrameworkCore;
-using PetFamily.Framework;
-using PetFamily.Framework.EntityIds;
-using PetFamily.Framework.ValueObjects;
+using PetFamily.SharedKernel;
+using PetFamily.SharedKernel.EntityIds;
+using PetFamily.SharedKernel.ValueObjects;
 using PetFamily.Volunteers.Domain.VolunteersManagement.Entities;
 using Volunteers.Application.VolunteersManagement;
 using Volunteers.Infrastructure.Postgres.DbContexts;
@@ -13,10 +13,7 @@ public class VolunteersRepository : IVolunteersRepository
 {
     private readonly VolunteersWriteDbContext _writeDbContext;
 
-    public VolunteersRepository(VolunteersWriteDbContext writeDbContext)
-    {
-        _writeDbContext = writeDbContext;
-    }
+    public VolunteersRepository(VolunteersWriteDbContext writeDbContext) => _writeDbContext = writeDbContext;
 
     public async Task<Guid> AddAsync(Volunteer volunteer, CancellationToken cancellationToken = default)
     {
@@ -40,19 +37,21 @@ public class VolunteersRepository : IVolunteersRepository
         VolunteerId volunteerId,
         CancellationToken cancellationToken = default)
     {
-        var volunteer = await _writeDbContext.Volunteers
+        Volunteer? volunteer = await _writeDbContext.Volunteers
             .Include(v => v.Pets)
             .FirstOrDefaultAsync(v => v.Id == volunteerId, cancellationToken);
 
         if (volunteer is null)
+        {
             return Errors.General.NotFound(volunteerId);
+        }
 
         return volunteer;
     }
 
     public async Task<Result<Volunteer>> GetByEmailAsync(Email email, CancellationToken cancellationToken = default)
     {
-        var volunteer = await _writeDbContext.Volunteers
+        Volunteer? volunteer = await _writeDbContext.Volunteers
             .FirstOrDefaultAsync(v => v.Email == email, cancellationToken);
 
         return volunteer ?? Result.Failure<Volunteer>("Email not found");
@@ -62,7 +61,7 @@ public class VolunteersRepository : IVolunteersRepository
         PhoneNumber phoneNumber,
         CancellationToken cancellationToken = default)
     {
-        var volunteer = await _writeDbContext.Volunteers
+        Volunteer? volunteer = await _writeDbContext.Volunteers
             .FirstOrDefaultAsync(v => v.PhoneNumber == phoneNumber, cancellationToken);
 
         return volunteer ?? Result.Failure<Volunteer>("Phone number not found");

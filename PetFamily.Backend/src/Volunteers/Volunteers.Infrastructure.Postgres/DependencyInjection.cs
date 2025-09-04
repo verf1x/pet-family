@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using PetFamily.Framework;
-using PetFamily.Framework.Database;
+using PetFamily.Core.Database;
+using PetFamily.SharedKernel;
 using Volunteers.Application.Database;
 using Volunteers.Application.VolunteersManagement;
 using Volunteers.Infrastructure.Postgres.Database;

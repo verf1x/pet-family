@@ -1,19 +1,20 @@
 using CSharpFunctionalExtensions;
 using FluentValidation;
+using FluentValidation.Results;
 using Microsoft.Extensions.Logging;
-using PetFamily.Framework;
-using PetFamily.Framework.Abstractions;
-using PetFamily.Framework.EntityIds;
-using PetFamily.Framework.Extensions;
+using PetFamily.Core.Abstractions;
+using PetFamily.SharedKernel;
+using PetFamily.SharedKernel.EntityIds;
+using PetFamily.SharedKernel.Extensions;
 using Species.Domain.SpeciesManagement.ValueObjects;
 
 namespace Species.Application.SpeciesManagement.UseCases.Create;
 
 public class CreateSpeciesHandler : ICommandHandler<Guid, CreateSpeciesCommand>
 {
+    private readonly ILogger<CreateSpeciesHandler> _logger;
     private readonly ISpeciesRepository _speciesRepository;
     private readonly IValidator<CreateSpeciesCommand> _validator;
-    private readonly ILogger<CreateSpeciesHandler> _logger;
 
     public CreateSpeciesHandler(
         ISpeciesRepository speciesRepository,
@@ -29,23 +30,27 @@ public class CreateSpeciesHandler : ICommandHandler<Guid, CreateSpeciesCommand>
         CreateSpeciesCommand command,
         CancellationToken cancellationToken = default)
     {
-        var validationResult = await _validator.ValidateAsync(command, cancellationToken);
+        ValidationResult? validationResult = await _validator.ValidateAsync(command, cancellationToken);
         if (!validationResult.IsValid)
+        {
             return validationResult.ToErrorList();
+        }
 
-        var name = Name.Create(command.Name).Value;
+        Name? name = Name.Create(command.Name).Value;
 
-        var speciesByNameResult = await _speciesRepository
+        Result<Domain.SpeciesManagement.Species> speciesByNameResult = await _speciesRepository
             .GetByNameAsync(name, cancellationToken);
 
         if (speciesByNameResult.IsSuccess)
+        {
             return Errors.Species.AlreadyExists().ToErrorList();
+        }
 
-        var id = SpeciesId.CreateNew();
+        SpeciesId id = SpeciesId.CreateNew();
 
-        var species = new Species.Domain.SpeciesManagement.Species(id, name);
+        Domain.SpeciesManagement.Species species = new(id, name);
 
-        var result = await _speciesRepository.AddAsync(species, cancellationToken);
+        Guid result = await _speciesRepository.AddAsync(species, cancellationToken);
 
         _logger.LogInformation("Created species with ID: {id}", id);
 

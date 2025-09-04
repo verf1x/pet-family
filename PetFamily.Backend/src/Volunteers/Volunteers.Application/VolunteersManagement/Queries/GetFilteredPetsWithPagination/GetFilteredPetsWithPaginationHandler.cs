@@ -1,11 +1,12 @@
+using System.Data;
 using System.Text;
 using CSharpFunctionalExtensions;
 using Dapper;
-using PetFamily.Framework;
-using PetFamily.Framework.Abstractions;
-using PetFamily.Framework.Database;
-using PetFamily.Framework.Extensions;
-using PetFamily.Framework.Models;
+using PetFamily.Core.Abstractions;
+using PetFamily.Core.Database;
+using PetFamily.SharedKernel;
+using PetFamily.SharedKernel.Extensions;
+using PetFamily.SharedKernel.Models;
 using Volunteers.Application.Mappers;
 using Volunteers.Contracts.Dtos.Pet;
 
@@ -16,17 +17,15 @@ public class GetFilteredPetsWithPaginationHandler
 {
     private readonly ISqlConnectionFactory _sqlConnectionFactory;
 
-    public GetFilteredPetsWithPaginationHandler(ISqlConnectionFactory sqlConnectionFactory)
-    {
+    public GetFilteredPetsWithPaginationHandler(ISqlConnectionFactory sqlConnectionFactory) =>
         _sqlConnectionFactory = sqlConnectionFactory;
-    }
 
     public async Task<Result<PagedList<PetDto>, ErrorList>> HandleAsync(
         GetFilteredPetsWithPaginationQuery query,
         CancellationToken cancellationToken = default)
     {
-        var connection = _sqlConnectionFactory.Create();
-        var parameters = new DynamicParameters();
+        IDbConnection connection = _sqlConnectionFactory.Create();
+        DynamicParameters parameters = new();
 
         const string baseQuery = """
                                  SELECT
@@ -63,8 +62,8 @@ public class GetFilteredPetsWithPaginationHandler
 
         List<string> whereClauses = GetWhereClauses(query, parameters);
 
-        var sqlQuery = new StringBuilder(baseQuery);
-        var countQueryBuilder = new StringBuilder(countQuery);
+        StringBuilder sqlQuery = new(baseQuery);
+        StringBuilder countQueryBuilder = new(countQuery);
 
         if (whereClauses.Any())
         {
@@ -79,7 +78,7 @@ public class GetFilteredPetsWithPaginationHandler
         sqlQuery.ApplySorting(query.SortBy, query.SortAscending);
         sqlQuery.ApplyPagination(parameters, query.PageNumber, query.PageSize);
 
-        var pets = await connection.QueryAsync(
+        IEnumerable<PetDto> pets = await connection.QueryAsync(
             sqlQuery.ToString(),
             PetDtoMapper.MapFlatDtoToPetDtoWithPhotos(),
             splitOn: "photos",
@@ -87,13 +86,13 @@ public class GetFilteredPetsWithPaginationHandler
 
         return new PagedList<PetDto>
         {
-            Items = pets.ToList(), TotalCount = totalCount, PageSize = query.PageSize, PageNumber = query.PageNumber,
+            Items = pets.ToList(), TotalCount = totalCount, PageSize = query.PageSize, PageNumber = query.PageNumber
         };
     }
 
     private List<string> GetWhereClauses(GetFilteredPetsWithPaginationQuery query, DynamicParameters parameters)
     {
-        var whereClauses = new List<string>();
+        List<string> whereClauses = new();
 
         if (query.VolunteerIds != null && query.VolunteerIds.Length != 0)
         {

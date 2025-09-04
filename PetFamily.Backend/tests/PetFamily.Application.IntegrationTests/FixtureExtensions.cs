@@ -26,7 +26,7 @@ public static class FixtureExtensions
         IEnumerable<SocialNetworkDto>? socialNetworks = null,
         IEnumerable<HelpRequisiteDto>? helpRequisites = null)
     {
-        var faker = new Faker();
+        Faker faker = new();
 
         firstName ??= faker.Name.FirstName();
         lastName ??= faker.Name.LastName();
@@ -34,14 +34,8 @@ public static class FixtureExtensions
         description ??= faker.Lorem.Paragraph();
         experienceYears ??= faker.Random.Int(0, 30);
         phoneNumber ??= faker.Phone.PhoneNumber("############");
-        socialNetworks ??= new List<SocialNetworkDto>
-        {
-            new SocialNetworkDto(faker.Internet.DomainName(), faker.Internet.Url()),
-        };
-        helpRequisites ??= new List<HelpRequisiteDto>
-        {
-            new HelpRequisiteDto(faker.Lorem.Word(), faker.Finance.CreditCardNumber()),
-        };
+        socialNetworks ??= new List<SocialNetworkDto> { new(faker.Internet.DomainName(), faker.Internet.Url()) };
+        helpRequisites ??= new List<HelpRequisiteDto> { new(faker.Lorem.Word(), faker.Finance.CreditCardNumber()) };
 
         return fixture.Build<CreateVolunteerCommand>()
             .With(cv => cv.FullName, new FullNameDto(firstName, lastName, middleName))
@@ -65,7 +59,7 @@ public static class FixtureExtensions
         int? experienceYears = null,
         string? phoneNumber = null)
     {
-        var faker = new Faker();
+        Faker faker = new();
 
         firstName ??= faker.Name.FirstName();
         lastName ??= faker.Name.LastName();
@@ -102,7 +96,7 @@ public static class FixtureExtensions
         int? helpStatus = null,
         IEnumerable<HelpRequisiteDto>? helpRequisites = null)
     {
-        var faker = new Faker();
+        Faker faker = new();
 
         nickname ??= faker.Name.FirstName();
         description ??= faker.Lorem.Paragraph();
@@ -116,10 +110,7 @@ public static class FixtureExtensions
         ownerPhoneNumber ??= faker.Phone.PhoneNumber("############");
         dateOfBirth ??= DateOnly.FromDateTime(faker.Date.Past(25));
         helpStatus ??= faker.Random.Int(0, 2);
-        helpRequisites ??= new List<HelpRequisiteDto>
-        {
-            new HelpRequisiteDto(faker.Lorem.Word(), faker.Finance.CreditCardNumber()),
-        };
+        helpRequisites ??= new List<HelpRequisiteDto> { new(faker.Lorem.Word(), faker.Finance.CreditCardNumber()) };
 
         return fixture.Build<AddPetCommand>()
             .With(ap => ap.VolunteerId, volunteerId)
@@ -143,17 +134,17 @@ public static class FixtureExtensions
         Guid petId,
         IEnumerable<UploadFileDto>? photos = null)
     {
-        var faker = new Faker();
+        Faker faker = new();
 
         photos ??= new List<UploadFileDto>
         {
             new(GetFakeImageStream(), faker.Image.DataUri(8, 8)),
-            new(GetFakeImageStream(), faker.Image.DataUri(8, 8)),
+            new(GetFakeImageStream(), faker.Image.DataUri(8, 8))
         };
 
         fixture.Register<Stream>(() =>
         {
-            var random = new Random();
+            Random random = new();
             byte[] fakeImageContent = new byte[64];
             random.NextBytes(fakeImageContent);
             return new MemoryStream(fakeImageContent);
@@ -183,7 +174,7 @@ public static class FixtureExtensions
         string? ownerPhoneNumber = null,
         IEnumerable<HelpRequisiteDto>? helpRequisites = null)
     {
-        var faker = new Faker();
+        Faker faker = new();
 
         nickname ??= faker.Name.FirstName();
         description ??= faker.Lorem.Paragraph();
@@ -195,7 +186,7 @@ public static class FixtureExtensions
         height ??= faker.Random.Float(.05F, 80.0F);
         weight ??= faker.Random.Float(.1F, 70.0F);
         ownerPhoneNumber ??= faker.Phone.PhoneNumber("############");
-        helpRequisites ??= new List<HelpRequisiteDto> { new(faker.Lorem.Word(), faker.Finance.CreditCardNumber()), };
+        helpRequisites ??= new List<HelpRequisiteDto> { new(faker.Lorem.Word(), faker.Finance.CreditCardNumber()) };
 
         return fixture.Build<UpdateMainPetInfoCommand>()
             .With(um => um.VolunteerId, volunteerId)
@@ -216,7 +207,7 @@ public static class FixtureExtensions
         this IFixture fixture,
         string? name = null)
     {
-        var faker = new Faker();
+        Faker faker = new();
 
         name ??= faker.Lorem.Word();
         return fixture.Build<CreateSpeciesCommand>()
@@ -226,7 +217,7 @@ public static class FixtureExtensions
 
     private static Stream GetFakeImageStream()
     {
-        var random = new Random();
+        Random random = new();
 
         byte[] fakeImageContent = new byte[256];
         random.NextBytes(fakeImageContent);

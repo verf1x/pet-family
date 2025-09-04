@@ -9,10 +9,8 @@ public class SpeciesReadDbContext(string connectionString) : DbContext, ISpecies
 {
     public IQueryable<SpeciesDto> Species => Set<SpeciesDto>();
 
-    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-    {
-        return await base.SaveChangesAsync(cancellationToken);
-    }
+    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default) =>
+        await base.SaveChangesAsync(cancellationToken);
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -24,12 +22,10 @@ public class SpeciesReadDbContext(string connectionString) : DbContext, ISpecies
         optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
     }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
+    protected override void OnModelCreating(ModelBuilder modelBuilder) =>
         modelBuilder.ApplyConfigurationsFromAssembly(
             typeof(ISpeciesReadDbContext).Assembly,
             type => type.FullName?.Contains(nameof(Configurations.Read)) ?? false);
-    }
 
     private ILoggerFactory CreateLoggerFactory()
         => LoggerFactory.Create(builder =>

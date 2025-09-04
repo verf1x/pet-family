@@ -1,4 +1,4 @@
-using PetFamily.Framework.Abstractions;
+using PetFamily.Core.Abstractions;
 using Volunteers.Contracts.Dtos.Volunteer;
 
 namespace Volunteers.Application.VolunteersManagement.UseCases.UpdateMainInfo;

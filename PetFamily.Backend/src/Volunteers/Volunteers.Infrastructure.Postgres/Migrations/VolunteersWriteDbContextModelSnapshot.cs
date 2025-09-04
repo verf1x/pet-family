@@ -299,7 +299,7 @@ namespace Volunteers.Infrastructure.Postgres.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_pets_volunteers_volunteer_id");
 
-                    b.OwnsMany("PetFamily.Framework.ValueObjects.HelpRequisite", "HelpRequisites", b1 =>
+                    b.OwnsMany("PetFamily.PetFamily.Framework.ValueObjects.HelpRequisite", "HelpRequisites", b1 =>
                         {
                             b1.Property<Guid>("PetId")
                                 .HasColumnType("uuid");
@@ -359,7 +359,7 @@ namespace Volunteers.Infrastructure.Postgres.Migrations
 
             modelBuilder.Entity("PetFamily.Volunteers.Domain.VolunteersManagement.Entities.Volunteer", b =>
                 {
-                    b.OwnsMany("PetFamily.Framework.ValueObjects.HelpRequisite", "HelpRequisites", b1 =>
+                    b.OwnsMany("PetFamily.PetFamily.Framework.ValueObjects.HelpRequisite", "HelpRequisites", b1 =>
                         {
                             b1.Property<Guid>("VolunteerId")
                                 .HasColumnType("uuid");

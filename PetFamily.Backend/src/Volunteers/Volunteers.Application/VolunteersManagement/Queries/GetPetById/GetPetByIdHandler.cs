@@ -1,8 +1,9 @@
-﻿using CSharpFunctionalExtensions;
+﻿using System.Data;
+using CSharpFunctionalExtensions;
 using Dapper;
-using PetFamily.Framework;
-using PetFamily.Framework.Abstractions;
-using PetFamily.Framework.Database;
+using PetFamily.Core.Abstractions;
+using PetFamily.Core.Database;
+using PetFamily.SharedKernel;
 using Volunteers.Application.Mappers;
 using Volunteers.Contracts.Dtos.Pet;
 
@@ -12,18 +13,16 @@ public class GetPetByIdHandler : IQueryHandler<PetDto, GetPetByIdQuery>
 {
     private readonly ISqlConnectionFactory _sqlConnectionFactory;
 
-    public GetPetByIdHandler(ISqlConnectionFactory sqlConnectionFactory)
-    {
+    public GetPetByIdHandler(ISqlConnectionFactory sqlConnectionFactory) =>
         _sqlConnectionFactory = sqlConnectionFactory;
-    }
 
     public async Task<Result<PetDto, ErrorList>> HandleAsync(
         GetPetByIdQuery query,
         CancellationToken cancellationToken = default)
     {
-        var connection = _sqlConnectionFactory.Create();
+        IDbConnection connection = _sqlConnectionFactory.Create();
 
-        var parameters = new DynamicParameters();
+        DynamicParameters parameters = new();
         parameters.Add("PetId", query.PetId);
 
         const string sql = """
@@ -58,16 +57,18 @@ public class GetPetByIdHandler : IQueryHandler<PetDto, GetPetByIdQuery>
                            WHERE id = @PetId AND is_deleted = false
                            """;
 
-        var pets = await connection.QueryAsync(
+        IEnumerable<PetDto> pets = await connection.QueryAsync(
             sql,
             PetDtoMapper.MapFlatDtoToPetDtoWithPhotos(),
             parameters,
             splitOn: "photos");
 
-        var petDto = pets.SingleOrDefault();
+        PetDto? petDto = pets.SingleOrDefault();
 
         if (petDto is null)
+        {
             return Errors.General.NotFound(query.PetId).ToErrorList();
+        }
 
         return petDto;
     }

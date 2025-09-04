@@ -8,10 +8,8 @@ public class VolunteersWriteDbContext(string connectionString) : DbContext
 {
     public DbSet<Volunteer> Volunteers => Set<Volunteer>();
 
-    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-    {
-        return await base.SaveChangesAsync(cancellationToken);
-    }
+    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default) =>
+        await base.SaveChangesAsync(cancellationToken);
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -21,12 +19,10 @@ public class VolunteersWriteDbContext(string connectionString) : DbContext
         optionsBuilder.EnableSensitiveDataLogging();
     }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
+    protected override void OnModelCreating(ModelBuilder modelBuilder) =>
         modelBuilder.ApplyConfigurationsFromAssembly(
             typeof(VolunteersWriteDbContext).Assembly,
             type => type.FullName?.Contains(nameof(Configurations.Write)) ?? false);
-    }
 
     private ILoggerFactory CreateLoggerFactory()
         => LoggerFactory.Create(builder =>

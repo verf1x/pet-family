@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using PetFamily.Framework;
-using PetFamily.Framework.EntityIds;
+using PetFamily.SharedKernel;
+using PetFamily.SharedKernel.EntityIds;
 using PetFamily.Volunteers.Domain.VolunteersManagement.Entities;
 
 namespace Volunteers.Infrastructure.Postgres.Configurations.Write;

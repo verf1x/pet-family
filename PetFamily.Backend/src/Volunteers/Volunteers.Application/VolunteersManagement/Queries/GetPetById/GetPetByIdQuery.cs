@@ -1,4 +1,4 @@
-﻿using PetFamily.Framework.Abstractions;
+﻿using PetFamily.Core.Abstractions;
 
 namespace Volunteers.Application.VolunteersManagement.Queries.GetPetById;
 

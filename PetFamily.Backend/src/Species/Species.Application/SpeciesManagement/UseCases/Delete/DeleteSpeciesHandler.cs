@@ -1,19 +1,21 @@
+using System.Data;
 using CSharpFunctionalExtensions;
 using Dapper;
 using FluentValidation;
-using PetFamily.Framework;
-using PetFamily.Framework.Abstractions;
-using PetFamily.Framework.Database;
-using PetFamily.Framework.EntityIds;
-using PetFamily.Framework.Extensions;
+using FluentValidation.Results;
+using PetFamily.Core.Abstractions;
+using PetFamily.Core.Database;
+using PetFamily.SharedKernel;
+using PetFamily.SharedKernel.EntityIds;
+using PetFamily.SharedKernel.Extensions;
 
 namespace Species.Application.SpeciesManagement.UseCases.Delete;
 
 public class DeleteSpeciesHandler : ICommandHandler<Guid, DeleteSpeciesCommand>
 {
-    private readonly ISqlConnectionFactory _sqlConnectionFactory;
-    private readonly ISpeciesRepository _speciesRepository;
     private readonly IValidator<DeleteSpeciesCommand> _speciesIdValidator;
+    private readonly ISpeciesRepository _speciesRepository;
+    private readonly ISqlConnectionFactory _sqlConnectionFactory;
 
     public DeleteSpeciesHandler(
         ISqlConnectionFactory sqlConnectionFactory,
@@ -29,13 +31,15 @@ public class DeleteSpeciesHandler : ICommandHandler<Guid, DeleteSpeciesCommand>
         DeleteSpeciesCommand command,
         CancellationToken cancellationToken = default)
     {
-        var validationResult = await _speciesIdValidator.ValidateAsync(command, cancellationToken);
+        ValidationResult? validationResult = await _speciesIdValidator.ValidateAsync(command, cancellationToken);
         if (!validationResult.IsValid)
+        {
             return validationResult.ToErrorList();
+        }
 
-        var speciesId = SpeciesId.Create(command.SpeciesId);
+        SpeciesId speciesId = SpeciesId.Create(command.SpeciesId);
 
-        var hasPetsWithSpecies = await IsAnyPetsWithSpeciesAsync(speciesId);
+        bool hasPetsWithSpecies = await IsAnyPetsWithSpeciesAsync(speciesId);
         if (hasPetsWithSpecies)
         {
             return Error.Validation(
@@ -45,20 +49,23 @@ public class DeleteSpeciesHandler : ICommandHandler<Guid, DeleteSpeciesCommand>
                 .ToErrorList();
         }
 
-        var speciesResult = await _speciesRepository.GetByIdAsync(speciesId, cancellationToken);
+        Result<Domain.SpeciesManagement.Species, Error> speciesResult =
+            await _speciesRepository.GetByIdAsync(speciesId, cancellationToken);
         if (speciesResult.IsFailure)
+        {
             return speciesResult.Error.ToErrorList();
+        }
 
-        var removedSpeciesId = await _speciesRepository.RemoveAsync(speciesResult.Value, cancellationToken);
+        Guid removedSpeciesId = await _speciesRepository.RemoveAsync(speciesResult.Value, cancellationToken);
 
         return removedSpeciesId;
     }
 
     private async Task<bool> IsAnyPetsWithSpeciesAsync(SpeciesId speciesId)
     {
-        var connection = _sqlConnectionFactory.Create();
+        IDbConnection connection = _sqlConnectionFactory.Create();
 
-        var anyPetsWithSpeciesQuery =
+        string anyPetsWithSpeciesQuery =
             """
             SELECT CAST(
                 CASE WHEN EXISTS (
@@ -72,7 +79,7 @@ public class DeleteSpeciesHandler : ICommandHandler<Guid, DeleteSpeciesCommand>
             AS BIT)
             """;
 
-        var parameters = new DynamicParameters();
+        DynamicParameters parameters = new();
         parameters.Add("speciesId", speciesId.Value);
 
         return await connection.ExecuteScalarAsync<bool>(anyPetsWithSpeciesQuery, parameters);

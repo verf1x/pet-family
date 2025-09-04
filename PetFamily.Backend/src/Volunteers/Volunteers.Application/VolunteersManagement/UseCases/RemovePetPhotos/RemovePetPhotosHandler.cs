@@ -1,12 +1,15 @@
+using System.Data;
 using CSharpFunctionalExtensions;
 using FluentValidation;
+using FluentValidation.Results;
 using Microsoft.Extensions.Logging;
-using PetFamily.Framework;
-using PetFamily.Framework.Abstractions;
-using PetFamily.Framework.Database;
-using PetFamily.Framework.EntityIds;
-using PetFamily.Framework.Extensions;
-using PetFamily.Framework.Files;
+using PetFamily.Core.Abstractions;
+using PetFamily.Core.Database;
+using PetFamily.Core.Files;
+using PetFamily.SharedKernel;
+using PetFamily.SharedKernel.EntityIds;
+using PetFamily.SharedKernel.Extensions;
+using PetFamily.Volunteers.Domain.VolunteersManagement.Entities;
 using PetFamily.Volunteers.Domain.VolunteersManagement.ValueObjects;
 
 namespace Volunteers.Application.VolunteersManagement.UseCases.RemovePetPhotos;
@@ -14,10 +17,10 @@ namespace Volunteers.Application.VolunteersManagement.UseCases.RemovePetPhotos;
 public class RemovePetPhotosHandler : ICommandHandler<List<string>, RemovePetPhotosCommand>
 {
     private readonly IFileProvider _fileProvider;
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly IVolunteersRepository _volunteersRepository;
-    private readonly IValidator<RemovePetPhotosCommand> _validator;
     private readonly ILogger<RemovePetPhotosHandler> _logger;
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly IValidator<RemovePetPhotosCommand> _validator;
+    private readonly IVolunteersRepository _volunteersRepository;
 
     public RemovePetPhotosHandler(
         IFileProvider fileProvider,
@@ -37,29 +40,36 @@ public class RemovePetPhotosHandler : ICommandHandler<List<string>, RemovePetPho
         RemovePetPhotosCommand command,
         CancellationToken cancellationToken = default)
     {
-        var validationResult = await _validator.ValidateAsync(command, cancellationToken);
+        ValidationResult? validationResult = await _validator.ValidateAsync(command, cancellationToken);
         if (!validationResult.IsValid)
-            return validationResult.ToErrorList();
-
-        var volunteerId = VolunteerId.Create(command.VolunteerId);
-        var volunteerResult = await _volunteersRepository.GetByIdAsync(volunteerId, cancellationToken);
-        if (volunteerResult.IsFailure)
-            return volunteerResult.Error.ToErrorList();
-
-        var petId = PetId.Create(command.PetId);
-        var petResult = volunteerResult.Value.GetPetById(petId);
-        if (petResult.IsFailure)
-            return petResult.Error.ToErrorList();
-
-        var petPhotos = new List<Photo>();
-        foreach (var path in command.PhotoPaths)
         {
-            var photo = new Photo(path);
+            return validationResult.ToErrorList();
+        }
+
+        VolunteerId volunteerId = VolunteerId.Create(command.VolunteerId);
+        Result<Volunteer, Error> volunteerResult =
+            await _volunteersRepository.GetByIdAsync(volunteerId, cancellationToken);
+        if (volunteerResult.IsFailure)
+        {
+            return volunteerResult.Error.ToErrorList();
+        }
+
+        PetId petId = PetId.Create(command.PetId);
+        Result<Pet, Error> petResult = volunteerResult.Value.GetPetById(petId);
+        if (petResult.IsFailure)
+        {
+            return petResult.Error.ToErrorList();
+        }
+
+        List<Photo> petPhotos = new();
+        foreach (string path in command.PhotoPaths)
+        {
+            Photo photo = new(path);
 
             petPhotos.Add(photo);
         }
 
-        var transaction = await _unitOfWork.BeginTransactionAsync(cancellationToken);
+        IDbTransaction transaction = await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
         try
         {
@@ -67,9 +77,12 @@ public class RemovePetPhotosHandler : ICommandHandler<List<string>, RemovePetPho
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            var removeResult = await _fileProvider.RemoveFilesAsync(command.PhotoPaths, cancellationToken);
+            Result<List<string>, Error> removeResult =
+                await _fileProvider.RemoveFilesAsync(command.PhotoPaths, cancellationToken);
             if (removeResult.IsFailure)
+            {
                 return removeResult.Error.ToErrorList();
+            }
 
             transaction.Commit();
 

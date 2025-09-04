@@ -1,11 +1,12 @@
+using System.Data;
 using System.Text;
 using CSharpFunctionalExtensions;
 using Dapper;
-using PetFamily.Framework;
-using PetFamily.Framework.Abstractions;
-using PetFamily.Framework.Database;
-using PetFamily.Framework.Extensions;
-using PetFamily.Framework.Models;
+using PetFamily.Core.Abstractions;
+using PetFamily.Core.Database;
+using PetFamily.SharedKernel;
+using PetFamily.SharedKernel.Extensions;
+using PetFamily.SharedKernel.Models;
 using Volunteers.Contracts.Dtos.Volunteer;
 
 namespace Volunteers.Application.VolunteersManagement.Queries.GetWithPagination;
@@ -15,37 +16,35 @@ public class GetVolunteersWithPaginationHandlerDapper
 {
     private readonly ISqlConnectionFactory _sqlConnectionFactory;
 
-    public GetVolunteersWithPaginationHandlerDapper(ISqlConnectionFactory sqlConnectionFactory)
-    {
+    public GetVolunteersWithPaginationHandlerDapper(ISqlConnectionFactory sqlConnectionFactory) =>
         _sqlConnectionFactory = sqlConnectionFactory;
-    }
 
     public async Task<Result<PagedList<VolunteerDto>, ErrorList>> HandleAsync(
         GetVolunteersWithPaginationQuery query,
         CancellationToken cancellationToken = default)
     {
-        var connection = _sqlConnectionFactory.Create();
+        IDbConnection connection = _sqlConnectionFactory.Create();
 
-        var parameters = new DynamicParameters();
+        DynamicParameters parameters = new();
 
-        var totalCount = await connection.ExecuteScalarAsync<long>(
+        long totalCount = await connection.ExecuteScalarAsync<long>(
             "SELECT COUNT(*) FROM volunteers");
 
-        var sqlQuery = new StringBuilder(
+        StringBuilder sqlQuery = new(
             "SELECT id, description, experience, phone_number as PhoneNumber FROM volunteers");
 
         sqlQuery.ApplyPagination(parameters, query.PageNumber, query.PageSize);
 
-        var volunteers = await connection.QueryAsync<VolunteerDto>(
+        IEnumerable<VolunteerDto> volunteers = await connection.QueryAsync<VolunteerDto>(
             sqlQuery.ToString(),
-            param: parameters);
+            parameters);
 
         return new PagedList<VolunteerDto>
         {
             Items = volunteers.ToList(),
             TotalCount = totalCount,
             PageNumber = query.PageNumber,
-            PageSize = query.PageSize,
+            PageSize = query.PageSize
         };
     }
 }

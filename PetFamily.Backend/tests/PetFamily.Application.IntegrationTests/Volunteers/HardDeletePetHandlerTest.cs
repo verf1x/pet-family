@@ -1,8 +1,9 @@
 ﻿using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using PetFamily.Framework.Abstractions;
+using PetFamily.Core.Abstractions;
 using PetFamily.TestUtils;
+using PetFamily.Volunteers.Domain.VolunteersManagement.Entities;
 using Volunteers.Application.VolunteersManagement.UseCases.HardDeletePet;
 
 namespace PetFamily.Application.IntegrationTests.Volunteers;
@@ -12,20 +13,20 @@ public class HardDeletePetHandlerTest : VolunteerTestBase
     private readonly ICommandHandler<Guid, HardDeletePetCommand> _sut;
 
     public HardDeletePetHandlerTest(IntegrationTestsWebFactory factory)
-        : base(factory)
-    {
+        : base(factory) =>
         _sut = Scope.ServiceProvider.GetRequiredService<ICommandHandler<Guid, HardDeletePetCommand>>();
-    }
 
     [Fact]
     public async Task HandleAsync_ShouldHardDeletePet_WhenCommandIsValid()
     {
         // Arrange
-        var volunteer = await VolunteerSeeder.SeedVolunteerAsync(VolunteersRepository, VolunteersWriteDbContext);
-        var species = await SpeciesSeeder.SeedSpeciesWithBreedsAsync(SpeciesRepository, SpeciesWriteDbContext);
-        var pet = await VolunteerSeeder.SeedPetAsync(VolunteersWriteDbContext, volunteer, species.Id, species.Breeds[0].Id);
+        Volunteer volunteer = await VolunteerSeeder.SeedVolunteerAsync(VolunteersRepository, VolunteersWriteDbContext);
+        global::Species.Domain.SpeciesManagement.Species species =
+            await SpeciesSeeder.SeedSpeciesWithBreedsAsync(SpeciesRepository, SpeciesWriteDbContext);
+        Pet pet = await VolunteerSeeder.SeedPetAsync(VolunteersWriteDbContext, volunteer, species.Id,
+            species.Breeds[0].Id);
 
-        var command = new HardDeletePetCommand(volunteer.Id, pet.Id.Value);
+        HardDeletePetCommand command = new(volunteer.Id, pet.Id.Value);
 
         // Act
         var result = await _sut.HandleAsync(command, CancellationToken.None);
@@ -33,7 +34,7 @@ public class HardDeletePetHandlerTest : VolunteerTestBase
         // Assert
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().Be(pet.Id.Value);
-        var updatedVolunteer = await VolunteersWriteDbContext.Volunteers.FirstOrDefaultAsync();
+        Volunteer? updatedVolunteer = await VolunteersWriteDbContext.Volunteers.FirstOrDefaultAsync();
         updatedVolunteer!.Pets.Should().BeEmpty();
     }
 }

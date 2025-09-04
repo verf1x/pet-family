@@ -1,4 +1,4 @@
-using PetFamily.Framework.Abstractions;
+using PetFamily.Core.Abstractions;
 using Volunteers.Contracts.Dtos;
 
 namespace Volunteers.Application.VolunteersManagement.UseCases.UploadPetPhotos;

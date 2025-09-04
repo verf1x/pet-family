@@ -1,46 +1,47 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
-    <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
-        <Nullable>enable</Nullable>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-      <UserSecretsId>a9662492-712c-4d8a-8947-ee4fae9e55ae</UserSecretsId>
-      <RootNamespace>Web</RootNamespace>
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <UserSecretsId>a9662492-712c-4d8a-8947-ee4fae9e55ae</UserSecretsId>
+    <RootNamespace>Web</RootNamespace>
   </PropertyGroup>
 
-    <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.8" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.8">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
-        <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
-        <PackageReference Include="Serilog.Enrichers.Environment" Version="3.0.1" />
-        <PackageReference Include="Serilog.Enrichers.Thread" Version="4.0.0" />
-        <PackageReference Include="Serilog.Exceptions" Version="8.4.0" />
-        <PackageReference Include="Serilog.Sinks.Http" Version="9.1.1" />
-        <PackageReference Include="Serilog.Sinks.Seq" Version="9.0.0" />
-        <PackageReference Include="Serilog.Sinks.Trace" Version="4.0.0" />
-        <PackageReference Include="SharpGrip.FluentValidation.AutoValidation.Mvc" Version="1.5.0" />
-        <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="9.0.3" />
-        <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="9.0.3" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.8"/>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.8">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Serilog.AspNetCore" Version="9.0.0"/>
+    <PackageReference Include="Serilog.Enrichers.Environment" Version="3.0.1"/>
+    <PackageReference Include="Serilog.Enrichers.Thread" Version="4.0.0"/>
+    <PackageReference Include="Serilog.Exceptions" Version="8.4.0"/>
+    <PackageReference Include="Serilog.Sinks.Http" Version="9.1.1"/>
+    <PackageReference Include="Serilog.Sinks.Seq" Version="9.0.0"/>
+    <PackageReference Include="Serilog.Sinks.Trace" Version="4.0.0"/>
+    <PackageReference Include="SharpGrip.FluentValidation.AutoValidation.Mvc" Version="1.5.0"/>
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="9.0.3"/>
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="9.0.3"/>
+  </ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\Core\Framework\Framework.csproj" />
-      <ProjectReference Include="..\Core\Infrastructure\Infrastructure.S3\Infrastructure.S3.csproj" />
-      <ProjectReference Include="..\Core\Shared\Shared.csproj" />
-      <ProjectReference Include="..\Species\Species.Infrastructure.Postgres\Species.Infrastructure.Postgres.csproj" />
-      <ProjectReference Include="..\Species\Species.Presenters\Species.Presenters.csproj" />
-      <ProjectReference Include="..\Volunteers\Volunteers.Infrastructure.Postgres\Volunteers.Infrastructure.Postgres.csproj" />
-      <ProjectReference Include="..\Volunteers\Volunteers.Presenters\Volunteers.Presenters.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Core\Framework\Framework.csproj"/>
+    <ProjectReference Include="..\Core\Infrastructure\Infrastructure.S3\Infrastructure.S3.csproj"/>
+    <ProjectReference Include="..\Core\Shared\Shared.csproj"/>
+    <ProjectReference Include="..\Shared\Infrastructure\Infrastructure.S3\Infrastructure.S3.csproj" />
+    <ProjectReference Include="..\Species\Species.Infrastructure.Postgres\Species.Infrastructure.Postgres.csproj"/>
+    <ProjectReference Include="..\Species\Species.Presenters\Species.Presenters.csproj"/>
+    <ProjectReference Include="..\Volunteers\Volunteers.Infrastructure.Postgres\Volunteers.Infrastructure.Postgres.csproj"/>
+    <ProjectReference Include="..\Volunteers\Volunteers.Presenters\Volunteers.Presenters.csproj"/>
+  </ItemGroup>
 
-    <ItemGroup>
-      <Content Include="..\..\.dockerignore">
-        <Link>.dockerignore</Link>
-      </Content>
-    </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\..\.dockerignore">
+      <Link>.dockerignore</Link>
+    </Content>
+  </ItemGroup>
 
 </Project>

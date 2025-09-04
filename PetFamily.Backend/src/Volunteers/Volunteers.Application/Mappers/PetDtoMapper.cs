@@ -26,6 +26,6 @@ public static class PetDtoMapper
                 petFlat.CountryCode),
             Photos = !string.IsNullOrWhiteSpace(jsonFiles)
                 ? JsonSerializer.Deserialize<PetFileDto[]>(jsonFiles)!
-                : [],
+                : []
         };
 }

@@ -1,7 +1,8 @@
 ﻿using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
-using PetFamily.Framework.Abstractions;
+using PetFamily.Core.Abstractions;
 using PetFamily.TestUtils;
+using PetFamily.Volunteers.Domain.VolunteersManagement.Entities;
 using Volunteers.Application.VolunteersManagement.UseCases.RemovePetPhotos;
 using Volunteers.Application.VolunteersManagement.UseCases.UploadPetPhotos;
 
@@ -9,8 +10,8 @@ namespace PetFamily.Application.IntegrationTests.Volunteers;
 
 public class RemovePetPhotosHandlerTest : VolunteerTestBase
 {
-    private readonly ICommandHandler<List<string>, UploadPetPhotosCommand> _uploadSut;
     private readonly ICommandHandler<List<string>, RemovePetPhotosCommand> _removeSut;
+    private readonly ICommandHandler<List<string>, UploadPetPhotosCommand> _uploadSut;
 
     public RemovePetPhotosHandlerTest(IntegrationTestsWebFactory factory)
         : base(factory)
@@ -25,21 +26,23 @@ public class RemovePetPhotosHandlerTest : VolunteerTestBase
     public async Task HandleAsync_ShouldRemovePetPhotos_WhenCommandIsValid()
     {
         // Arrange
-        var volunteer = await VolunteerSeeder.SeedVolunteerAsync(VolunteersRepository, VolunteersWriteDbContext);
-        var species = await SpeciesSeeder.SeedSpeciesWithBreedsAsync(SpeciesRepository, SpeciesWriteDbContext);
-        var pet = await VolunteerSeeder.SeedPetAsync(VolunteersWriteDbContext, volunteer, species.Id, species.Breeds[0].Id);
+        Volunteer volunteer = await VolunteerSeeder.SeedVolunteerAsync(VolunteersRepository, VolunteersWriteDbContext);
+        global::Species.Domain.SpeciesManagement.Species species =
+            await SpeciesSeeder.SeedSpeciesWithBreedsAsync(SpeciesRepository, SpeciesWriteDbContext);
+        Pet pet = await VolunteerSeeder.SeedPetAsync(VolunteersWriteDbContext, volunteer, species.Id,
+            species.Breeds[0].Id);
 
-        var uploadCommand = Fixture.BuildUploadPetPhotosCommand(volunteer.Id, pet.Id.Value);
+        UploadPetPhotosCommand uploadCommand = Fixture.BuildUploadPetPhotosCommand(volunteer.Id, pet.Id.Value);
         var uploadResult = await _uploadSut.HandleAsync(uploadCommand, CancellationToken.None);
 
-        var removeCommand = new RemovePetPhotosCommand(volunteer.Id, pet.Id.Value, uploadResult.Value);
+        RemovePetPhotosCommand removeCommand = new(volunteer.Id, pet.Id.Value, uploadResult.Value);
 
         // Act
         var removeResult = await _removeSut.HandleAsync(removeCommand, CancellationToken.None);
 
         // Assert
         removeResult.IsSuccess.Should().BeTrue();
-        var updatedVolunteer = await VolunteersWriteDbContext.Volunteers.FindAsync(volunteer.Id);
+        Volunteer? updatedVolunteer = await VolunteersWriteDbContext.Volunteers.FindAsync(volunteer.Id);
         updatedVolunteer!.Pets.Should().HaveCount(1);
         updatedVolunteer.Pets[0].Photos.Should().BeEmpty();
 

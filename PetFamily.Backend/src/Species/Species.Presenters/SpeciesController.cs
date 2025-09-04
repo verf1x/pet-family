@@ -1,7 +1,9 @@
+using CSharpFunctionalExtensions;
 using Microsoft.AspNetCore.Mvc;
+using PetFamily.Core.Abstractions;
 using PetFamily.Framework;
-using PetFamily.Framework.Abstractions;
 using PetFamily.Framework.ResponseExtensions;
+using PetFamily.SharedKernel;
 using Species.Application.SpeciesManagement.Queries.Get;
 using Species.Application.SpeciesManagement.Queries.GetBreedsBySpeciesId;
 using Species.Application.SpeciesManagement.UseCases.AddBreeds;
@@ -20,11 +22,13 @@ public class SpeciesController : ApplicationController
         [FromBody] string name,
         CancellationToken cancellationToken = default)
     {
-        var command = new CreateSpeciesCommand(name);
+        CreateSpeciesCommand command = new(name);
 
-        var result = await handler.HandleAsync(command, cancellationToken);
+        Result<Guid, ErrorList> result = await handler.HandleAsync(command, cancellationToken);
         if (result.IsFailure)
+        {
             return result.Error.ToResponse();
+        }
 
         return Ok(result.Value);
     }
@@ -35,11 +39,13 @@ public class SpeciesController : ApplicationController
         [FromRoute] Guid id,
         [FromBody] IEnumerable<string> breedsNames)
     {
-        var command = new AddBreedsCommand(id, breedsNames);
+        AddBreedsCommand command = new(id, breedsNames);
 
-        var result = await handler.HandleAsync(command);
+        Result<List<Guid>, ErrorList> result = await handler.HandleAsync(command);
         if (result.IsFailure)
+        {
             return result.Error.ToResponse();
+        }
 
         return Ok(result.Value);
     }
@@ -50,11 +56,13 @@ public class SpeciesController : ApplicationController
         [FromRoute] Guid id,
         CancellationToken cancellationToken = default)
     {
-        var command = new DeleteSpeciesCommand(id);
+        DeleteSpeciesCommand command = new(id);
 
-        var result = await handler.HandleAsync(command, cancellationToken);
+        Result<Guid, ErrorList> result = await handler.HandleAsync(command, cancellationToken);
         if (result.IsFailure)
+        {
             return result.Error.ToResponse();
+        }
 
         return Ok(result.Value);
     }
@@ -66,11 +74,13 @@ public class SpeciesController : ApplicationController
         [FromRoute] Guid breedId,
         CancellationToken cancellationToken = default)
     {
-        var command = new DeleteBreedCommand(speciesId, breedId);
+        DeleteBreedCommand command = new(speciesId, breedId);
 
-        var result = await handler.HandleAsync(command, cancellationToken);
+        Result<Guid, ErrorList> result = await handler.HandleAsync(command, cancellationToken);
         if (result.IsFailure)
+        {
             return result.Error.ToResponse();
+        }
 
         return Ok(result.Value);
     }
@@ -80,10 +90,14 @@ public class SpeciesController : ApplicationController
         [FromServices] IQueryHandler<IReadOnlyList<SpeciesDto>, GetAllSpeciesQuery> handler,
         CancellationToken cancellationToken = default)
     {
-        var result = await handler.HandleAsync(new(), cancellationToken); //TODO: убрать пустой GetAllSpeciesQuery
+        Result<IReadOnlyList<SpeciesDto>, ErrorList> result =
+            await handler.HandleAsync(new GetAllSpeciesQuery(),
+                cancellationToken); //TODO: убрать пустой GetAllSpeciesQuery
 
         if (result.IsFailure)
+        {
             return result.Error.ToResponse();
+        }
 
         return Ok(result.Value);
     }
@@ -94,12 +108,14 @@ public class SpeciesController : ApplicationController
         [FromRoute] Guid id,
         CancellationToken cancellationToken = default)
     {
-        var query = new GetBreedsBySpeciesIdQuery(id);
+        GetBreedsBySpeciesIdQuery query = new(id);
 
-        var result = await handler.HandleAsync(query, cancellationToken);
+        Result<IReadOnlyList<BreedDto>, ErrorList> result = await handler.HandleAsync(query, cancellationToken);
 
         if (result.IsFailure)
+        {
             return result.Error.ToResponse();
+        }
 
         return Ok(result.Value);
     }
