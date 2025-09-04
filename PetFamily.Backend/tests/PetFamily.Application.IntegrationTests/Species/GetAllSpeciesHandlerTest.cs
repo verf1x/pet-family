@@ -1,9 +1,9 @@
 ﻿using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
-using PetFamily.Application.Abstractions;
-using PetFamily.Application.SpeciesManagement.Queries.Get;
-using PetFamily.Contracts.Dtos.Species;
+using PetFamily.Core.Abstractions;
 using PetFamily.TestUtils;
+using Species.Application.SpeciesManagement.Queries.Get;
+using Species.Contracts.Dtos.Species;
 
 namespace PetFamily.Application.IntegrationTests.Species;
 
@@ -12,19 +12,19 @@ public class GetAllSpeciesHandlerTest : SpeciesTestBase
     private readonly IQueryHandler<IReadOnlyList<SpeciesDto>, GetAllSpeciesQuery> _sut;
 
     public GetAllSpeciesHandlerTest(IntegrationTestsWebFactory factory)
-        : base(factory)
-    {
+        : base(factory) =>
         _sut = Scope.ServiceProvider.GetRequiredService<IQueryHandler<IReadOnlyList<SpeciesDto>, GetAllSpeciesQuery>>();
-    }
 
     [Fact]
     public async Task HandleAsync_ShouldReturnAllSpeciesWithBreeds()
     {
         // Arrange
-        var species1 = await SpeciesSeeder.SeedSpeciesWithBreedsAsync(SpeciesRepository, WriteDbContext);
-        var species2 = await SpeciesSeeder.SeedSpeciesWithBreedsAsync(SpeciesRepository, WriteDbContext);
+        global::Species.Domain.SpeciesManagement.Species species1 =
+            await SpeciesSeeder.SeedSpeciesWithBreedsAsync(SpeciesRepository, WriteDbContext);
+        global::Species.Domain.SpeciesManagement.Species species2 =
+            await SpeciesSeeder.SeedSpeciesWithBreedsAsync(SpeciesRepository, WriteDbContext);
 
-        var query = new GetAllSpeciesQuery();
+        GetAllSpeciesQuery query = new();
 
         // Act
         var result = await _sut.HandleAsync(query, CancellationToken.None);

@@ -1,10 +1,11 @@
 ﻿using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using PetFamily.Application.Abstractions;
-using PetFamily.Application.VolunteersManagement.UseCases.Create;
-using PetFamily.Contracts.Dtos;
-using PetFamily.Contracts.Dtos.Volunteer;
+using PetFamily.Core.Abstractions;
+using PetFamily.Volunteers.Domain.VolunteersManagement.Entities;
+using Volunteers.Application.VolunteersManagement.UseCases.Create;
+using Volunteers.Contracts.Dtos;
+using Volunteers.Contracts.Dtos.Volunteer;
 
 namespace PetFamily.Application.IntegrationTests.Volunteers;
 
@@ -13,16 +14,14 @@ public class CreateVolunteerHandlerTest : VolunteerTestBase
     private readonly ICommandHandler<Guid, CreateVolunteerCommand> _sut;
 
     public CreateVolunteerHandlerTest(IntegrationTestsWebFactory factory)
-        : base(factory)
-    {
+        : base(factory) =>
         _sut = Scope.ServiceProvider.GetRequiredService<ICommandHandler<Guid, CreateVolunteerCommand>>();
-    }
 
     [Fact]
     public async Task HandleAsync_ShouldCreateVolunteer_WhenCommandIsValid()
     {
         // Arrange
-        var command = Fixture.BuildCreateVolunteerCommand();
+        CreateVolunteerCommand command = Fixture.BuildCreateVolunteerCommand();
 
         // Act
         var result = await _sut.HandleAsync(command, CancellationToken.None);
@@ -31,7 +30,7 @@ public class CreateVolunteerHandlerTest : VolunteerTestBase
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().NotBeEmpty();
 
-        var volunteer = await WriteDbContext.Volunteers.FirstOrDefaultAsync();
+        Volunteer? volunteer = await VolunteersWriteDbContext.Volunteers.FirstOrDefaultAsync();
         volunteer.Should().NotBeNull();
     }
 
@@ -39,7 +38,7 @@ public class CreateVolunteerHandlerTest : VolunteerTestBase
     public async Task HandleAsync_ShouldReturnError_WhenEmailAlreadyExists()
     {
         // Arrange
-        var command = Fixture.BuildCreateVolunteerCommand(email: "volunteer@petfamily.com");
+        CreateVolunteerCommand command = Fixture.BuildCreateVolunteerCommand(email: "volunteer@petfamily.com");
 
         // Act
         var firstTry = await _sut.HandleAsync(command, CancellationToken.None);
@@ -57,7 +56,7 @@ public class CreateVolunteerHandlerTest : VolunteerTestBase
     public async Task HandleAsync_ShouldCreateVolunteer_WhenPhoneNumberAlreadyExists()
     {
         // Arrange
-        var command = Fixture.BuildCreateVolunteerCommand(phoneNumber: "+1234567890");
+        CreateVolunteerCommand command = Fixture.BuildCreateVolunteerCommand(phoneNumber: "+1234567890");
 
         // Act
         var firstTry = await _sut.HandleAsync(command, CancellationToken.None);
@@ -95,7 +94,7 @@ public class CreateVolunteerHandlerTest : VolunteerTestBase
         string? helpRequisiteDescription)
     {
         // Arrange
-        var command = Fixture.BuildCreateVolunteerCommand(
+        CreateVolunteerCommand command = Fixture.BuildCreateVolunteerCommand(
             firstName,
             lastName,
             null,
@@ -103,8 +102,8 @@ public class CreateVolunteerHandlerTest : VolunteerTestBase
             description,
             experienceYears,
             phoneNumber,
-            new List<SocialNetworkDto>() { new(socialNetworkName!, socialNetworkUrl!), },
-            new List<HelpRequisiteDto>() { new(helpRequisiteName!, helpRequisiteDescription!), });
+            new List<SocialNetworkDto> { new(socialNetworkName!, socialNetworkUrl!) },
+            new List<HelpRequisiteDto> { new(helpRequisiteName!, helpRequisiteDescription!) });
 
         // Act
         var result = await _sut.HandleAsync(command, CancellationToken.None);

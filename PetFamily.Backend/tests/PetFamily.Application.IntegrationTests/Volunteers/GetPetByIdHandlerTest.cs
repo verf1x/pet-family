@@ -1,9 +1,10 @@
 ﻿using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
-using PetFamily.Application.Abstractions;
-using PetFamily.Application.VolunteersManagement.Queries.GetPetById;
-using PetFamily.Contracts.Dtos.Pet;
+using PetFamily.Core.Abstractions;
 using PetFamily.TestUtils;
+using PetFamily.Volunteers.Domain.VolunteersManagement.Entities;
+using Volunteers.Application.VolunteersManagement.Queries.GetPetById;
+using Volunteers.Contracts.Dtos.Pet;
 
 namespace PetFamily.Application.IntegrationTests.Volunteers;
 
@@ -12,21 +13,22 @@ public class GetPetByIdHandlerTest : VolunteerTestBase
     private readonly IQueryHandler<PetDto, GetPetByIdQuery> _sut;
 
     public GetPetByIdHandlerTest(IntegrationTestsWebFactory factory)
-        : base(factory)
-    {
+        : base(factory) =>
         _sut = Scope.ServiceProvider.GetRequiredService<IQueryHandler<PetDto, GetPetByIdQuery>>();
-    }
 
     [Fact]
     public async Task HandleAsync_ShouldReturnPet_WhenQueryIsValid()
     {
         // Arrange
-        var volunteer = await VolunteerSeeder.SeedVolunteerAsync(VolunteersRepository, WriteDbContext);
-        var species = await SpeciesSeeder.SeedSpeciesWithBreedsAsync(SpeciesRepository, WriteDbContext);
-        var pet1 = await VolunteerSeeder.SeedPetAsync(WriteDbContext, volunteer, species.Id, species.Breeds[0].Id);
-        var pet2 = await VolunteerSeeder.SeedPetAsync(WriteDbContext, volunteer, species.Id, species.Breeds[1].Id);
+        Volunteer volunteer = await VolunteerSeeder.SeedVolunteerAsync(VolunteersRepository, VolunteersWriteDbContext);
+        global::Species.Domain.SpeciesManagement.Species species =
+            await SpeciesSeeder.SeedSpeciesWithBreedsAsync(SpeciesRepository, SpeciesWriteDbContext);
+        Pet pet1 = await VolunteerSeeder.SeedPetAsync(VolunteersWriteDbContext, volunteer, species.Id,
+            species.Breeds[0].Id);
+        Pet pet2 = await VolunteerSeeder.SeedPetAsync(VolunteersWriteDbContext, volunteer, species.Id,
+            species.Breeds[1].Id);
 
-        var query = new GetPetByIdQuery(pet2.Id);
+        GetPetByIdQuery query = new(pet2.Id);
 
         // Act
         var result = await _sut.HandleAsync(query, CancellationToken.None);

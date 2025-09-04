@@ -1,16 +1,17 @@
 ﻿using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
-using PetFamily.Application.Abstractions;
-using PetFamily.Application.VolunteersManagement.UseCases.SetMainPetPhoto;
-using PetFamily.Application.VolunteersManagement.UseCases.UploadPetPhotos;
+using PetFamily.Core.Abstractions;
 using PetFamily.TestUtils;
+using PetFamily.Volunteers.Domain.VolunteersManagement.Entities;
+using Volunteers.Application.VolunteersManagement.UseCases.SetMainPetPhoto;
+using Volunteers.Application.VolunteersManagement.UseCases.UploadPetPhotos;
 
 namespace PetFamily.Application.IntegrationTests.Volunteers;
 
 public class SetMainPetPhotoHandlerTest : VolunteerTestBase
 {
-    private readonly ICommandHandler<List<string>, UploadPetPhotosCommand> _uploadPhotosSut;
     private readonly ICommandHandler<string, SetMainPetPhotoCommand> _setMainPhotoSut;
+    private readonly ICommandHandler<List<string>, UploadPetPhotosCommand> _uploadPhotosSut;
 
     public SetMainPetPhotoHandlerTest(IntegrationTestsWebFactory factory)
         : base(factory)
@@ -24,17 +25,19 @@ public class SetMainPetPhotoHandlerTest : VolunteerTestBase
     public async Task HandleAsync_ShouldSetMainPetPhoto_WhenCommandIsValid()
     {
         // Arrange
-        var volunteer = await VolunteerSeeder.SeedVolunteerAsync(VolunteersRepository, WriteDbContext);
-        var species = await SpeciesSeeder.SeedSpeciesAsync(SpeciesRepository, WriteDbContext);
-        var pet = await VolunteerSeeder.SeedPetAsync(WriteDbContext, volunteer, species.Id, species.Breeds[0].Id);
+        Volunteer volunteer = await VolunteerSeeder.SeedVolunteerAsync(VolunteersRepository, VolunteersWriteDbContext);
+        global::Species.Domain.SpeciesManagement.Species species =
+            await SpeciesSeeder.SeedSpeciesWithBreedsAsync(SpeciesRepository, SpeciesWriteDbContext);
+        Pet pet = await VolunteerSeeder.SeedPetAsync(VolunteersWriteDbContext, volunteer, species.Id,
+            species.Breeds[0].Id);
 
-        var uploadCommand = Fixture.BuildUploadPetPhotosCommand(volunteer.Id, pet.Id);
+        UploadPetPhotosCommand uploadCommand = Fixture.BuildUploadPetPhotosCommand(volunteer.Id, pet.Id);
 
         // Act
         // TODO: Придумать чето с транзакциями и пофиксить
         var uploadResult = await _uploadPhotosSut.HandleAsync(uploadCommand, CancellationToken.None);
 
-        var setMainPhotoCommand = new SetMainPetPhotoCommand(volunteer.Id, pet.Id, uploadResult.Value[1]);
+        SetMainPetPhotoCommand setMainPhotoCommand = new(volunteer.Id, pet.Id, uploadResult.Value[1]);
 
         var setMainPhotoResult = await _setMainPhotoSut.HandleAsync(setMainPhotoCommand, CancellationToken.None);
 

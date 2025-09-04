@@ -1,0 +1,38 @@
+using CSharpFunctionalExtensions;
+using PetFamily.SharedKernel;
+
+namespace PetFamily.Volunteers.Domain.VolunteersManagement.ValueObjects;
+
+public class Measurements : ComparableValueObject
+{
+    private Measurements(float height, float weight)
+    {
+        Height = height;
+        Weight = weight;
+    }
+
+    public float Height { get; }
+
+    public float Weight { get; }
+
+    public static Result<Measurements, Error> Create(float height, float weight)
+    {
+        if (height <= 0)
+        {
+            return Errors.General.ValueIsInvalid(nameof(height));
+        }
+
+        if (weight <= 0)
+        {
+            return Errors.General.ValueIsInvalid(nameof(weight));
+        }
+
+        return new Measurements(height, weight);
+    }
+
+    protected override IEnumerable<IComparable> GetComparableEqualityComponents()
+    {
+        yield return Height;
+        yield return Weight;
+    }
+}

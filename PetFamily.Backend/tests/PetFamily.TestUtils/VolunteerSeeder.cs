@@ -1,45 +1,46 @@
 ﻿using Bogus;
-using PetFamily.Application.VolunteersManagement;
-using PetFamily.Domain.Shared.EntityIds;
-using PetFamily.Domain.Shared.ValueObjects;
-using PetFamily.Domain.VolunteersManagement.Entities;
-using PetFamily.Domain.VolunteersManagement.Enums;
-using PetFamily.Domain.VolunteersManagement.ValueObjects;
-using PetFamily.Infrastructure.DbContexts;
+using PetFamily.SharedKernel.EntityIds;
+using PetFamily.SharedKernel.ValueObjects;
+using PetFamily.Volunteers.Domain.VolunteersManagement.Entities;
+using PetFamily.Volunteers.Domain.VolunteersManagement.Enums;
+using PetFamily.Volunteers.Domain.VolunteersManagement.ValueObjects;
+using Volunteers.Application.VolunteersManagement;
+using Volunteers.Infrastructure.Postgres.DbContexts;
 
 namespace PetFamily.TestUtils;
 
 public static class VolunteerSeeder
 {
-    public static async Task<Volunteer> SeedVolunteerAsync(IVolunteersRepository repository, WriteDbContext dbContext)
+    public static async Task<Volunteer> SeedVolunteerAsync(IVolunteersRepository repository,
+        VolunteersWriteDbContext dbContext)
     {
-        var faker = new Faker();
+        Faker faker = new();
 
-        var volunteerId = VolunteerId.CreateNew();
-        var fullName = FullName.Create(
+        VolunteerId volunteerId = VolunteerId.CreateNew();
+        FullName? fullName = FullName.Create(
                 faker.Name.FirstName(),
                 faker.Name.LastName())
             .Value;
-        var email = Email.Create(faker.Internet.Email()).Value;
-        var description = Description.Create(faker.Lorem.Paragraph()).Value;
-        var experience = Experience.Create(faker.Random.Int(0, 30)).Value;
-        var phoneNumber = PhoneNumber.Create(faker.Phone.PhoneNumber("############")).Value;
-        var socialNetworks = new List<SocialNetwork>
+        Email? email = Email.Create(faker.Internet.Email()).Value;
+        Description? description = Description.Create(faker.Lorem.Paragraph()).Value;
+        Experience? experience = Experience.Create(faker.Random.Int(0, 30)).Value;
+        PhoneNumber? phoneNumber = PhoneNumber.Create(faker.Phone.PhoneNumber("############")).Value;
+        List<SocialNetwork> socialNetworks = new()
         {
             SocialNetwork.Create(
                     faker.Internet.DomainName(),
                     faker.Internet.Url())
-                .Value,
+                .Value
         };
-        var helpRequisites = new List<HelpRequisite>
+        List<HelpRequisite> helpRequisites = new()
         {
             HelpRequisite.Create(
                     faker.Finance.AccountName(),
                     faker.Finance.CreditCardNumber())
-                .Value,
+                .Value
         };
 
-        var volunteer = new Volunteer(
+        Volunteer volunteer = new(
             volunteerId,
             fullName,
             email,
@@ -56,20 +57,20 @@ public static class VolunteerSeeder
     }
 
     public static async Task<Pet> SeedPetAsync(
-        WriteDbContext writeDbContext,
+        VolunteersWriteDbContext writeDbContext,
         Volunteer volunteer,
         SpeciesId speciesId,
         BreedId breedId)
     {
-        var faker = new Faker();
+        Faker faker = new();
 
-        var petId = PetId.CreateNew();
-        var nickname = Nickname.Create(faker.Name.FirstName()).Value;
-        var description = Description.Create(faker.Lorem.Paragraph()).Value;
-        var speciesBreed = SpeciesBreed.Create(speciesId, breedId).Value;
-        var color = Color.Create(faker.Commerce.Color()).Value;
-        var healthInfo = HealthInfo.Create(faker.Lorem.Sentence(), true, true).Value;
-        var address = Address.Create(
+        PetId petId = PetId.CreateNew();
+        Nickname? nickname = Nickname.Create(faker.Name.FirstName()).Value;
+        Description? description = Description.Create(faker.Lorem.Paragraph()).Value;
+        SpeciesBreed? speciesBreed = SpeciesBreed.Create(speciesId, breedId).Value;
+        Color? color = Color.Create(faker.Commerce.Color()).Value;
+        HealthInfo? healthInfo = HealthInfo.Create(faker.Lorem.Sentence(), true, true).Value;
+        Address? address = Address.Create(
                 new List<string>(
                     [faker.Address.StreetAddress(), faker.Address.City()]),
                 faker.Address.Country(),
@@ -77,21 +78,21 @@ public static class VolunteerSeeder
                 faker.Address.ZipCode(),
                 faker.Address.CountryCode())
             .Value;
-        var measurements = Measurements.Create(
+        Measurements? measurements = Measurements.Create(
             faker.Random.Float(.05F, 70.0F),
             faker.Random.Float(.05F, 70.0F)).Value;
-        var ownerPhoneNumber = PhoneNumber.Create(faker.Phone.PhoneNumber("############")).Value;
-        var dateOfBirth = faker.Date.PastDateOnly(30);
-        var helpStatus = HelpStatus.NeedsHelp;
-        var helpRequisites = new List<HelpRequisite>
+        PhoneNumber? ownerPhoneNumber = PhoneNumber.Create(faker.Phone.PhoneNumber("############")).Value;
+        DateOnly dateOfBirth = faker.Date.PastDateOnly(30);
+        HelpStatus helpStatus = HelpStatus.NeedsHelp;
+        List<HelpRequisite> helpRequisites = new()
         {
             HelpRequisite.Create(
                     faker.Finance.AccountName(),
                     faker.Finance.CreditCardNumber())
-                .Value,
+                .Value
         };
 
-        var pet = new Pet(
+        Pet pet = new(
             petId,
             nickname,
             description,

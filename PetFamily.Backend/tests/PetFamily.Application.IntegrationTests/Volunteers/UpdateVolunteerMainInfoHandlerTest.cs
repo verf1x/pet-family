@@ -1,9 +1,10 @@
 ﻿using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using PetFamily.Application.Abstractions;
-using PetFamily.Application.VolunteersManagement.UseCases.Create;
-using PetFamily.Application.VolunteersManagement.UseCases.UpdateMainInfo;
+using PetFamily.Core.Abstractions;
+using PetFamily.Volunteers.Domain.VolunteersManagement.Entities;
+using Volunteers.Application.VolunteersManagement.UseCases.Create;
+using Volunteers.Application.VolunteersManagement.UseCases.UpdateMainInfo;
 
 namespace PetFamily.Application.IntegrationTests.Volunteers;
 
@@ -23,10 +24,10 @@ public class UpdateVolunteerMainInfoHandlerTest : VolunteerTestBase
     public async Task HandleAsync_ShouldUpdateVolunteerMainInfo_WhenCommandIsValid()
     {
         // Arrange
-        var createCommand = Fixture.BuildCreateVolunteerCommand();
+        CreateVolunteerCommand createCommand = Fixture.BuildCreateVolunteerCommand();
         var volunteerId = await _createSut.HandleAsync(createCommand, CancellationToken.None);
 
-        var updateCommand = Fixture.BuildUpdateVolunteerMainInfoCommand(volunteerId.Value);
+        UpdateMainInfoCommand updateCommand = Fixture.BuildUpdateVolunteerMainInfoCommand(volunteerId.Value);
 
         // Act
         var result = await _updateMainInfoSut.HandleAsync(updateCommand, CancellationToken.None);
@@ -35,7 +36,7 @@ public class UpdateVolunteerMainInfoHandlerTest : VolunteerTestBase
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().Be(volunteerId.Value);
 
-        var volunteer = await WriteDbContext.Volunteers.FirstOrDefaultAsync();
+        Volunteer? volunteer = await VolunteersWriteDbContext.Volunteers.FirstOrDefaultAsync();
         volunteer.Should().NotBeNull();
 
         volunteer.FullName.FirstName.Should().Be(updateCommand.FullName.FirstName);

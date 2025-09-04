@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core\Shared\Shared.csproj"/>
+    <ProjectReference Include="..\..\Shared\PetFamily.Core\PetFamily.Core.csproj"/>
+    <ProjectReference Include="..\Volunteers.Contracts\Volunteers.Contracts.csproj"/>
+    <ProjectReference Include="..\Volunteers.Domain\Volunteers.Domain.csproj"/>
+  </ItemGroup>
+
+</Project>

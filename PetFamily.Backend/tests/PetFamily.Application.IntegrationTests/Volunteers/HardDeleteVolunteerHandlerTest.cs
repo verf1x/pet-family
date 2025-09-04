@@ -1,9 +1,10 @@
 ﻿using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using PetFamily.Application.Abstractions;
-using PetFamily.Application.VolunteersManagement.UseCases.Create;
-using PetFamily.Application.VolunteersManagement.UseCases.Delete.Hard;
+using PetFamily.Core.Abstractions;
+using PetFamily.Volunteers.Domain.VolunteersManagement.Entities;
+using Volunteers.Application.VolunteersManagement.UseCases.Create;
+using Volunteers.Application.VolunteersManagement.UseCases.Delete.Hard;
 
 namespace PetFamily.Application.IntegrationTests.Volunteers;
 
@@ -23,19 +24,19 @@ public class HardDeleteVolunteerHandlerTest : VolunteerTestBase
     public async Task HandleAsync_ShouldHardDeleteVolunteer_WhenCommandIsValid()
     {
         // Arrange
-        var createCommand = Fixture.BuildCreateVolunteerCommand();
+        CreateVolunteerCommand createCommand = Fixture.BuildCreateVolunteerCommand();
 
         // Act
         var createResult = await _createVolunteerSut.HandleAsync(createCommand, CancellationToken.None);
         var volunteerId = createResult.Value;
 
-        var hardDeleteCommand = new HardDeleteVolunteerCommand(volunteerId);
+        HardDeleteVolunteerCommand hardDeleteCommand = new(volunteerId);
         var hardDeleteResult = await _hardDeleteSut.HandleAsync(hardDeleteCommand, CancellationToken.None);
 
         // Assert
         hardDeleteResult.IsSuccess.Should().BeTrue();
 
-        var volunteer = await WriteDbContext.Volunteers.FirstOrDefaultAsync();
+        Volunteer? volunteer = await VolunteersWriteDbContext.Volunteers.FirstOrDefaultAsync();
         volunteer.Should().BeNull();
     }
 }

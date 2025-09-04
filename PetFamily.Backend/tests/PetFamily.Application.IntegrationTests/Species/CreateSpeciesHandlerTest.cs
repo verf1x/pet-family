@@ -1,7 +1,7 @@
 ﻿using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
-using PetFamily.Application.Abstractions;
-using PetFamily.Application.SpeciesManagement.UseCases.Create;
+using PetFamily.Core.Abstractions;
+using Species.Application.SpeciesManagement.UseCases.Create;
 
 namespace PetFamily.Application.IntegrationTests.Species;
 
@@ -10,16 +10,14 @@ public class CreateSpeciesHandlerTest : SpeciesTestBase
     private readonly ICommandHandler<Guid, CreateSpeciesCommand> _sut;
 
     public CreateSpeciesHandlerTest(IntegrationTestsWebFactory factory)
-        : base(factory)
-    {
+        : base(factory) =>
         _sut = Scope.ServiceProvider.GetRequiredService<ICommandHandler<Guid, CreateSpeciesCommand>>();
-    }
 
     [Fact]
     public async Task HandleAsync_ShouldCreateSpeciesWithBreeds_WhenCommandIsValid()
     {
         // Arrange
-        var command = Fixture.BuildCreateSpeciesCommand();
+        CreateSpeciesCommand command = Fixture.BuildCreateSpeciesCommand();
 
         // Act
         var result = await _sut.HandleAsync(command, CancellationToken.None);
@@ -33,8 +31,8 @@ public class CreateSpeciesHandlerTest : SpeciesTestBase
     public async Task HandleAsync_ShouldReturnError_WhenSpeciesWithNameAlreadyExists()
     {
         // Arrange
-        var command1 = Fixture.BuildCreateSpeciesCommand("Cat");
-        var command2 = Fixture.BuildCreateSpeciesCommand("Cat");
+        CreateSpeciesCommand command1 = Fixture.BuildCreateSpeciesCommand("Cat");
+        CreateSpeciesCommand command2 = Fixture.BuildCreateSpeciesCommand("Cat");
 
         // Act
         var result1 = await _sut.HandleAsync(command1, CancellationToken.None);

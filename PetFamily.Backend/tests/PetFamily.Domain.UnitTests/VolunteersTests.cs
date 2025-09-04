@@ -1,9 +1,11 @@
-﻿using FluentAssertions;
-using PetFamily.Domain.Shared.EntityIds;
-using PetFamily.Domain.Shared.ValueObjects;
-using PetFamily.Domain.VolunteersManagement.Entities;
-using PetFamily.Domain.VolunteersManagement.Enums;
-using PetFamily.Domain.VolunteersManagement.ValueObjects;
+﻿using CSharpFunctionalExtensions;
+using FluentAssertions;
+using PetFamily.SharedKernel;
+using PetFamily.SharedKernel.EntityIds;
+using PetFamily.SharedKernel.ValueObjects;
+using PetFamily.Volunteers.Domain.VolunteersManagement.Entities;
+using PetFamily.Volunteers.Domain.VolunteersManagement.Enums;
+using PetFamily.Volunteers.Domain.VolunteersManagement.ValueObjects;
 
 namespace PetFamily.Domain.UnitTests;
 
@@ -13,11 +15,11 @@ public class VolunteersTests
     public void AddPet_First_Approach_ReturnsSuccessResult()
     {
         // Arrange
-        var volunteer = GetUniqueVolunteer();
-        var pet = GetUniquePet();
+        Volunteer volunteer = GetUniqueVolunteer();
+        Pet pet = GetUniquePet();
 
         // Act
-        var result = volunteer.AddPet(pet);
+        UnitResult<Error> result = volunteer.AddPet(pet);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -30,17 +32,19 @@ public class VolunteersTests
     {
         // Arrange
         const int petsCount = 5;
-        var volunteer = GetUniqueVolunteer();
-        var pets = Enumerable.Range(1, petsCount).Select(_ => GetUniquePet());
+        Volunteer volunteer = GetUniqueVolunteer();
+        IEnumerable<Pet> pets = Enumerable.Range(1, petsCount).Select(_ => GetUniquePet());
 
-        foreach (var pet in pets)
+        foreach (Pet pet in pets)
+        {
             volunteer.AddPet(pet);
+        }
 
-        var petToAdd = GetUniquePet();
+        Pet petToAdd = GetUniquePet();
 
         // Act
-        var result = volunteer.AddPet(petToAdd);
-        var serialNumber = Position.Create(petsCount + 1);
+        UnitResult<Error> result = volunteer.AddPet(petToAdd);
+        Result<Position, Error> serialNumber = Position.Create(petsCount + 1);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -53,19 +57,19 @@ public class VolunteersTests
     {
         // Arrange
         const int petsCount = 6;
-        var volunteer = CreateVolunteerWithPets(petsCount);
+        Volunteer volunteer = CreateVolunteerWithPets(petsCount);
 
-        var secondPosition = Position.Create(2).Value;
+        Position? secondPosition = Position.Create(2).Value;
 
-        var firstPet = volunteer.Pets[0];
-        var secondPet = volunteer.Pets[1];
-        var thirdPet = volunteer.Pets[2];
-        var fourthPet = volunteer.Pets[3];
-        var fifthPet = volunteer.Pets[4];
-        var sixthPet = volunteer.Pets[5];
+        Pet firstPet = volunteer.Pets[0];
+        Pet secondPet = volunteer.Pets[1];
+        Pet thirdPet = volunteer.Pets[2];
+        Pet fourthPet = volunteer.Pets[3];
+        Pet fifthPet = volunteer.Pets[4];
+        Pet sixthPet = volunteer.Pets[5];
 
         // Act
-        var result = volunteer.MovePet(secondPet, secondPosition);
+        UnitResult<Error> result = volunteer.MovePet(secondPet, secondPosition);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -83,18 +87,18 @@ public class VolunteersTests
     {
         // Arrange
         const int petsCount = 5;
-        var volunteer = CreateVolunteerWithPets(petsCount);
+        Volunteer volunteer = CreateVolunteerWithPets(petsCount);
 
-        var secondPosition = Position.Create(2).Value;
+        Position? secondPosition = Position.Create(2).Value;
 
-        var firstPet = volunteer.Pets[0];
-        var secondPet = volunteer.Pets[1];
-        var thirdPet = volunteer.Pets[2];
-        var fourthPet = volunteer.Pets[3];
-        var fifthPet = volunteer.Pets[4];
+        Pet firstPet = volunteer.Pets[0];
+        Pet secondPet = volunteer.Pets[1];
+        Pet thirdPet = volunteer.Pets[2];
+        Pet fourthPet = volunteer.Pets[3];
+        Pet fifthPet = volunteer.Pets[4];
 
         // Act
-        var result = volunteer.MovePet(fourthPet, secondPosition);
+        UnitResult<Error> result = volunteer.MovePet(fourthPet, secondPosition);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -111,18 +115,18 @@ public class VolunteersTests
     {
         // Arrange
         const int petsCount = 5;
-        var volunteer = CreateVolunteerWithPets(petsCount);
+        Volunteer volunteer = CreateVolunteerWithPets(petsCount);
 
-        var fourthPosition = Position.Create(4).Value;
+        Position? fourthPosition = Position.Create(4).Value;
 
-        var firstPet = volunteer.Pets[0];
-        var secondPet = volunteer.Pets[1];
-        var thirdPet = volunteer.Pets[2];
-        var fourthPet = volunteer.Pets[3];
-        var fifthPet = volunteer.Pets[4];
+        Pet firstPet = volunteer.Pets[0];
+        Pet secondPet = volunteer.Pets[1];
+        Pet thirdPet = volunteer.Pets[2];
+        Pet fourthPet = volunteer.Pets[3];
+        Pet fifthPet = volunteer.Pets[4];
 
         // Act
-        var result = volunteer.MovePet(secondPet, fourthPosition);
+        UnitResult<Error> result = volunteer.MovePet(secondPet, fourthPosition);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -139,18 +143,18 @@ public class VolunteersTests
     {
         // Arrange
         const int petsCount = 5;
-        var volunteer = CreateVolunteerWithPets(petsCount);
+        Volunteer volunteer = CreateVolunteerWithPets(petsCount);
 
-        var firstPosition = Position.Create(1).Value;
+        Position? firstPosition = Position.Create(1).Value;
 
-        var firstPet = volunteer.Pets[0];
-        var secondPet = volunteer.Pets[1];
-        var thirdPet = volunteer.Pets[2];
-        var fourthPet = volunteer.Pets[3];
-        var fifthPet = volunteer.Pets[4];
+        Pet firstPet = volunteer.Pets[0];
+        Pet secondPet = volunteer.Pets[1];
+        Pet thirdPet = volunteer.Pets[2];
+        Pet fourthPet = volunteer.Pets[3];
+        Pet fifthPet = volunteer.Pets[4];
 
         // Act
-        var result = volunteer.MovePet(fifthPet, firstPosition);
+        UnitResult<Error> result = volunteer.MovePet(fifthPet, firstPosition);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -166,18 +170,18 @@ public class VolunteersTests
     {
         // Arrange
         const int petsCount = 5;
-        var volunteer = CreateVolunteerWithPets(petsCount);
+        Volunteer volunteer = CreateVolunteerWithPets(petsCount);
 
-        var fifthPosition = Position.Create(5).Value;
+        Position? fifthPosition = Position.Create(5).Value;
 
-        var firstPet = volunteer.Pets[0];
-        var secondPet = volunteer.Pets[1];
-        var thirdPet = volunteer.Pets[2];
-        var fourthPet = volunteer.Pets[3];
-        var fifthPet = volunteer.Pets[4];
+        Pet firstPet = volunteer.Pets[0];
+        Pet secondPet = volunteer.Pets[1];
+        Pet thirdPet = volunteer.Pets[2];
+        Pet fourthPet = volunteer.Pets[3];
+        Pet fifthPet = volunteer.Pets[4];
 
         // Act
-        var result = volunteer.MovePet(firstPet, fifthPosition);
+        UnitResult<Error> result = volunteer.MovePet(firstPet, fifthPosition);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -190,25 +194,27 @@ public class VolunteersTests
 
     private Volunteer CreateVolunteerWithPets(int petsCount)
     {
-        var volunteer = GetUniqueVolunteer();
-        var pets = Enumerable.Range(1, petsCount).Select(_ => GetUniquePet());
+        Volunteer volunteer = GetUniqueVolunteer();
+        IEnumerable<Pet> pets = Enumerable.Range(1, petsCount).Select(_ => GetUniquePet());
 
-        foreach (var pet in pets)
+        foreach (Pet pet in pets)
+        {
             volunteer.AddPet(pet);
+        }
 
         return volunteer;
     }
 
     private Email GetRandomEmail()
     {
-        var emailLine = $"{Guid.NewGuid().ToString("N")[..8]}@petfamily.com";
+        string emailLine = $"{Guid.NewGuid().ToString("N")[..8]}@petfamily.com";
 
         return Email.Create(emailLine).Value;
     }
 
     private PhoneNumber GetRandomPhoneNumber()
     {
-        var phoneNumber = $"+7{string.Concat(Enumerable.Range(0, 10)
+        string phoneNumber = $"+7{string.Concat(Enumerable.Range(0, 10)
             .Select(_ => Random.Shared.Next(0, 10)))}";
 
         return PhoneNumber.Create(phoneNumber).Value;
@@ -216,18 +222,18 @@ public class VolunteersTests
 
     private Volunteer GetUniqueVolunteer()
     {
-        var fullName = FullName.Create("John", "Doe").Value;
-        var email = GetRandomEmail();
-        var description = Description.Create("description").Value;
-        var experience = Experience.Create(5).Value;
-        var phoneNumber = GetRandomPhoneNumber();
-        var socialNetworks = new List<SocialNetwork>(
+        FullName? fullName = FullName.Create("John", "Doe").Value;
+        Email email = GetRandomEmail();
+        Description? description = Description.Create("description").Value;
+        Experience? experience = Experience.Create(5).Value;
+        PhoneNumber phoneNumber = GetRandomPhoneNumber();
+        List<SocialNetwork> socialNetworks = new(
             [
                 SocialNetwork.Create("string", "https://exampleone.com/johndoe").Value,
                 SocialNetwork.Create("string", "https://exampletwo.com/johndoe").Value
             ]
         );
-        var helpRequisites = new List<HelpRequisite>(
+        List<HelpRequisite> helpRequisites = new(
         [
             HelpRequisite.Create("string", "string").Value,
             HelpRequisite.Create("string", "string").Value
@@ -246,15 +252,15 @@ public class VolunteersTests
 
     private Pet GetUniquePet()
     {
-        var nickname = Nickname.Create("JohnDoe").Value;
-        var description = Description.Create("string").Value;
-        var speciesBreed = SpeciesBreed.Create(SpeciesId.CreateNew(), BreedId.CreateNew()).Value;
-        var color = Color.Create("Red").Value;
-        var healthInfo = HealthInfo.Create(
+        Nickname? nickname = Nickname.Create("JohnDoe").Value;
+        Description? description = Description.Create("string").Value;
+        SpeciesBreed? speciesBreed = SpeciesBreed.Create(SpeciesId.CreateNew(), BreedId.CreateNew()).Value;
+        Color? color = Color.Create("Red").Value;
+        HealthInfo? healthInfo = HealthInfo.Create(
             "Healthy",
             true,
             false).Value;
-        var address = Address.Create(
+        Address? address = Address.Create(
             [
                 "123 Main St",
                 "Apt 4B",
@@ -265,12 +271,12 @@ public class VolunteersTests
             "12345",
             "US"
         ).Value;
-        var measurements = Measurements.Create(
+        Measurements? measurements = Measurements.Create(
             50,
             17).Value;
-        var phoneNumber = GetRandomPhoneNumber();
-        var dateOfBirth = new DateOnly(2022, 1, 1);
-        var helpRequisites = new List<HelpRequisite>(
+        PhoneNumber phoneNumber = GetRandomPhoneNumber();
+        DateOnly dateOfBirth = new(2022, 1, 1);
+        List<HelpRequisite> helpRequisites = new(
         [
             HelpRequisite.Create("string", "string").Value,
             HelpRequisite.Create("string", "string").Value

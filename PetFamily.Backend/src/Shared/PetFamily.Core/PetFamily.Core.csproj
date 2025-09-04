@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="CSharpFunctionalExtensions">
+      <HintPath>..\..\..\..\..\..\.nuget\packages\csharpfunctionalextensions\3.6.0\lib\net8.0\CSharpFunctionalExtensions.dll</HintPath>
+    </Reference>
+    <Reference Include="FluentValidation">
+      <HintPath>..\..\..\..\..\..\.nuget\packages\fluentvalidation\12.0.0\lib\net8.0\FluentValidation.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PetFamily.SharedKernel\PetFamily.SharedKernel.csproj"/>
+  </ItemGroup>
+
+</Project>

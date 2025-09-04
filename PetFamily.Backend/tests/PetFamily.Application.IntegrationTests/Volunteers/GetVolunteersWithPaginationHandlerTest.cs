@@ -1,10 +1,11 @@
 ﻿using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
-using PetFamily.Application.Abstractions;
-using PetFamily.Application.Models;
-using PetFamily.Application.VolunteersManagement.Queries.GetWithPagination;
-using PetFamily.Contracts.Dtos.Volunteer;
+using PetFamily.Core.Abstractions;
+using PetFamily.SharedKernel.Models;
 using PetFamily.TestUtils;
+using PetFamily.Volunteers.Domain.VolunteersManagement.Entities;
+using Volunteers.Application.VolunteersManagement.Queries.GetWithPagination;
+using Volunteers.Contracts.Dtos.Volunteer;
 
 namespace PetFamily.Application.IntegrationTests.Volunteers;
 
@@ -13,20 +14,18 @@ public class GetVolunteersWithPaginationHandlerTest : VolunteerTestBase
     private readonly IQueryHandler<PagedList<VolunteerDto>, GetVolunteersWithPaginationQuery> _sut;
 
     public GetVolunteersWithPaginationHandlerTest(IntegrationTestsWebFactory factory)
-        : base(factory)
-    {
+        : base(factory) =>
         _sut = Scope.ServiceProvider
             .GetRequiredService<IQueryHandler<PagedList<VolunteerDto>, GetVolunteersWithPaginationQuery>>();
-    }
 
     [Fact]
     public async Task HandleAsync_ShouldReturnPagedListOfVolunteers_WhenQueryIsValid()
     {
         // Arrange
-        var volunteer1 = await VolunteerSeeder.SeedVolunteerAsync(VolunteersRepository, WriteDbContext);
-        var volunteer2 = await VolunteerSeeder.SeedVolunteerAsync(VolunteersRepository, WriteDbContext);
+        Volunteer volunteer1 = await VolunteerSeeder.SeedVolunteerAsync(VolunteersRepository, VolunteersWriteDbContext);
+        Volunteer volunteer2 = await VolunteerSeeder.SeedVolunteerAsync(VolunteersRepository, VolunteersWriteDbContext);
 
-        var query = new GetVolunteersWithPaginationQuery(1, 2);
+        GetVolunteersWithPaginationQuery query = new(1, 2);
 
         // Act
         var result = await _sut.HandleAsync(query, CancellationToken.None);
