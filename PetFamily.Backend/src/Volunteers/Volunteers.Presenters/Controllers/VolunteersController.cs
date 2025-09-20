@@ -26,9 +26,9 @@ using Volunteers.Contracts.Requests.Volunteers;
 
 namespace Volunteers.Presenters.Controllers;
 
+[Authorize]
 public class VolunteersController : ApplicationController
 {
-    [Authorize]
     [HttpPost]
     public async Task<ActionResult<Guid>> CreateAsync(
         [FromServices] ICommandHandler<Guid, CreateVolunteerCommand> handler,
@@ -163,6 +163,7 @@ public class VolunteersController : ApplicationController
         return result.IsFailure ? result.Error.ToResponse() : Ok(result.Value);
     }
 
+    [AllowAnonymous]
     [HttpGet]
     public async Task<IActionResult> GetAsync(
         [FromQuery] GetVolunteersWithPaginationRequest request,
@@ -177,6 +178,7 @@ public class VolunteersController : ApplicationController
         return result.IsFailure ? result.Error.ToResponse() : Ok(result.Value);
     }
 
+    [AllowAnonymous]
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetByIdAsync(
         [FromRoute] Guid id,
