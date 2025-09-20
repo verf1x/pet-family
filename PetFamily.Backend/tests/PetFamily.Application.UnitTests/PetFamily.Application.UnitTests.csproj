@@ -22,7 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Core\Shared\Shared.csproj"/>
     <ProjectReference Include="..\..\src\Volunteers\Volunteers.Application\Volunteers.Application.csproj"/>
   </ItemGroup>
 

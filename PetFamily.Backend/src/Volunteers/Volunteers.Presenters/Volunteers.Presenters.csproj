@@ -7,14 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Core\Framework\Framework.csproj"/>
-    <ProjectReference Include="..\..\Core\Shared\Shared.csproj"/>
     <ProjectReference Include="..\..\Shared\PetFamily.Framework\PetFamily.Framework.csproj" />
     <ProjectReference Include="..\Volunteers.Application\Volunteers.Application.csproj"/>
     <ProjectReference Include="..\Volunteers.Infrastructure.Postgres\Volunteers.Infrastructure.Postgres.csproj"/>
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="Microsoft.AspNetCore.Authentication.JwtBearer">
+      <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.aspnetcore.authentication.jwtbearer\9.0.8\lib\net9.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.AspNetCore.Http.Features">
       <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.aspnetcore.app.ref\9.0.8\ref\net9.0\Microsoft.AspNetCore.Http.Features.dll</HintPath>
     </Reference>
@@ -24,6 +25,16 @@
     <Reference Include="Microsoft.AspNetCore.Mvc.Core">
       <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.aspnetcore.app.ref\9.0.8\ref\net9.0\Microsoft.AspNetCore.Mvc.Core.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.IdentityModel.Tokens">
+      <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.identitymodel.tokens\8.0.1\lib\net9.0\Microsoft.IdentityModel.Tokens.dll</HintPath>
+    </Reference>
+    <Reference Include="System.IdentityModel.Tokens.Jwt">
+      <HintPath>..\..\..\..\..\..\.nuget\packages\system.identitymodel.tokens.jwt\8.0.1\lib\net9.0\System.IdentityModel.Tokens.Jwt.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.9" />
   </ItemGroup>
 
 </Project>

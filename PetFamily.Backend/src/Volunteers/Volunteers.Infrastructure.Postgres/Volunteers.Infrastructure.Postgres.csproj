@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Core\Infrastructure\Infrastructure.Postgres\Infrastructure.Postgres.csproj"/>
     <ProjectReference Include="..\..\Shared\Infrastructure\Infrastructure.Postgres\Infrastructure.Postgres.csproj" />
     <ProjectReference Include="..\Volunteers.Application\Volunteers.Application.csproj"/>
     <ProjectReference Include="..\Volunteers.Contracts\Volunteers.Contracts.csproj"/>

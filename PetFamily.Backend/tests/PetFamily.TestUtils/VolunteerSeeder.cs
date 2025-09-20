@@ -11,7 +11,8 @@ namespace PetFamily.TestUtils;
 
 public static class VolunteerSeeder
 {
-    public static async Task<Volunteer> SeedVolunteerAsync(IVolunteersRepository repository,
+    public static async Task<Volunteer> SeedVolunteerAsync(
+        IVolunteersRepository repository,
         VolunteersWriteDbContext dbContext)
     {
         Faker faker = new();
@@ -30,14 +31,14 @@ public static class VolunteerSeeder
             SocialNetwork.Create(
                     faker.Internet.DomainName(),
                     faker.Internet.Url())
-                .Value
+                .Value,
         };
         List<HelpRequisite> helpRequisites = new()
         {
             HelpRequisite.Create(
                     faker.Finance.AccountName(),
                     faker.Finance.CreditCardNumber())
-                .Value
+                .Value,
         };
 
         Volunteer volunteer = new(
@@ -89,7 +90,7 @@ public static class VolunteerSeeder
             HelpRequisite.Create(
                     faker.Finance.AccountName(),
                     faker.Finance.CreditCardNumber())
-                .Value
+                .Value,
         };
 
         Pet pet = new(
