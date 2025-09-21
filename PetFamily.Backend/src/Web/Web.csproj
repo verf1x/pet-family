@@ -28,9 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Core\Framework\Framework.csproj"/>
-    <ProjectReference Include="..\Core\Infrastructure\Infrastructure.S3\Infrastructure.S3.csproj"/>
-    <ProjectReference Include="..\Core\Shared\Shared.csproj"/>
+    <ProjectReference Include="..\Accounts\Accounts.Presenters\Accounts.Presenters.csproj" />
     <ProjectReference Include="..\Shared\Infrastructure\Infrastructure.S3\Infrastructure.S3.csproj" />
     <ProjectReference Include="..\Species\Species.Infrastructure.Postgres\Species.Infrastructure.Postgres.csproj"/>
     <ProjectReference Include="..\Species\Species.Presenters\Species.Presenters.csproj"/>

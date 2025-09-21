@@ -1,11 +1,10 @@
-using CSharpFunctionalExtensions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PetFamily.Core.Abstractions;
 using PetFamily.Framework;
 using PetFamily.Framework.Processors;
 using PetFamily.Framework.ResponseExtensions;
-using PetFamily.SharedKernel;
 using PetFamily.SharedKernel.Models;
 using Volunteers.Application.VolunteersManagement.Queries.GetById;
 using Volunteers.Application.VolunteersManagement.Queries.GetWithPagination;
@@ -22,12 +21,12 @@ using Volunteers.Application.VolunteersManagement.UseCases.UpdateMainInfo;
 using Volunteers.Application.VolunteersManagement.UseCases.UpdateMainPetInfo;
 using Volunteers.Application.VolunteersManagement.UseCases.UpdatePetHelpStatus;
 using Volunteers.Application.VolunteersManagement.UseCases.UploadPetPhotos;
-using Volunteers.Contracts.Dtos;
 using Volunteers.Contracts.Dtos.Volunteer;
 using Volunteers.Contracts.Requests.Volunteers;
 
 namespace Volunteers.Presenters.Controllers;
 
+[Authorize]
 public class VolunteersController : ApplicationController
 {
     [HttpPost]
@@ -45,13 +44,8 @@ public class VolunteersController : ApplicationController
             request.SocialNetworks,
             request.HelpRequisites);
 
-        Result<Guid, ErrorList> result = await handler.HandleAsync(command, cancellationToken);
-        if (result.IsFailure)
-        {
-            return result.Error.ToResponse();
-        }
-
-        return Ok(result.Value);
+        var result = await handler.HandleAsync(command, cancellationToken);
+        return result.IsFailure ? result.Error.ToResponse() : Ok(result.Value);
     }
 
     [HttpPut("{id:guid}/main-info")]
@@ -69,13 +63,8 @@ public class VolunteersController : ApplicationController
             request.ExperienceYears,
             request.PhoneNumber);
 
-        Result<Guid, ErrorList> result = await handler.HandleAsync(command, cancellationToken);
-        if (result.IsFailure)
-        {
-            return result.Error.ToResponse();
-        }
-
-        return Ok(result.Value);
+        var result = await handler.HandleAsync(command, cancellationToken);
+        return result.IsFailure ? result.Error.ToResponse() : Ok(result.Value);
     }
 
     [HttpDelete("{id:guid}/soft")]
@@ -85,13 +74,9 @@ public class VolunteersController : ApplicationController
         CancellationToken cancellationToken = default)
     {
         SoftDeleteVolunteerCommand command = new(id);
-        Result<Guid, ErrorList> result = await handler.HandleAsync(command, cancellationToken);
-        if (result.IsFailure)
-        {
-            return result.Error.ToResponse();
-        }
 
-        return Ok(result.Value);
+        var result = await handler.HandleAsync(command, cancellationToken);
+        return result.IsFailure ? result.Error.ToResponse() : Ok(result.Value);
     }
 
     [HttpDelete("{id:guid}/hard")]
@@ -101,13 +86,9 @@ public class VolunteersController : ApplicationController
         CancellationToken cancellationToken = default)
     {
         HardDeleteVolunteerCommand command = new(id);
-        Result<Guid, ErrorList> result = await handler.HandleAsync(command, cancellationToken);
-        if (result.IsFailure)
-        {
-            return result.Error.ToResponse();
-        }
 
-        return Ok(result.Value);
+        var result = await handler.HandleAsync(command, cancellationToken);
+        return result.IsFailure ? result.Error.ToResponse() : Ok(result.Value);
     }
 
     [HttpPost("{id:guid}/pet")]
@@ -131,14 +112,8 @@ public class VolunteersController : ApplicationController
             request.HelpStatus,
             request.HelpRequisites);
 
-        Result<Guid, ErrorList> result = await handler.HandleAsync(command, cancellationToken);
-
-        if (result.IsFailure)
-        {
-            return result.Error.ToResponse();
-        }
-
-        return Ok(result.Value);
+        var result = await handler.HandleAsync(command, cancellationToken);
+        return result.IsFailure ? result.Error.ToResponse() : Ok(result.Value);
     }
 
     [HttpPost("{volunteerId:guid}/pet/{petId:guid}/photos")]
@@ -152,18 +127,12 @@ public class VolunteersController : ApplicationController
     {
         await using FormFileProcessor fileProcessor = new();
 
-        List<UploadFileDto> fileDtos = fileProcessor.Process(photos);
+        var fileDtos = fileProcessor.Process(photos);
 
         UploadPetPhotosCommand command = new(volunteerId, petId, fileDtos);
 
-        Result<List<string>, ErrorList> result = await handler.HandleAsync(command, cancellationToken);
-
-        if (result.IsFailure)
-        {
-            return result.Error.ToResponse();
-        }
-
-        return Ok(result.Value);
+        var result = await handler.HandleAsync(command, cancellationToken);
+        return result.IsFailure ? result.Error.ToResponse() : Ok(result.Value);
     }
 
     [HttpDelete("{volunteerId:guid}/pet/{petId:guid}/photos")]
@@ -176,14 +145,8 @@ public class VolunteersController : ApplicationController
     {
         RemovePetPhotosCommand command = new(volunteerId, petId, photoPaths);
 
-        Result<List<string>, ErrorList> result = await handler.HandleAsync(command, cancellationToken);
-
-        if (result.IsFailure)
-        {
-            return result.Error.ToResponse();
-        }
-
-        return Ok(result.Value);
+        var result = await handler.HandleAsync(command, cancellationToken);
+        return result.IsFailure ? result.Error.ToResponse() : Ok(result.Value);
     }
 
     [HttpPut("{volunteerId:guid}/pet/{petId:guid}/move/{newPosition:int}")]
@@ -195,16 +158,12 @@ public class VolunteersController : ApplicationController
         CancellationToken cancellationToken = default)
     {
         MovePetCommand command = new(volunteerId, petId, newPosition);
-        Result<int, ErrorList> result = await handler.HandleAsync(command, cancellationToken);
 
-        if (result.IsFailure)
-        {
-            return result.Error.ToResponse();
-        }
-
-        return Ok(result.Value);
+        var result = await handler.HandleAsync(command, cancellationToken);
+        return result.IsFailure ? result.Error.ToResponse() : Ok(result.Value);
     }
 
+    [AllowAnonymous]
     [HttpGet]
     public async Task<IActionResult> GetAsync(
         [FromQuery] GetVolunteersWithPaginationRequest request,
@@ -215,16 +174,11 @@ public class VolunteersController : ApplicationController
             request.PageNumber,
             request.PageSize);
 
-        Result<PagedList<VolunteerDto>, ErrorList> result = await handler.HandleAsync(query, cancellationToken);
-
-        if (result.IsFailure)
-        {
-            return result.Error.ToResponse();
-        }
-
-        return Ok(result.Value);
+        var result = await handler.HandleAsync(query, cancellationToken);
+        return result.IsFailure ? result.Error.ToResponse() : Ok(result.Value);
     }
 
+    [AllowAnonymous]
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetByIdAsync(
         [FromRoute] Guid id,
@@ -232,14 +186,9 @@ public class VolunteersController : ApplicationController
         CancellationToken cancellationToken = default)
     {
         GetVolunteerByIdQuery query = new(id);
-        Result<VolunteerDto, ErrorList> result = await handler.HandleAsync(query, cancellationToken);
 
-        if (result.IsFailure)
-        {
-            return result.Error.ToResponse();
-        }
-
-        return Ok(result.Value);
+        var result = await handler.HandleAsync(query, cancellationToken);
+        return result.IsFailure ? result.Error.ToResponse() : Ok(result.Value);
     }
 
     [HttpPut("{volunteerId:guid}/pet/{petId:guid}/main-info")]
@@ -264,13 +213,8 @@ public class VolunteersController : ApplicationController
             request.DateOfBirth,
             request.HelpRequisites);
 
-        Result<Guid, ErrorList> result = await handler.HandleAsync(command, cancellationToken);
-        if (result.IsFailure)
-        {
-            return result.Error.ToResponse();
-        }
-
-        return Ok(result.Value);
+        var result = await handler.HandleAsync(command, cancellationToken);
+        return result.IsFailure ? result.Error.ToResponse() : Ok(result.Value);
     }
 
     [HttpPut("{volunteerId:guid}/pet/{petId:guid}/help-status")]
@@ -283,13 +227,8 @@ public class VolunteersController : ApplicationController
     {
         UpdatePetHelpStatusCommand command = new(volunteerId, petId, helpStatus);
 
-        Result<int, ErrorList> result = await handler.HandleAsync(command, cancellationToken);
-        if (result.IsFailure)
-        {
-            return result.Error.ToResponse();
-        }
-
-        return Ok(result.Value);
+        var result = await handler.HandleAsync(command, cancellationToken);
+        return result.IsFailure ? result.Error.ToResponse() : Ok(result.Value);
     }
 
     [HttpDelete("{volunteerId:guid}/pet/{petId:guid}/soft")]
@@ -301,13 +240,8 @@ public class VolunteersController : ApplicationController
     {
         SoftDeletePetCommand command = new(volunteerId, petId);
 
-        Result<Guid, ErrorList> result = await handler.HandleAsync(command, cancellationToken);
-        if (result.IsFailure)
-        {
-            return result.Error.ToResponse();
-        }
-
-        return Ok(result.Value);
+        var result = await handler.HandleAsync(command, cancellationToken);
+        return result.IsFailure ? result.Error.ToResponse() : Ok(result.Value);
     }
 
     [HttpDelete("{volunteerId:guid}/pet/{petId:guid}/hard")]
@@ -319,13 +253,8 @@ public class VolunteersController : ApplicationController
     {
         HardDeletePetCommand command = new(volunteerId, petId);
 
-        Result<Guid, ErrorList> result = await handler.HandleAsync(command, cancellationToken);
-        if (result.IsFailure)
-        {
-            return result.Error.ToResponse();
-        }
-
-        return Ok(result.Value);
+        var result = await handler.HandleAsync(command, cancellationToken);
+        return result.IsFailure ? result.Error.ToResponse() : Ok(result.Value);
     }
 
     [HttpPut("{volunteerId}/pet/{petId:guid}/main-photo")]
@@ -338,13 +267,7 @@ public class VolunteersController : ApplicationController
     {
         SetMainPetPhotoCommand command = new(volunteerId, petId, photoPath);
 
-        Result<string, ErrorList> result = await handler.HandleAsync(command, cancellationToken);
-
-        if (result.IsFailure)
-        {
-            return result.Error.ToResponse();
-        }
-
-        return Ok(result.Value);
+        var result = await handler.HandleAsync(command, cancellationToken);
+        return result.IsFailure ? result.Error.ToResponse() : Ok(result.Value);
     }
 }

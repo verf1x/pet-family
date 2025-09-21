@@ -5,7 +5,7 @@ using Serilog;
 using Web;
 using Web.Extensions;
 
-WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(args);
 
 Log.Logger = LoggerConfigurationFactory.Create(builder.GetSeqConnectionString());
 
@@ -15,7 +15,7 @@ builder.Services.AddS3Infrastructure(builder.Configuration);
 builder.Services.AddPostgres(builder.Configuration);
 builder.Services.AddProgramDependencies(builder.Configuration);
 
-WebApplication app = builder.Build();
+var app = builder.Build();
 
 app.UseExceptionMiddleware();
 
@@ -31,13 +31,11 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
 
 app.Run();
 
-namespace Web
-{
-    public class Program;
-}
+public partial class Program;

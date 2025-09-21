@@ -1,4 +1,5 @@
 using CSharpFunctionalExtensions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PetFamily.Core.Abstractions;
 using PetFamily.Framework;
@@ -14,6 +15,7 @@ using Species.Contracts.Dtos.Species;
 
 namespace Species.Presenters;
 
+[Authorize]
 public class SpeciesController : ApplicationController
 {
     [HttpPost]
@@ -25,12 +27,7 @@ public class SpeciesController : ApplicationController
         CreateSpeciesCommand command = new(name);
 
         Result<Guid, ErrorList> result = await handler.HandleAsync(command, cancellationToken);
-        if (result.IsFailure)
-        {
-            return result.Error.ToResponse();
-        }
-
-        return Ok(result.Value);
+        return result.IsFailure ? result.Error.ToResponse() : Ok(result.Value);
     }
 
     [HttpPost("{id:guid}/breeds")]
@@ -42,12 +39,7 @@ public class SpeciesController : ApplicationController
         AddBreedsCommand command = new(id, breedsNames);
 
         Result<List<Guid>, ErrorList> result = await handler.HandleAsync(command);
-        if (result.IsFailure)
-        {
-            return result.Error.ToResponse();
-        }
-
-        return Ok(result.Value);
+        return result.IsFailure ? result.Error.ToResponse() : Ok(result.Value);
     }
 
     [HttpDelete("{id:guid}")]
@@ -59,12 +51,7 @@ public class SpeciesController : ApplicationController
         DeleteSpeciesCommand command = new(id);
 
         Result<Guid, ErrorList> result = await handler.HandleAsync(command, cancellationToken);
-        if (result.IsFailure)
-        {
-            return result.Error.ToResponse();
-        }
-
-        return Ok(result.Value);
+        return result.IsFailure ? result.Error.ToResponse() : Ok(result.Value);
     }
 
     [HttpDelete("{speciesId:guid}/breeds/{breedId:guid}")]
@@ -77,14 +64,10 @@ public class SpeciesController : ApplicationController
         DeleteBreedCommand command = new(speciesId, breedId);
 
         Result<Guid, ErrorList> result = await handler.HandleAsync(command, cancellationToken);
-        if (result.IsFailure)
-        {
-            return result.Error.ToResponse();
-        }
-
-        return Ok(result.Value);
+        return result.IsFailure ? result.Error.ToResponse() : Ok(result.Value);
     }
 
+    [AllowAnonymous]
     [HttpGet]
     public async Task<IActionResult> GetAsync(
         [FromServices] IQueryHandler<IReadOnlyList<SpeciesDto>, GetAllSpeciesQuery> handler,
@@ -93,15 +76,10 @@ public class SpeciesController : ApplicationController
         Result<IReadOnlyList<SpeciesDto>, ErrorList> result =
             await handler.HandleAsync(new GetAllSpeciesQuery(),
                 cancellationToken); //TODO: убрать пустой GetAllSpeciesQuery
-
-        if (result.IsFailure)
-        {
-            return result.Error.ToResponse();
-        }
-
-        return Ok(result.Value);
+        return result.IsFailure ? result.Error.ToResponse() : Ok(result.Value);
     }
 
+    [AllowAnonymous]
     [HttpGet("{id:guid}/breeds")]
     public async Task<IActionResult> GetBreedsAsync(
         [FromServices] IQueryHandler<IReadOnlyList<BreedDto>, GetBreedsBySpeciesIdQuery> handler,
@@ -111,12 +89,6 @@ public class SpeciesController : ApplicationController
         GetBreedsBySpeciesIdQuery query = new(id);
 
         Result<IReadOnlyList<BreedDto>, ErrorList> result = await handler.HandleAsync(query, cancellationToken);
-
-        if (result.IsFailure)
-        {
-            return result.Error.ToResponse();
-        }
-
-        return Ok(result.Value);
+        return result.IsFailure ? result.Error.ToResponse() : Ok(result.Value);
     }
 }

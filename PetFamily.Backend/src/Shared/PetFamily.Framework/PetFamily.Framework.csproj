@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Volunteers\Volunteers.Contracts\Volunteers.Contracts.csproj"/>
+    <ProjectReference Include="..\PetFamily.Core\PetFamily.Core.csproj" />
     <ProjectReference Include="..\PetFamily.SharedKernel\PetFamily.SharedKernel.csproj"/>
   </ItemGroup>
 

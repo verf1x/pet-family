@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Core\Framework\Framework.csproj"/>
     <ProjectReference Include="..\..\Shared\PetFamily.Framework\PetFamily.Framework.csproj" />
     <ProjectReference Include="..\Species.Application\Species.Application.csproj"/>
     <ProjectReference Include="..\Species.Infrastructure.Postgres\Species.Infrastructure.Postgres.csproj"/>

@@ -40,4 +40,10 @@ public static class Errors
         public static Error AlreadyExists() =>
             Error.Validation("record.already.exists", "Species already exists", null);
     }
+
+    public static class User
+    {
+        public static Error InvalidCredentials() =>
+            Error.Validation("credentials.is.invalid", $"Your credentials are invalid", null);
+    }
 }

@@ -40,12 +40,7 @@ public class PetsController : ApplicationController
             request.PageSize);
 
         Result<PagedList<PetDto>, ErrorList> result = await handler.HandleAsync(query, cancellationToken);
-        if (result.IsFailure)
-        {
-            return result.Error.ToResponse();
-        }
-
-        return Ok(result.Value);
+        return result.IsFailure ? result.Error.ToResponse() : Ok(result.Value);
     }
 
     [HttpGet("{petId:guid}")]
@@ -57,11 +52,6 @@ public class PetsController : ApplicationController
         GetPetByIdQuery query = new(petId);
 
         Result<PetDto, ErrorList> result = await handler.HandleAsync(query, cancellationToken);
-        if (result.IsFailure)
-        {
-            return result.Error.ToResponse();
-        }
-
-        return Ok(result.Value);
+        return result.IsFailure ? result.Error.ToResponse() : Ok(result.Value);
     }
 }
