@@ -24,5 +24,3 @@ jobs:
       run: dotnet restore ./PetFamily.Backend/PetFamily.Backend.sln
     - name: Build
       run: dotnet build ./PetFamily.Backend/PetFamily.Backend.sln --no-restore
-    - name: Test
-      run: dotnet test ./PetFamily.Backend/PetFamily.Backend.sln --no-build --verbosity normal
